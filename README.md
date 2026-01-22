@@ -26,25 +26,6 @@ Built for **mobile-first**, designed for **low-income users** on **slow connecti
 - ✅ Works on any device, any connection speed
 - ✅ No dependencies except Tailwind CDN
 
-## Quick Start
-
-### Option 1: Direct Hosting
-1. Download `index.html`
-2. Upload to any web host
-3. Point your domain at it
-4. Done!
-
-### Option 2: GitHub Pages (Free)
-1. Fork this repository
-2. Go to Settings → Pages
-3. Enable Pages from main branch
-4. Access at `yourusername.github.io/startwith60`
-
-### Option 3: Netlify (Free)
-1. Drag `index.html` to [Netlify Drop](https://app.netlify.com/drop)
-2. Add your custom domain
-3. Deploy!
-
 ## File Structure
 
 ```
