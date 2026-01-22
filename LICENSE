@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 middletonfilms
+Copyright (c) 2025 StartWith60
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +19,44 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+## Additional Disclaimers
+
+### Financial Information Disclaimer
+
+This software provides educational information only and should not be considered 
+financial, investment, or legal advice. All calculations are based on historical 
+data and mathematical models that may not reflect future performance.
+
+**Important:**
+- Past performance does not guarantee future results
+- All investments carry risk, including possible loss of principal
+- Individual financial situations vary significantly
+- Tax implications depend on personal circumstances
+- Users should consult licensed financial advisors and tax professionals before 
+  making investment decisions
+
+### Data Sources
+
+Financial calculations use S&P 500 historical average returns (10.4% annually, 
+1926-2024). This data is provided for educational purposes only.
+
+### No Liability
+
+The creators and distributors of this software assume no liability for financial 
+decisions made based on information provided by this tool. Users are solely 
+responsible for their financial decisions.
+
+### Compliance
+
+Organizations deploying this tool should ensure compliance with relevant financial 
+regulations in their jurisdiction, including but not limited to:
+- Securities regulations
+- Investment advisor regulations  
+- Consumer protection laws
+- Data privacy requirements
+
+This tool is designed to be educational in nature and not to provide personalized
+financial advice or recommendations.
