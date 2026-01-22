@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Start With 60</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+
+<script>
+// ============================================================================
+// STATE AND CALCULATIONS
+// ============================================================================
+
+var AppState = {
+  currentPage: '1.0',
+  age: '',
+  budget: '',
+  hasDebt: false
+};
+
+var Calculator = {
+  retirement: function(age, budget) {
+    var years = 65 - age;
+    var months = years * 12;
+    var rate = Math.pow(1.104, 1/12) - 1;
+    var result = budget * ((Math.pow(1 + rate, months) - 1) / rate);
+    return Math.round(result);
+  },
+  
+  income: function(principal) {
+    return Math.round(principal * 0.1284);
+  },
+  
+  dailyLoss: function(age, budget) {
+    var now = this.retirement(age, budget);
+    var later = this.retirement(age + 1, budget);
+    return Math.round((now - later) / 365);
+  },
+  
+  getDescription: function(amount) {
+    if (amount < 100000) return { header: 'Over $' + Math.floor(amount/1000) + 'K', showNumber: true };
+    if (amount < 180000) return { header: 'Over $100,000', showNumber: true };
+    if (amount < 220000) return { header: 'Nearly $200,000', showNumber: true };
+    if (amount < 250000) return { header: 'Almost a quarter million dollars', showNumber: true };
+    if (amount < 295000) return { header: 'Over a quarter million dollars', showNumber: true };
+    if (amount < 333333) return { header: 'Nearly a third of a million dollars', showNumber: true };
+    if (amount < 380000) return { header: 'Over a third of a million dollars', showNumber: true };
+    if (amount < 480000) return { header: 'Nearly half a million dollars', showNumber: true };
+    if (amount < 520000) return { header: 'HALF A MILLION DOLLARS', showNumber: true };
+    if (amount < 580000) return { header: 'Over half a million dollars', showNumber: true };
+    if (amount < 666666) return { header: 'Nearly two-thirds of a million dollars', showNumber: true };
+    if (amount < 720000) return { header: 'Over two-thirds of a million dollars', showNumber: true };
+    if (amount < 750000) return { header: 'Nearly three-quarters of a million dollars', showNumber: true };
+    if (amount < 825000) return { header: 'Three-quarters of a million dollars', showNumber: true };
+    if (amount < 900000) return { header: 'Over three-quarters of a million dollars', showNumber: true };
+    if (amount < 980000) return { header: 'Nearly a million dollars', showNumber: true };
+    if (amount < 1080000) return { header: 'OVER ONE MILLION DOLLARS', showNumber: true };
+    return { header: (amount/1000000).toFixed(1) + ' MILLION DOLLARS', showNumber: true };
+  }
+};
+
+// ============================================================================
+// PAGE TEMPLATES
+// ============================================================================
+
+var Pages = {
+  '1.0': function() {
+    var canSubmit = AppState.age && AppState.budget && AppState.age >= 18 && AppState.age <= 64 && AppState.budget > 0;
+    var buttonClass = canSubmit 
+      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white cursor-pointer hover:from-blue-700 hover:to-blue-800 transform hover:scale-105' 
+      : 'bg-slate-300 text-slate-500 cursor-not-allowed';
+    
+    return '\
+      <div class="min-h-screen bg-gradient-to-br from-slate-900 to-slate-700 p-4 flex items-center justify-center">\
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
+          <h1 class="text-5xl font-black text-center mb-3 text-slate-900 leading-tight">STILL BROKE<br>AT 65?</h1>\
+          <p class="text-center text-xl text-slate-600 mb-8">Most people are.<br><span class="font-bold text-slate-900">You do not have to be.</span></p>\
+          <div class="grid grid-cols-2 gap-4 mb-6">\
+            <div>\
+              <label class="block text-sm font-bold text-slate-700 mb-2 text-center">YOUR AGE</label>\
+              <input type="number" id="age-input" placeholder="AGE" min="18" max="64" value="' + AppState.age + '" class="w-full h-24 px-4 border-3 border-slate-400 rounded-xl focus:border-blue-500 focus:outline-none text-4xl font-black text-center bg-slate-50 placeholder-slate-300">\
+            </div>\
+            <div>\
+              <label class="block text-sm font-bold text-slate-700 mb-2 text-center">PER MONTH</label>\
+              <div class="relative">\
+                <span class="absolute left-3 top-7 text-3xl text-slate-400 font-black">$</span>\
+                <input type="number" id="budget-input" placeholder="60" min="1" value="' + AppState.budget + '" class="w-full h-24 pl-10 pr-3 border-3 border-slate-400 rounded-xl focus:border-blue-500 focus:outline-none text-4xl font-black text-center bg-slate-50 placeholder-slate-300">\
+              </div>\
+            </div>\
+          </div>\
+          <button id="submit-btn" class="w-full py-5 rounded-xl font-black text-xl shadow-xl transition-all ' + buttonClass + '">SHOW ME THE MATH</button>\
+          <p class="text-center text-sm text-slate-500 mt-4">Takes 30 seconds. Changes everything.</p>\
+        </div>\
+      </div>';
+  },
+  
+  '1.01': function() {
+    var years = 65 - Number(AppState.age);
+    var retAmount = Calculator.retirement(Number(AppState.age), Number(AppState.budget));
+    var income = Calculator.income(retAmount);
+    var desc = Calculator.getDescription(retAmount);
+    
+    return '\
+      <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 flex items-center justify-center">\
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
+          <div class="text-center mb-6">\
+            <p class="text-slate-600 text-sm mb-3 uppercase tracking-wide">YOUR $' + AppState.budget + '/MONTH BECOMES</p>\
+            <h1 class="text-4xl md:text-5xl font-black text-emerald-600 mb-3 leading-tight">' + desc.header + '</h1>\
+            ' + (desc.showNumber ? '<p class="text-3xl font-bold text-slate-700 mb-3">$' + retAmount.toLocaleString() + '</p>' : '') + '\
+            <p class="text-slate-500 text-sm">You are ' + AppState.age + '. That is <span class="font-bold text-slate-900">' + years + ' years</span> of compound growth.</p>\
+          </div>\
+          <div class="bg-emerald-50 rounded-xl p-6 mb-6 space-y-3">\
+            <p class="text-lg font-bold text-slate-900">That is:</p>\
+            <div class="space-y-2 text-slate-700">\
+              <p class="flex items-start"><span class="mr-2">→</span><span>Never asking your kids for money</span></p>\
+              <p class="flex items-start"><span class="mr-2">→</span><span>Retiring when <span class="font-bold">YOU</span> want to</span></p>\
+              <p class="flex items-start"><span class="mr-2">→</span><span>Leaving something behind</span></p>\
+              <p class="flex items-start"><span class="mr-2">→</span><span class="font-bold">$' + income.toLocaleString() + '/year forever</span></p>\
+            </div>\
+          </div>\
+          <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4 text-xs text-slate-600">\
+            <p class="font-semibold text-blue-900 mb-1">Based on S&P 500 historical average</p>\
+            <p>10.4% annual return (1926-2024). Past performance does not guarantee future results. Market values fluctuate.</p>\
+          </div>\
+          <p class="text-center text-slate-700 mb-6 text-lg leading-relaxed">This money <span class="font-bold">works for you while you sleep</span>. Every single day. For decades.</p>\
+          <div class="space-y-3">\
+            <button id="want-btn" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-4 rounded-lg font-black text-lg hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg">THIS IS WHAT I WANT</button>\
+            <button id="wait-btn" class="w-full bg-slate-200 text-slate-600 py-3 rounded-lg font-semibold hover:bg-slate-300 transition-colors text-sm">Show me what happens if I wait</button>\
+            <button id="back-btn" class="w-full text-slate-500 underline text-sm">Try different numbers</button>\
+          </div>\
+        </div>\
+      </div>';
+  },
+  
+  '1.02': function() {
+    return '\
+      <div class="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 p-4 flex items-center justify-center">\
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
+          <h1 class="text-3xl font-black text-center mb-6 text-slate-900">QUICK QUESTION</h1>\
+          <p class="text-xl text-center text-slate-700 mb-8">Do you have credit card debt?</p>\
+          <div class="space-y-3 mb-6">\
+            <button id="yes-debt" class="w-full bg-red-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-red-700 transition-colors shadow-lg">YES</button>\
+            <button id="no-debt" class="w-full bg-emerald-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-emerald-700 transition-colors shadow-lg">NO</button>\
+          </div>\
+          <div class="bg-slate-50 border border-slate-200 rounded p-3 text-xs text-slate-600">\
+            <p class="font-semibold text-slate-700 mb-1">Why we ask:</p>\
+            <p>High-interest debt (typically 15-25% APR) costs more than stock market returns. Paying it off first is mathematically optimal.</p>\
+          </div>\
+        </div>\
+      </div>';
+  },
+  
+  '1.03': function() {
+    var daily = Calculator.dailyLoss(Number(AppState.age), Number(AppState.budget));
+    var monthly = daily * 30;
+    var yearly = daily * 365;
+    
+    return '\
+      <div class="min-h-screen bg-gradient-to-br from-red-900 to-red-700 p-4 flex items-center justify-center">\
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
+          <h1 class="text-6xl font-black text-center mb-8 text-red-600">WAIT.</h1>\
+          <div class="bg-red-50 border-4 border-red-200 rounded-xl p-6 mb-6">\
+            <p class="text-center text-lg font-bold text-slate-700 mb-4">EVERY DAY YOU WAIT:</p>\
+            <p class="text-center text-5xl font-black text-red-600 mb-6">$' + daily.toLocaleString() + '</p>\
+            <div class="space-y-2 text-center text-slate-600">\
+              <p>Every month: <span class="font-bold text-red-600">$' + monthly.toLocaleString() + '</span></p>\
+              <p>Every year: <span class="font-bold text-red-600">$' + yearly.toLocaleString() + '</span></p>\
+            </div>\
+          </div>\
+          <div class="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4 mb-6">\
+            <p class="text-center font-bold text-slate-900">That is money you will <span class="text-red-600">NEVER</span> get back.</p>\
+          </div>\
+          <div class="space-y-3">\
+            <button id="start-btn" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-5 rounded-lg font-black text-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-xl">NO, LET\'S START</button>\
+            <button id="later-btn" class="w-full bg-slate-200 text-slate-600 py-3 rounded-lg font-semibold hover:bg-slate-300 transition-colors text-sm">I will come back later</button>\
+          </div>\
+        </div>\
+      </div>';
+  },
+  
+  '1.04': function() {
+    return '\
+      <div class="min-h-screen bg-gradient-to-br from-amber-50 to-amber-100 p-4 flex items-center justify-center">\
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
+          <h1 class="text-4xl font-black text-center mb-6 text-amber-900">PAY THAT OFF FIRST</h1>\
+          <div class="space-y-4 text-lg text-slate-700 mb-6">\
+            <p>Credit card debt at <span class="font-bold text-red-600">20% interest</span> is costing you more than the stock market will make you.</p>\
+            <p class="font-bold text-slate-900">Take your $' + AppState.budget + '/month and attack that debt.</p>\
+            <p>Once it is gone, <span class="font-bold">come back here</span>. Then that $' + AppState.budget + ' can start building wealth instead of paying interest.</p>\
+          </div>\
+          <div class="bg-amber-50 border-2 border-amber-300 rounded-lg p-4 mb-4">\
+            <p class="text-center font-bold text-slate-900">Paying off a 20% loan = <span class="text-emerald-600">guaranteed 20% return</span></p>\
+            <p class="text-center text-sm text-slate-600 mt-2">S&P 500 averages 10%. Your debt costs 20%. Math favors debt payoff.</p>\
+          </div>\
+          <div class="bg-slate-50 border border-slate-200 rounded p-3 mb-4 text-xs text-slate-600">\
+            <p class="font-semibold text-slate-700 mb-1">This is general guidance, not personal advice</p>\
+            <p>Everyone\'s financial situation is different. Consider consulting a financial advisor for personalized recommendations.</p>\
+          </div>\
+          <button id="gotit-btn" class="w-full bg-slate-700 text-white py-4 rounded-lg font-bold text-lg hover:bg-slate-800 transition-colors">Got it. I will be back.</button>\
+        </div>\
+      </div>';
+  },
+  
+  '1.05': function() {
+    return '\
+      <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 flex items-center justify-center">\
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
+          <h1 class="text-4xl font-black text-center mb-6 text-emerald-900">SETUP READY</h1>\
+          <div class="bg-emerald-50 rounded-lg p-6 mb-6">\
+            <p class="text-center text-xl font-bold text-slate-900 mb-2">Your plan: $' + AppState.budget + '/month</p>\
+            <p class="text-center text-sm text-slate-600">Age ' + AppState.age + ' → Retirement at 65</p>\
+          </div>\
+          <p class="text-center text-lg text-slate-700 mb-6">Setup instructions coming soon...</p>\
+          <div class="border-t border-slate-200 pt-6 mt-6">\
+            <p class="text-xs text-slate-500 text-center leading-relaxed"><span class="font-semibold text-slate-700">Important:</span> This tool provides educational information only, not personalized financial advice. All calculations use S&P 500 historical average returns (10.4% annually, 1926-2024). Past performance does not guarantee future results. Investments carry risk including possible loss of principal.</p>\
+          </div>\
+        </div>\
+      </div>';
+  }
+};
+
+// ============================================================================
+// NAVIGATION AND RENDERING
+// ============================================================================
+
+function navigateTo(page) {
+  AppState.currentPage = page;
+  render();
+  window.scrollTo(0, 0);
+}
+
+function render() {
+  var container = document.getElementById('app');
+  if (!container) return;
+  
+  var pageHTML = Pages[AppState.currentPage];
+  if (pageHTML) {
+    container.innerHTML = pageHTML();
+    attachEventListeners();
+  }
+}
+
+function attachEventListeners() {
+  var page = AppState.currentPage;
+  
+  if (page === '1.0') {
+    var ageInput = document.getElementById('age-input');
+    var budgetInput = document.getElementById('budget-input');
+    var submitBtn = document.getElementById('submit-btn');
+    
+    if (ageInput) {
+      ageInput.addEventListener('input', function(e) {
+        AppState.age = e.target.value;
+        render();
+      });
+    }
+    
+    if (budgetInput) {
+      budgetInput.addEventListener('input', function(e) {
+        AppState.budget = e.target.value;
+        render();
+      });
+    }
+    
+    if (submitBtn) {
+      submitBtn.addEventListener('click', function() {
+        if (AppState.age && AppState.budget && AppState.age >= 18 && AppState.age <= 64 && AppState.budget > 0) {
+          navigateTo('1.01');
+        }
+      });
+    }
+  }
+  
+  if (page === '1.01') {
+    var wantBtn = document.getElementById('want-btn');
+    var waitBtn = document.getElementById('wait-btn');
+    var backBtn = document.getElementById('back-btn');
+    
+    if (wantBtn) wantBtn.addEventListener('click', function() { navigateTo('1.02'); });
+    if (waitBtn) waitBtn.addEventListener('click', function() { navigateTo('1.03'); });
+    if (backBtn) backBtn.addEventListener('click', function() { navigateTo('1.0'); });
+  }
+  
+  if (page === '1.02') {
+    var yesBtn = document.getElementById('yes-debt');
+    var noBtn = document.getElementById('no-debt');
+    
+    if (yesBtn) yesBtn.addEventListener('click', function() { AppState.hasDebt = true; navigateTo('1.04'); });
+    if (noBtn) noBtn.addEventListener('click', function() { AppState.hasDebt = false; navigateTo('1.05'); });
+  }
+  
+  if (page === '1.03') {
+    var startBtn = document.getElementById('start-btn');
+    var laterBtn = document.getElementById('later-btn');
+    
+    if (startBtn) startBtn.addEventListener('click', function() { navigateTo('1.02'); });
+    if (laterBtn) laterBtn.addEventListener('click', function() { navigateTo('1.0'); });
+  }
+  
+  if (page === '1.04') {
+    var gotitBtn = document.getElementById('gotit-btn');
+    if (gotitBtn) gotitBtn.addEventListener('click', function() { navigateTo('1.0'); });
+  }
+}
+
+// ============================================================================
+// INITIALIZE APP
+// ============================================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+  render();
+});
+</script>
+
+</body>
+</html>
