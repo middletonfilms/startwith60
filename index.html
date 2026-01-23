@@ -1,17 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-FJL1TPGYBG"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-FJL1TPGYBG');
-  
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Start With 60</title>
@@ -32,6 +21,7 @@ var AppState = {
   currentPage: '1.0',
   age: '',
   budget: '',
+  goal: 'retirement',
   hasDebt: false
 };
 
@@ -44,8 +34,20 @@ var Calculator = {
     return Math.round(result);
   },
   
+  death: function(age, budget) {
+    var years = 80 - age;
+    var months = years * 12;
+    var rate = Math.pow(1.104, 1/12) - 1;
+    var result = budget * ((Math.pow(1 + rate, months) - 1) / rate);
+    return Math.round(result);
+  },
+  
   income: function(principal) {
     return Math.round(principal * 0.1284);
+  },
+  
+  future20Years: function(principal) {
+    return Math.round(principal * Math.pow(1.104, 20));
   },
   
   dailyLoss: function(age, budget) {
@@ -94,11 +96,11 @@ var Pages = {
           <p class="text-center text-xl text-slate-600 mb-8">Most people are.<br><span class="font-bold text-slate-900">You do not have to be.</span></p>\
           <div class="grid grid-cols-2 gap-4 mb-6">\
             <div>\
-              <label class="block text-sm font-bold text-slate-700 mb-2 text-center">YOUR AGE</label>\
-              <input type="number" id="age-input" placeholder="How old are you?" min="18" max="64" value="' + AppState.age + '" class="w-full h-24 px-4 border-3 border-slate-400 rounded-xl focus:border-blue-500 focus:outline-none text-4xl font-black text-center bg-slate-50 placeholder-slate-300">\
+              <label class="block text-xs font-bold text-slate-700 mb-2 text-center h-8 flex items-center justify-center">YOUR AGE</label>\
+              <input type="number" id="age-input" placeholder="AGE" min="18" max="64" value="' + AppState.age + '" class="w-full h-24 px-4 border-3 border-slate-400 rounded-xl focus:border-blue-500 focus:outline-none text-4xl font-black text-center bg-slate-50 placeholder-slate-300">\
             </div>\
             <div>\
-              <label class="block text-sm font-bold text-slate-700 mb-2 text-center">How much can you set aside per month?</label>\
+              <label class="block text-xs font-bold text-slate-700 mb-2 text-center h-8 flex items-center justify-center">PER MONTH</label>\
               <div class="relative">\
                 <span class="absolute left-3 top-7 text-3xl text-slate-400 font-black">$</span>\
                 <input type="number" id="budget-input" placeholder="60" min="1" value="' + AppState.budget + '" class="w-full h-24 pl-10 pr-3 border-3 border-slate-400 rounded-xl focus:border-blue-500 focus:outline-none text-4xl font-black text-center bg-slate-50 placeholder-slate-300">\
@@ -111,28 +113,58 @@ var Pages = {
       </div>';
   },
   
+  '1.00': function() {
+    return '\
+      <div class="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 p-4 flex items-center justify-center">\
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
+          <h1 class="text-4xl font-black text-center mb-6 text-slate-900">WHAT MATTERS MOST?</h1>\
+          <p class="text-center text-lg text-slate-700 mb-8">Choose your primary goal:</p>\
+          <div class="space-y-4">\
+            <button id="retirement-btn" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 text-white py-6 rounded-xl font-black text-xl hover:from-indigo-700 hover:to-indigo-800 transition-all shadow-lg">\
+              <div class="text-2xl mb-1">MY RETIREMENT</div>\
+              <div class="text-sm font-normal opacity-90">Living comfortably when I stop working</div>\
+            </button>\
+            <button id="family-btn" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-6 rounded-xl font-black text-xl hover:from-purple-700 hover:to-purple-800 transition-all shadow-lg">\
+              <div class="text-2xl mb-1">FAMILY LEGACY</div>\
+              <div class="text-sm font-normal opacity-90">Leaving wealth for my loved ones</div>\
+            </button>\
+          </div>\
+        </div>\
+      </div>';
+  },
+  
   '1.01': function() {
-    var years = 65 - Number(AppState.age);
-    var retAmount = Calculator.retirement(Number(AppState.age), Number(AppState.budget));
-    var income = Calculator.income(retAmount);
-    var desc = Calculator.getDescription(retAmount);
+    var isRetirement = AppState.goal === 'retirement';
+    var years = isRetirement ? (65 - Number(AppState.age)) : (80 - Number(AppState.age));
+    var amount = isRetirement 
+      ? Calculator.retirement(Number(AppState.age), Number(AppState.budget))
+      : Calculator.death(Number(AppState.age), Number(AppState.budget));
+    var income = Calculator.income(amount);
+    var desc = Calculator.getDescription(amount);
+    var future20 = Calculator.future20Years(amount);
     
     return '\
       <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 flex items-center justify-center">\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
           <div class="text-center mb-6">\
             <p class="text-slate-600 text-sm mb-3 uppercase tracking-wide">YOUR $' + AppState.budget + '/MONTH BECOMES</p>\
-            <h1 class="text-4xl md:text-5xl font-black text-emerald-600 mb-3 leading-tight">' + desc.header + '</h1>\
-            ' + (desc.showNumber ? '<p class="text-3xl font-bold text-slate-700 mb-3">$' + retAmount.toLocaleString() + '</p>' : '') + '\
+            <h1 class="text-4xl md:text-5xl font-black ' + (isRetirement ? 'text-indigo-600' : 'text-purple-600') + ' mb-3 leading-tight">' + desc.header + '</h1>\
+            ' + (desc.showNumber ? '<p class="text-3xl font-bold text-slate-700 mb-3">$' + amount.toLocaleString() + '</p>' : '') + '\
             <p class="text-slate-500 text-sm">You are ' + AppState.age + '. That is <span class="font-bold text-slate-900">' + years + ' years</span> of compound growth.</p>\
           </div>\
           <div class="bg-emerald-50 rounded-xl p-6 mb-6 space-y-3">\
             <p class="text-lg font-bold text-slate-900">That is:</p>\
-            <div class="space-y-2 text-slate-700">\
-              <p class="flex items-start"><span class="mr-2">→</span><span>Never asking your kids for money</span></p>\
-              <p class="flex items-start"><span class="mr-2">→</span><span>Retiring when <span class="font-bold">YOU</span> want to</span></p>\
-              <p class="flex items-start"><span class="mr-2">→</span><span>Leaving something behind</span></p>\
-              <p class="flex items-start"><span class="mr-2">→</span><span class="font-bold">$' + income.toLocaleString() + '/year forever, without even reducing that $' + retAmount.toLocaleString() </span></p>\
+            <div class="space-y-2 text-slate-700">' +
+              (isRetirement ? '\
+                <p class="flex items-start"><span class="mr-2">→</span><span>Never asking your kids for money</span></p>\
+                <p class="flex items-start"><span class="mr-2">→</span><span>Retiring when <span class="font-bold">YOU</span> want to</span></p>\
+                <p class="flex items-start"><span class="mr-2">→</span><span>Financial security for life</span></p>\
+                <p class="flex items-start"><span class="mr-2">→</span><span class="font-bold">$' + income.toLocaleString() + '/year forever</span></p>' 
+              : '\
+                <p class="flex items-start"><span class="mr-2">→</span><span>Your kids never struggle like you did</span></p>\
+                <p class="flex items-start"><span class="mr-2">→</span><span>Generational wealth starts with YOU</span></p>\
+                <p class="flex items-start"><span class="mr-2">→</span><span class="font-bold">$' + income.toLocaleString() + '/year for your family</span></p>\
+                <p class="flex items-start"><span class="mr-2">→</span><span>If untouched 20 more years: <span class="font-bold">$' + future20.toLocaleString() + '</span></span></p>') + '\
             </div>\
           </div>\
           <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4 text-xs text-slate-600">\
@@ -225,7 +257,7 @@ var Pages = {
           <h1 class="text-4xl font-black text-center mb-6 text-emerald-900">SETUP READY</h1>\
           <div class="bg-emerald-50 rounded-lg p-6 mb-6">\
             <p class="text-center text-xl font-bold text-slate-900 mb-2">Your plan: $' + AppState.budget + '/month</p>\
-            <p class="text-center text-sm text-slate-600">Age ' + AppState.age + ' → Retirement at 65</p>\
+            <p class="text-center text-sm text-slate-600">Age ' + AppState.age + ' → ' + (AppState.goal === 'retirement' ? 'Retirement' : 'Legacy') + '</p>\
           </div>\
           <p class="text-center text-lg text-slate-700 mb-6">Setup instructions coming soon...</p>\
           <div class="border-t border-slate-200 pt-6 mt-6">\
@@ -268,24 +300,50 @@ function attachEventListeners() {
     if (ageInput) {
       ageInput.addEventListener('input', function(e) {
         AppState.age = e.target.value;
-        render();
+        var canSubmit = AppState.age && AppState.budget && AppState.age >= 18 && AppState.age <= 64 && AppState.budget > 0;
+        if (submitBtn) {
+          submitBtn.className = 'w-full py-5 rounded-xl font-black text-xl shadow-xl transition-all ' + 
+            (canSubmit 
+              ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white cursor-pointer hover:from-blue-700 hover:to-blue-800 transform hover:scale-105' 
+              : 'bg-slate-300 text-slate-500 cursor-not-allowed');
+        }
       });
     }
     
     if (budgetInput) {
       budgetInput.addEventListener('input', function(e) {
         AppState.budget = e.target.value;
-        render();
+        var canSubmit = AppState.age && AppState.budget && AppState.age >= 18 && AppState.age <= 64 && AppState.budget > 0;
+        if (submitBtn) {
+          submitBtn.className = 'w-full py-5 rounded-xl font-black text-xl shadow-xl transition-all ' + 
+            (canSubmit 
+              ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white cursor-pointer hover:from-blue-700 hover:to-blue-800 transform hover:scale-105' 
+              : 'bg-slate-300 text-slate-500 cursor-not-allowed');
+        }
       });
     }
     
     if (submitBtn) {
       submitBtn.addEventListener('click', function() {
         if (AppState.age && AppState.budget && AppState.age >= 18 && AppState.age <= 64 && AppState.budget > 0) {
-          navigateTo('1.01');
+          navigateTo('1.00');
         }
       });
     }
+  }
+  
+  if (page === '1.00') {
+    var retBtn = document.getElementById('retirement-btn');
+    var famBtn = document.getElementById('family-btn');
+    
+    if (retBtn) retBtn.addEventListener('click', function() { 
+      AppState.goal = 'retirement';
+      navigateTo('1.01'); 
+    });
+    if (famBtn) famBtn.addEventListener('click', function() { 
+      AppState.goal = 'family';
+      navigateTo('1.01'); 
+    });
   }
   
   if (page === '1.01') {
