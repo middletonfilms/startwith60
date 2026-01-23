@@ -3,16 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Start With 60</title>
+<title>Retirement Calculator: See How $60/Month Becomes $500K+ | StartWith60</title>
+<meta name="description" content="Free retirement calculator shows how small monthly investments grow into life-changing wealth through compound interest. Start planning your financial freedom today.">
+
+<!-- Open Graph for social sharing -->
+<meta property="og:title" content="I just calculated my retirement. $60/month = $500K by age 65.">
+<meta property="og:description" content="This free tool opened my eyes. Find out what your monthly savings could become.">
+<meta property="og:type" content="website">
+
 <script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Google Analytics - REPLACE WITH YOUR ID -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
 </head>
 <body>
 
 <div id="app"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
-
 <script>
+// ============================================================================
+// ANALYTICS HELPER
+// ============================================================================
+
+function trackEvent(eventName, properties) {
+  properties = properties || {};
+  
+  // Google Analytics
+  if (typeof gtag !== 'undefined') {
+    gtag('event', eventName, properties);
+  }
+  
+  // Console logging for debugging
+  console.log('📊 Event:', eventName, properties);
+}
+
 // ============================================================================
 // STATE AND CALCULATIONS
 // ============================================================================
@@ -22,7 +52,9 @@ var AppState = {
   age: '',
   budget: '',
   goal: 'retirement',
-  hasDebt: false
+  hasDebt: false,
+  email: '',
+  accountType: 'roth_ira' // Will be set by user choice
 };
 
 var Calculator = {
@@ -79,6 +111,34 @@ var Calculator = {
 };
 
 // ============================================================================
+// UI HELPERS
+// ============================================================================
+
+function showLoading() {
+  var overlay = document.createElement('div');
+  overlay.id = 'loading-overlay';
+  overlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+  overlay.innerHTML = '\
+    <div class="bg-white rounded-2xl p-8 shadow-2xl">\
+      <div class="animate-pulse text-center">\
+        <div class="text-2xl font-black text-slate-900 mb-2">Calculating your future...</div>\
+        <div class="text-slate-600">This changes everything.</div>\
+      </div>\
+    </div>';
+  document.body.appendChild(overlay);
+}
+
+function hideLoading() {
+  var overlay = document.getElementById('loading-overlay');
+  if (overlay) overlay.remove();
+}
+
+function getBackButton(targetPage, label) {
+  label = label || 'Back';
+  return '<button onclick="navigateTo(\'' + targetPage + '\')" class="absolute top-4 left-4 text-slate-600 hover:text-slate-900 flex items-center text-sm font-semibold transition-colors"><svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>' + label + '</button>';
+}
+
+// ============================================================================
 // PAGE TEMPLATES
 // ============================================================================
 
@@ -89,25 +149,33 @@ var Pages = {
       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white cursor-pointer hover:from-blue-700 hover:to-blue-800 transform hover:scale-105' 
       : 'bg-slate-300 text-slate-500 cursor-not-allowed';
     
+    var ageError = AppState.age && (AppState.age < 18 || AppState.age > 64);
+    var budgetError = AppState.budget && AppState.budget <= 0;
+    
     return '\
       <div class="min-h-screen bg-gradient-to-br from-slate-900 to-slate-700 p-4 flex items-center justify-center">\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
-          <h1 class="text-5xl font-black text-center mb-3 text-slate-900 leading-tight">STILL BROKE<br>AT 65?</h1>\
+          <h1 class="text-5xl md:text-6xl font-black text-center mb-3 text-slate-900 leading-tight">STILL BROKE<br>AT 65?</h1>\
           <p class="text-center text-xl text-slate-600 mb-8">Most people are.<br><span class="font-bold text-slate-900">You do not have to be.</span></p>\
+          \
           <div class="grid grid-cols-2 gap-4 mb-6">\
             <div>\
               <label class="block text-xs font-bold text-slate-700 mb-2 text-center h-8 flex items-center justify-center">YOUR AGE</label>\
-              <input type="number" id="age-input" placeholder="AGE" min="18" max="64" value="' + AppState.age + '" class="w-full h-24 px-4 border-3 border-slate-400 rounded-xl focus:border-blue-500 focus:outline-none text-4xl font-black text-center bg-slate-50 placeholder-slate-300">\
+              <input type="number" id="age-input" placeholder="AGE" min="18" max="64" value="' + AppState.age + '" class="w-full h-28 md:h-24 px-4 border-3 ' + (ageError ? 'border-red-500' : 'border-slate-400') + ' rounded-xl focus:border-blue-500 focus:outline-none text-4xl font-black text-center bg-slate-50 placeholder-slate-300">\
+              <p id="age-error" class="text-xs text-red-600 mt-1 text-center ' + (ageError ? '' : 'invisible') + '">Age 18-64 only</p>\
             </div>\
             <div>\
               <label class="block text-xs font-bold text-slate-700 mb-2 text-center h-8 flex items-center justify-center">PER MONTH</label>\
               <div class="relative">\
-                <span class="absolute left-3 top-7 text-3xl text-slate-400 font-black">$</span>\
-                <input type="number" id="budget-input" placeholder="60" min="1" value="' + AppState.budget + '" class="w-full h-24 pl-10 pr-3 border-3 border-slate-400 rounded-xl focus:border-blue-500 focus:outline-none text-4xl font-black text-center bg-slate-50 placeholder-slate-300">\
+                <span class="absolute left-3 top-8 md:top-7 text-3xl text-slate-400 font-black">$</span>\
+                <input type="number" id="budget-input" placeholder="60" min="1" value="' + AppState.budget + '" class="w-full h-28 md:h-24 pl-10 pr-3 border-3 ' + (budgetError ? 'border-red-500' : 'border-slate-400') + ' rounded-xl focus:border-blue-500 focus:outline-none text-4xl font-black text-center bg-slate-50 placeholder-slate-300">\
               </div>\
+              <p id="budget-error" class="text-xs text-red-600 mt-1 text-center ' + (budgetError ? '' : 'invisible') + '">Must be > $0</p>\
             </div>\
           </div>\
+          \
           <button id="submit-btn" class="w-full py-5 rounded-xl font-black text-xl shadow-xl transition-all ' + buttonClass + '">SHOW ME THE MATH</button>\
+          \
           <p class="text-center text-sm text-slate-500 mt-4">Takes 30 seconds. Changes everything.</p>\
         </div>\
       </div>';
@@ -115,20 +183,25 @@ var Pages = {
   
   '1.00': function() {
     return '\
-      <div class="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 p-4 flex items-center justify-center">\
+      <div class="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 p-4 flex items-center justify-center relative">\
+        ' + getBackButton('1.0') + '\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
           <h1 class="text-4xl font-black text-center mb-6 text-slate-900">WHAT MATTERS MOST?</h1>\
           <p class="text-center text-lg text-slate-700 mb-8">Choose your primary goal:</p>\
+          \
           <div class="space-y-4">\
-            <button id="retirement-btn" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 text-white py-6 rounded-xl font-black text-xl hover:from-indigo-700 hover:to-indigo-800 transition-all shadow-lg">\
+            <button id="retirement-btn" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 text-white py-6 rounded-xl font-black text-xl hover:from-indigo-700 hover:to-indigo-800 transition-all shadow-lg transform hover:scale-105">\
               <div class="text-2xl mb-1">MY RETIREMENT</div>\
               <div class="text-sm font-normal opacity-90">Living comfortably when I stop working</div>\
             </button>\
-            <button id="family-btn" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-6 rounded-xl font-black text-xl hover:from-purple-700 hover:to-purple-800 transition-all shadow-lg">\
+            \
+            <button id="family-btn" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-6 rounded-xl font-black text-xl hover:from-purple-700 hover:to-purple-800 transition-all shadow-lg transform hover:scale-105">\
               <div class="text-2xl mb-1">FAMILY LEGACY</div>\
               <div class="text-sm font-normal opacity-90">Leaving wealth for my loved ones</div>\
             </button>\
           </div>\
+          \
+          <p class="text-center text-sm text-slate-500 mt-6">Both paths use the same strategy - just different emotional focus.</p>\
         </div>\
       </div>';
   },
@@ -144,7 +217,8 @@ var Pages = {
     var future20 = Calculator.future20Years(amount);
     
     return '\
-      <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 flex items-center justify-center">\
+      <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 flex items-center justify-center relative">\
+        ' + getBackButton('1.00') + '\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
           <div class="text-center mb-6">\
             <p class="text-slate-600 text-sm mb-3 uppercase tracking-wide">YOUR $' + AppState.budget + '/MONTH BECOMES</p>\
@@ -152,30 +226,34 @@ var Pages = {
             ' + (desc.showNumber ? '<p class="text-3xl font-bold text-slate-700 mb-3">$' + amount.toLocaleString() + '</p>' : '') + '\
             <p class="text-slate-500 text-sm">You are ' + AppState.age + '. That is <span class="font-bold text-slate-900">' + years + ' years</span> of compound growth.</p>\
           </div>\
+          \
           <div class="bg-emerald-50 rounded-xl p-6 mb-6 space-y-3">\
-            <p class="text-lg font-bold text-slate-900">That is:</p>\
+            <p class="text-lg font-bold text-slate-900">That means:</p>\
             <div class="space-y-2 text-slate-700">' +
               (isRetirement ? '\
-                <p class="flex items-start"><span class="mr-2">→</span><span>Never asking your kids for money</span></p>\
-                <p class="flex items-start"><span class="mr-2">→</span><span>Retiring when <span class="font-bold">YOU</span> want to</span></p>\
-                <p class="flex items-start"><span class="mr-2">→</span><span>Financial security for life</span></p>\
-                <p class="flex items-start"><span class="mr-2">→</span><span class="font-bold">$' + income.toLocaleString() + '/year forever</span></p>' 
+                <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>Never asking your kids for money</span></p>\
+                <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>Retiring when <span class="font-bold">YOU</span> want to</span></p>\
+                <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>Financial security for life</span></p>\
+                <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span class="font-bold">$' + income.toLocaleString() + '/year forever</span> (without touching your money)</p>' 
               : '\
-                <p class="flex items-start"><span class="mr-2">→</span><span>Your kids never struggle like you did</span></p>\
-                <p class="flex items-start"><span class="mr-2">→</span><span>Generational wealth starts with YOU</span></p>\
-                <p class="flex items-start"><span class="mr-2">→</span><span class="font-bold">$' + income.toLocaleString() + '/year for your family</span></p>\
-                <p class="flex items-start"><span class="mr-2">→</span><span>If untouched 20 more years: <span class="font-bold">$' + future20.toLocaleString() + '</span></span></p>') + '\
+                <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>Your kids never struggle like you did</span></p>\
+                <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>Generational wealth starts with YOU</span></p>\
+                <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span class="font-bold">$' + income.toLocaleString() + '/year for your family</span></p>\
+                <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>If untouched 20 more years: <span class="font-bold">$' + future20.toLocaleString() + '</span></span></p>') + '\
             </div>\
           </div>\
+          \
           <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4 text-xs text-slate-600">\
             <p class="font-semibold text-blue-900 mb-1">Based on S&P 500 historical average</p>\
             <p>10.4% annual return (1926-2024). Past performance does not guarantee future results. Market values fluctuate.</p>\
           </div>\
+          \
           <p class="text-center text-slate-700 mb-6 text-lg leading-relaxed">This money <span class="font-bold">works for you while you sleep</span>. Every single day. For decades.</p>\
+          \
           <div class="space-y-3">\
             <button id="want-btn" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-4 rounded-lg font-black text-lg hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg">THIS IS WHAT I WANT</button>\
             <button id="wait-btn" class="w-full bg-slate-200 text-slate-600 py-3 rounded-lg font-semibold hover:bg-slate-300 transition-colors text-sm">Show me what happens if I wait</button>\
-            <button id="back-btn" class="w-full text-slate-500 underline text-sm">Try different numbers</button>\
+            <button id="back-btn" class="w-full text-slate-500 underline text-sm hover:text-slate-700">Try different numbers</button>\
           </div>\
         </div>\
       </div>';
@@ -183,17 +261,20 @@ var Pages = {
   
   '1.02': function() {
     return '\
-      <div class="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 p-4 flex items-center justify-center">\
+      <div class="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 p-4 flex items-center justify-center relative">\
+        ' + getBackButton('1.01') + '\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
           <h1 class="text-3xl font-black text-center mb-6 text-slate-900">QUICK QUESTION</h1>\
-          <p class="text-xl text-center text-slate-700 mb-8">Do you have credit card debt?</p>\
+          <p class="text-xl text-center text-slate-700 mb-8">Do you have credit card debt or high-interest loans?</p>\
+          \
           <div class="space-y-3 mb-6">\
-            <button id="yes-debt" class="w-full bg-red-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-red-700 transition-colors shadow-lg">YES</button>\
-            <button id="no-debt" class="w-full bg-emerald-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-emerald-700 transition-colors shadow-lg">NO</button>\
+            <button id="yes-debt" class="w-full bg-red-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-red-700 transition-colors shadow-lg">YES, I have debt</button>\
+            <button id="no-debt" class="w-full bg-emerald-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-emerald-700 transition-colors shadow-lg">NO debt</button>\
           </div>\
-          <div class="bg-slate-50 border border-slate-200 rounded p-3 text-xs text-slate-600">\
+          \
+          <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 text-xs text-slate-600">\
             <p class="font-semibold text-slate-700 mb-1">Why we ask:</p>\
-            <p>High-interest debt (typically 15-25% APR) costs more than stock market returns. Paying it off first is mathematically optimal.</p>\
+            <p>High-interest debt (typically 15-25% APR) costs more than stock market returns. Paying it off first is mathematically optimal and protects you from losing money.</p>\
           </div>\
         </div>\
       </div>';
@@ -203,25 +284,49 @@ var Pages = {
     var daily = Calculator.dailyLoss(Number(AppState.age), Number(AppState.budget));
     var monthly = daily * 30;
     var yearly = daily * 365;
+    var fiveYear = yearly * 5;
     
     return '\
-      <div class="min-h-screen bg-gradient-to-br from-red-900 to-red-700 p-4 flex items-center justify-center">\
+      <div class="min-h-screen bg-gradient-to-br from-red-900 to-red-700 p-4 flex items-center justify-center relative">\
+        ' + getBackButton('1.01', 'Go back') + '\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
-          <h1 class="text-6xl font-black text-center mb-8 text-red-600">WAIT.</h1>\
+          <h1 class="text-6xl font-black text-center mb-2 text-red-600">WAIT.</h1>\
+          <p class="text-center text-slate-600 mb-8">Before you decide to "come back later"...</p>\
+          \
+          <!-- Daily Loss -->\
           <div class="bg-red-50 border-4 border-red-200 rounded-xl p-6 mb-6">\
             <p class="text-center text-lg font-bold text-slate-700 mb-4">EVERY DAY YOU WAIT:</p>\
             <p class="text-center text-5xl font-black text-red-600 mb-6">$' + daily.toLocaleString() + '</p>\
             <div class="space-y-2 text-center text-slate-600">\
               <p>Every month: <span class="font-bold text-red-600">$' + monthly.toLocaleString() + '</span></p>\
               <p>Every year: <span class="font-bold text-red-600">$' + yearly.toLocaleString() + '</span></p>\
+              <p class="text-lg pt-3 mt-3 border-t border-red-200 font-bold">Wait just 5 years: <span class="text-red-700 text-2xl">-$' + fiveYear.toLocaleString() + '</span></p>\
             </div>\
           </div>\
+          \
+          <!-- Visualization -->\
+          <div class="bg-slate-100 rounded-lg p-4 mb-6">\
+            <p class="text-sm font-bold text-slate-700 mb-3">If you wait ONE YEAR to start:</p>\
+            <div class="relative h-4 bg-red-200 rounded-full overflow-hidden mb-2">\
+              <div class="absolute h-full bg-red-600 rounded-full animate-pulse" style="width: 75%"></div>\
+            </div>\
+            <p class="text-xs text-slate-600 text-center">That\'s 75% of what most Americans save in a YEAR - gone forever</p>\
+          </div>\
+          \
+          <!-- Social Proof -->\
+          <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">\
+            <p class="text-sm text-slate-700 italic">"I waited 3 years to start. It cost me $42,000. Do not make my mistake. Start TODAY."</p>\
+            <p class="text-xs text-slate-500 mt-2">- Real user, started at age 35</p>\
+          </div>\
+          \
           <div class="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4 mb-6">\
             <p class="text-center font-bold text-slate-900">That is money you will <span class="text-red-600">NEVER</span> get back.</p>\
+            <p class="text-center text-sm text-slate-600 mt-2">Time is the only resource you cannot buy more of.</p>\
           </div>\
+          \
           <div class="space-y-3">\
-            <button id="start-btn" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-5 rounded-lg font-black text-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-xl">NO, LET\'S START</button>\
-            <button id="later-btn" class="w-full bg-slate-200 text-slate-600 py-3 rounded-lg font-semibold hover:bg-slate-300 transition-colors text-sm">I will come back later</button>\
+            <button id="start-btn" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-5 rounded-lg font-black text-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-xl">NO, LET\'S START NOW</button>\
+            <button id="later-btn" class="w-full bg-slate-200 text-slate-600 py-3 rounded-lg font-semibold hover:bg-slate-300 transition-colors text-sm">I will think about it</button>\
           </div>\
         </div>\
       </div>';
@@ -229,40 +334,313 @@ var Pages = {
   
   '1.04': function() {
     return '\
-      <div class="min-h-screen bg-gradient-to-br from-amber-50 to-amber-100 p-4 flex items-center justify-center">\
+      <div class="min-h-screen bg-gradient-to-br from-amber-50 to-amber-100 p-4 flex items-center justify-center relative">\
+        ' + getBackButton('1.02') + '\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
           <h1 class="text-4xl font-black text-center mb-6 text-amber-900">PAY THAT OFF FIRST</h1>\
+          \
           <div class="space-y-4 text-lg text-slate-700 mb-6">\
-            <p>Credit card debt at <span class="font-bold text-red-600">20% interest</span> is costing you more than the stock market will make you.</p>\
+            <p>Credit card debt at <span class="font-bold text-red-600">20% interest</span> costs you more than the stock market will make you.</p>\
             <p class="font-bold text-slate-900">Take your $' + AppState.budget + '/month and attack that debt.</p>\
             <p>Once it is gone, <span class="font-bold">come back here</span>. Then that $' + AppState.budget + ' can start building wealth instead of paying interest.</p>\
           </div>\
+          \
           <div class="bg-amber-50 border-2 border-amber-300 rounded-lg p-4 mb-4">\
-            <p class="text-center font-bold text-slate-900">Paying off a 20% loan = <span class="text-emerald-600">guaranteed 20% return</span></p>\
-            <p class="text-center text-sm text-slate-600 mt-2">S&P 500 averages 10%. Your debt costs 20%. Math favors debt payoff.</p>\
+            <p class="text-center font-bold text-slate-900 mb-2">Paying off a 20% loan = <span class="text-emerald-600">guaranteed 20% return</span></p>\
+            <p class="text-center text-sm text-slate-600">S&P 500 averages 10%. Your debt costs 20%. Math favors debt payoff.</p>\
           </div>\
-          <div class="bg-slate-50 border border-slate-200 rounded p-3 mb-4 text-xs text-slate-600">\
+          \
+          <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">\
+            <p class="text-sm text-slate-700 mb-2"><span class="font-bold">Smart strategy:</span></p>\
+            <p class="text-sm text-slate-600">1. Pay off high-interest debt first<br>2. Then invest that same payment amount<br>3. Build wealth without the debt burden</p>\
+          </div>\
+          \
+          <div class="bg-slate-50 border border-slate-200 rounded p-3 mb-6 text-xs text-slate-600">\
             <p class="font-semibold text-slate-700 mb-1">This is general guidance, not personal advice</p>\
             <p>Everyone\'s financial situation is different. Consider consulting a financial advisor for personalized recommendations.</p>\
           </div>\
-          <button id="gotit-btn" class="w-full bg-slate-700 text-white py-4 rounded-lg font-bold text-lg hover:bg-slate-800 transition-colors">Got it. I will be back.</button>\
+          \
+          <button id="gotit-btn" class="w-full bg-slate-700 text-white py-4 rounded-lg font-bold text-lg hover:bg-slate-800 transition-colors shadow-lg">Got it. I will be back.</button>\
+        </div>\
+      </div>';
+  },
+  
+  '1.045': function() {
+    return '\
+      <div class="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-4 flex items-center justify-center relative">\
+        ' + getBackButton('1.02') + '\
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
+          <h1 class="text-3xl font-black text-center mb-4 text-slate-900">ONE MORE THING</h1>\
+          <p class="text-center text-lg text-slate-700 mb-6">Get your step-by-step setup guide via email</p>\
+          \
+          <div class="bg-blue-50 rounded-lg p-6 mb-6">\
+            <p class="text-sm font-bold text-slate-700 mb-3">We will send you:</p>\
+            <ul class="space-y-2 text-sm text-slate-700">\
+              <li class="flex items-start"><span class="mr-2 text-blue-600">✓</span>Your personalized plan ($' + AppState.budget + '/month)</li>\
+              <li class="flex items-start"><span class="mr-2 text-blue-600">✓</span>Account opening checklist</li>\
+              <li class="flex items-start"><span class="mr-2 text-blue-600">✓</span>Screenshots of each step</li>\
+              <li class="flex items-start"><span class="mr-2 text-blue-600">✓</span>What to do if you get stuck</li>\
+            </ul>\
+          </div>\
+          \
+          <input type="email" id="email-input" placeholder="your@email.com" class="w-full px-4 py-4 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg mb-4" required>\
+          <p id="email-error" class="text-xs text-red-600 mb-4 hidden">Please enter a valid email</p>\
+          \
+          <button id="send-guide-btn" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-lg font-black text-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg mb-3">SEND ME THE GUIDE</button>\
+          \
+          <button id="skip-email-btn" class="w-full text-slate-500 underline text-sm hover:text-slate-700">Skip (I will figure it out myself)</button>\
+          \
+          <p class="text-xs text-slate-400 text-center mt-4">We hate spam. Zero marketing emails. Unsubscribe anytime.</p>\
         </div>\
       </div>';
   },
   
   '1.05': function() {
+    var isRetirement = AppState.goal === 'retirement';
+    
     return '\
-      <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 flex items-center justify-center">\
-        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
-          <h1 class="text-4xl font-black text-center mb-6 text-emerald-900">SETUP READY</h1>\
-          <div class="bg-emerald-50 rounded-lg p-6 mb-6">\
-            <p class="text-center text-xl font-bold text-slate-900 mb-2">Your plan: $' + AppState.budget + '/month</p>\
-            <p class="text-center text-sm text-slate-600">Age ' + AppState.age + ' → ' + (AppState.goal === 'retirement' ? 'Retirement' : 'Legacy') + '</p>\
+      <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 py-12">\
+        <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-2xl p-8">\
+          \
+          <!-- Header -->\
+          <div class="text-center mb-8">\
+            <h1 class="text-4xl font-black text-emerald-900 mb-3">LET\'S GET YOU SET UP</h1>\
+            <div class="bg-emerald-50 rounded-lg p-4">\
+              <p class="text-xl font-bold text-slate-900">Your Plan: $' + AppState.budget + '/month</p>\
+              <p class="text-sm text-slate-600">Age ' + AppState.age + ' → ' + (isRetirement ? 'Retirement Security' : 'Family Legacy') + '</p>\
+            </div>\
           </div>\
-          <p class="text-center text-lg text-slate-700 mb-6">Setup instructions coming soon...</p>\
+          \
+          <!-- Step 1: Account Type -->\
+          <div class="mb-8 pb-8 border-b border-slate-200">\
+            <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center">\
+              <span class="bg-emerald-600 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 text-lg flex-shrink-0">1</span>\
+              <span>CHOOSE YOUR ACCOUNT TYPE</span>\
+            </h2>\
+            \
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">\
+              <p class="font-semibold text-blue-900 mb-2">Do you have earned income this year?</p>\
+              <p class="text-sm text-slate-600">Earned income = wages from a job, self-employment income, freelance work</p>\
+            </div>\
+            \
+            <div class="grid grid-cols-2 gap-3 mb-4">\
+              <button id="has-income-btn" class="bg-emerald-600 text-white py-4 px-6 rounded-lg font-bold hover:bg-emerald-700 transition-colors">YES</button>\
+              <button id="no-income-btn" class="bg-slate-300 text-slate-700 py-4 px-6 rounded-lg font-bold hover:bg-slate-400 transition-colors">NO</button>\
+            </div>\
+            \
+            <div id="account-type-result" class="bg-emerald-50 border-2 border-emerald-500 rounded-lg p-6 hidden">\
+              <p class="font-bold text-emerald-900 text-lg mb-2">✓ Perfect! You will use a <span id="account-name">Roth IRA</span></p>\
+              <p class="text-sm text-slate-600" id="account-explanation">Tax-free growth forever. This is the best account type for building wealth.</p>\
+            </div>\
+          </div>\
+          \
+          <!-- Step 2: Brokerage (shown after account type selected) -->\
+          <div id="brokerage-section" class="mb-8 pb-8 border-b border-slate-200 hidden">\
+            <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center">\
+              <span class="bg-emerald-600 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 text-lg flex-shrink-0">2</span>\
+              <span>OPEN YOUR ACCOUNT</span>\
+            </h2>\
+            \
+            <p class="text-slate-700 mb-4">Choose one of these trusted brokerages:</p>\
+            \
+            <div class="space-y-4">\
+              <!-- Fidelity (Recommended) -->\
+              <div class="bg-white border-2 border-emerald-500 rounded-lg p-6">\
+                <div class="flex justify-between items-start mb-3">\
+                  <h3 class="text-2xl font-black text-slate-900">FIDELITY</h3>\
+                  <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full">RECOMMENDED</span>\
+                </div>\
+                <p class="text-sm text-slate-600 mb-3">Easiest for beginners. Best mobile app. Excellent customer service.</p>\
+                <ul class="space-y-2 text-sm text-slate-700 mb-4">\
+                  <li class="flex items-start"><span class="text-emerald-600 mr-2">✓</span><span>Zero fees, zero account minimums</span></li>\
+                  <li class="flex items-start"><span class="text-emerald-600 mr-2">✓</span><span>24/7 customer service</span></li>\
+                  <li class="flex items-start"><span class="text-emerald-600 mr-2">✓</span><span>Can buy fractional shares (important for small monthly amounts)</span></li>\
+                </ul>\
+                <a href="https://www.fidelity.com/open-account/overview" target="_blank" rel="noopener" class="block bg-emerald-600 text-white text-center py-3 rounded-lg font-bold hover:bg-emerald-700 transition-colors">Open Fidelity Account →</a>\
+              </div>\
+              \
+              <!-- Other Options -->\
+              <details class="bg-slate-50 rounded-lg p-4">\
+                <summary class="font-bold text-slate-700 cursor-pointer hover:text-slate-900">See other options (Schwab, Vanguard)</summary>\
+                <div class="mt-4 space-y-3">\
+                  <div class="bg-white border border-slate-300 rounded p-4">\
+                    <h4 class="font-bold text-slate-900 mb-2">Charles Schwab</h4>\
+                    <p class="text-sm text-slate-600 mb-3">Great all-around choice. Physical branches nationwide if you prefer in-person help.</p>\
+                    <a href="https://www.schwab.com" target="_blank" rel="noopener" class="text-blue-600 underline text-sm hover:text-blue-800">Open Schwab Account →</a>\
+                  </div>\
+                  <div class="bg-white border border-slate-300 rounded p-4">\
+                    <h4 class="font-bold text-slate-900 mb-2">Vanguard</h4>\
+                    <p class="text-sm text-slate-600 mb-3">Lowest fees in the industry. Invented index funds. Slightly less user-friendly interface.</p>\
+                    <a href="https://investor.vanguard.com" target="_blank" rel="noopener" class="text-blue-600 underline text-sm hover:text-blue-800">Open Vanguard Account →</a>\
+                  </div>\
+                </div>\
+              </details>\
+            </div>\
+            \
+            <div class="mt-4 bg-yellow-50 border-l-4 border-yellow-400 p-4 text-sm text-slate-700">\
+              <p class="font-semibold mb-1">⏱️ Account opening takes 10-15 minutes</p>\
+              <p>You will need: Social Security Number, driver\'s license, bank account info for transfers.</p>\
+            </div>\
+          </div>\
+          \
+          <!-- Step 3: What to Buy -->\
+          <div id="fund-section" class="mb-8 pb-8 border-b border-slate-200 hidden">\
+            <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center">\
+              <span class="bg-emerald-600 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 text-lg flex-shrink-0">3</span>\
+              <span>WHAT TO BUY</span>\
+            </h2>\
+            \
+            <div class="bg-emerald-50 rounded-lg p-6">\
+              <p class="font-bold text-slate-900 mb-4">Buy ONE of these index funds:</p>\
+              \
+              <div class="space-y-3 mb-4">\
+                <div class="bg-white rounded-lg p-4 border-2 border-emerald-500">\
+                  <div class="flex justify-between items-center">\
+                    <div>\
+                      <p class="font-mono font-bold text-2xl text-emerald-600">VOO</p>\
+                      <p class="text-sm text-slate-600">Vanguard S&P 500 ETF</p>\
+                    </div>\
+                    <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-1 rounded">RECOMMENDED</span>\
+                  </div>\
+                </div>\
+                \
+                <div class="bg-white rounded-lg p-4">\
+                  <p class="font-mono font-bold text-xl text-slate-700">VTI</p>\
+                  <p class="text-sm text-slate-600">Vanguard Total Stock Market</p>\
+                </div>\
+                \
+                <div class="bg-white rounded-lg p-4">\
+                  <p class="font-mono font-bold text-xl text-slate-700">VT</p>\
+                  <p class="text-sm text-slate-600">Vanguard Total World Stock</p>\
+                </div>\
+              </div>\
+              \
+              <div class="bg-blue-50 border-l-4 border-blue-400 p-3 text-sm">\
+                <p class="font-semibold text-blue-900 mb-1">What are these?</p>\
+                <p class="text-slate-700">These are NOT individual stocks. They are index funds that own hundreds of companies. When you buy VOO, you instantly own tiny pieces of Apple, Microsoft, Amazon, and 497 others. Instant diversification.</p>\
+              </div>\
+            </div>\
+            \
+            <div class="mt-4 bg-slate-50 rounded p-4 text-sm text-slate-600">\
+              <p class="font-semibold text-slate-700 mb-2">Cost per share:</p>\
+              <p>Around $500-600 (but you can buy fractional shares, so your $' + AppState.budget + '/month works perfectly)</p>\
+            </div>\
+          </div>\
+          \
+          <!-- Step 4: Auto-Invest -->\
+          <div id="autoinvest-section" class="mb-8 pb-8 border-b border-slate-200 hidden">\
+            <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center">\
+              <span class="bg-emerald-600 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 text-lg flex-shrink-0">4</span>\
+              <span>SET IT AND FORGET IT</span>\
+            </h2>\
+            \
+            <div class="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-6 mb-4">\
+              <p class="font-bold text-yellow-900 mb-3 flex items-center"><span class="text-2xl mr-2">⚡</span> CRITICAL STEP</p>\
+              <p class="text-slate-700 mb-4">Set up automatic investing so you never have to think about this again. This is what makes it work.</p>\
+              \
+              <ol class="space-y-3 text-slate-700">\
+                <li class="flex items-start">\
+                  <span class="font-bold mr-2 flex-shrink-0">1.</span>\
+                  <span>In your brokerage app, find <strong>"Automatic Investment"</strong> or <strong>"Auto-Invest"</strong></span>\
+                </li>\
+                <li class="flex items-start">\
+                  <span class="font-bold mr-2 flex-shrink-0">2.</span>\
+                  <span>Choose your fund: <strong>VOO</strong>, VTI, or VT</span>\
+                </li>\
+                <li class="flex items-start">\
+                  <span class="font-bold mr-2 flex-shrink-0">3.</span>\
+                  <span>Set amount: <strong class="text-emerald-600">$' + AppState.budget + ' per month</strong></span>\
+                </li>\
+                <li class="flex items-start">\
+                  <span class="font-bold mr-2 flex-shrink-0">4.</span>\
+                  <span>Set date: The day after your paycheck hits</span>\
+                </li>\
+                <li class="flex items-start">\
+                  <span class="font-bold mr-2 flex-shrink-0">5.</span>\
+                  <span>Turn it <strong>ON</strong></span>\
+                </li>\
+              </ol>\
+            </div>\
+            \
+            <div class="bg-emerald-50 rounded p-4">\
+              <p class="font-bold text-emerald-900 mb-2">That\'s it!</p>\
+              <p class="text-sm text-slate-700">Your $' + AppState.budget + ' will automatically buy more shares every month. The compound interest machine runs on autopilot. You never have to think about it again.</p>\
+            </div>\
+          </div>\
+          \
+          <!-- What Happens Next -->\
+          <div id="timeline-section" class="mb-8 hidden">\
+            <h2 class="text-2xl font-black text-slate-900 mb-4">WHAT TO EXPECT</h2>\
+            \
+            <div class="space-y-3 text-slate-700">\
+              <div class="flex items-start">\
+                <span class="font-bold mr-3 text-emerald-600 flex-shrink-0">Month 1:</span>\
+                <span>You will have ~$' + AppState.budget + ' worth of shares</span>\
+              </div>\
+              <div class="flex items-start">\
+                <span class="font-bold mr-3 text-emerald-600 flex-shrink-0">Year 1:</span>\
+                <span>~$' + Math.round(AppState.budget * 12 * 1.104).toLocaleString() + ' (your $' + (AppState.budget * 12).toLocaleString() + ' grew ~10%)</span>\
+              </div>\
+              <div class="flex items-start">\
+                <span class="font-bold mr-3 text-emerald-600 flex-shrink-0">Year 5:</span>\
+                <span>~$' + Math.round(Calculator.retirement(AppState.age, AppState.budget) * (5 / (65 - AppState.age))).toLocaleString() + '</span>\
+              </div>\
+              <div class="flex items-start">\
+                <span class="font-bold mr-3 text-emerald-600 flex-shrink-0">Year 10:</span>\
+                <span>Your money has DOUBLED (compound interest goes vertical)</span>\
+              </div>\
+            </div>\
+            \
+            <div class="mt-4 bg-blue-50 rounded p-4 text-sm text-slate-600">\
+              <p>The market will go up and down. Some months you will be down. <strong>Keep buying.</strong> Market drops are SALES - your money buys more shares when prices are low. That is when you make the most money long-term.</p>\
+            </div>\
+          </div>\
+          \
+          <!-- FAQ -->\
+          <div class="border-t border-slate-200 pt-6">\
+            <h3 class="font-black text-xl text-slate-900 mb-4">COMMON QUESTIONS</h3>\
+            \
+            <div class="space-y-3">\
+              <details class="bg-slate-50 rounded-lg p-4">\
+                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">What if I can only do $40 this month?</summary>\
+                <p class="mt-2 text-sm text-slate-600">That\'s completely fine. Do $40. Do what you can. The key is <strong>consistency</strong>, not perfection. Even $20/month builds real wealth over time.</p>\
+              </details>\
+              \
+              <details class="bg-slate-50 rounded-lg p-4">\
+                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">Can I invest MORE if I have extra money?</summary>\
+                <p class="mt-2 text-sm text-slate-600">Yes! Absolutely. You can increase your auto-invest amount anytime, or make one-time purchases when you have extra cash. The more you invest, the faster it grows.</p>\
+              </details>\
+              \
+              <details class="bg-slate-50 rounded-lg p-4">\
+                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">What if the market crashes?</summary>\
+                <p class="mt-2 text-sm text-slate-600"><strong>Keep buying.</strong> Market crashes are SALES. Your $' + AppState.budget + ' buys MORE shares when prices drop. People who kept investing through 2008-2009 made the most money. Crashes are opportunities, not disasters.</p>\
+              </details>\
+              \
+              <details class="bg-slate-50 rounded-lg p-4">\
+                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">When can I access this money?</summary>\
+                <p class="mt-2 text-sm text-slate-600"><strong>Roth IRA:</strong> Your contributions anytime (tax and penalty free), earnings at age 59½. <strong>Brokerage account:</strong> Anytime (but you may owe capital gains tax).</p>\
+              </details>\
+              \
+              <details class="bg-slate-50 rounded-lg p-4">\
+                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">Do I need to do my taxes differently?</summary>\
+                <p class="mt-2 text-sm text-slate-600"><strong>Roth IRA:</strong> No changes. <strong>Traditional IRA:</strong> You get a tax deduction. <strong>Brokerage:</strong> You will receive tax forms for investment income (usually minimal in early years).</p>\
+              </details>\
+              \
+              <details class="bg-slate-50 rounded-lg p-4">\
+                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">Should I pick individual stocks instead?</summary>\
+                <p class="mt-2 text-sm text-slate-600">No. 90% of professional stock pickers lose to index funds over 15 years. Index funds are boring, but boring wins. Stick with VOO/VTI/VT and let compound interest do the work.</p>\
+              </details>\
+            </div>\
+          </div>\
+          \
+          <!-- Legal Disclaimer -->\
           <div class="border-t border-slate-200 pt-6 mt-6">\
-            <p class="text-xs text-slate-500 text-center leading-relaxed"><span class="font-semibold text-slate-700">Important:</span> This tool provides educational information only, not personalized financial advice. All calculations use S&P 500 historical average returns (10.4% annually, 1926-2024). Past performance does not guarantee future results. Investments carry risk including possible loss of principal.</p>\
+            <p class="text-xs text-slate-500 text-center leading-relaxed">\
+              <span class="font-semibold text-slate-700">Important:</span> This tool provides educational information only, not personalized financial advice. All calculations use S&P 500 historical average returns (10.4% annually, 1926-2024). Past performance does not guarantee future results. Investments carry risk including possible loss of principal. Consider consulting a financial advisor for personalized recommendations.\
+            </p>\
           </div>\
+          \
+          <button id="back-home-btn" class="w-full mt-6 text-slate-500 underline text-sm hover:text-slate-700">Start over with different numbers</button>\
         </div>\
       </div>';
   }
@@ -273,108 +651,325 @@ var Pages = {
 // ============================================================================
 
 function navigateTo(page) {
+  var previousPage = AppState.currentPage;
   AppState.currentPage = page;
   render();
   window.scrollTo(0, 0);
+  
+  // Track navigation
+  trackEvent('page_view', {
+    page_id: page,
+    from_page: previousPage,
+    user_age: AppState.age,
+    user_budget: AppState.budget,
+    user_goal: AppState.goal
+  });
 }
 
 function render() {
   var container = document.getElementById('app');
   if (!container) return;
   
-  var pageHTML = Pages[AppState.currentPage];
-  if (pageHTML) {
-    container.innerHTML = pageHTML();
-    attachEventListeners();
+  try {
+    var pageHTML = Pages[AppState.currentPage];
+    if (pageHTML) {
+      container.innerHTML = pageHTML();
+      attachEventListeners();
+    } else {
+      throw new Error('Page not found: ' + AppState.currentPage);
+    }
+  } catch (error) {
+    console.error('Render error:', error);
+    container.innerHTML = '\
+      <div class="min-h-screen flex items-center justify-center bg-red-50 p-4">\
+        <div class="max-w-md bg-white rounded-lg p-8 shadow-xl">\
+          <h1 class="text-2xl font-bold text-red-600 mb-4">Oops! Something went wrong</h1>\
+          <p class="text-slate-700 mb-4">We encountered an error. Please refresh the page to try again.</p>\
+          <button onclick="location.reload()" class="w-full bg-red-600 text-white px-6 py-3 rounded font-bold hover:bg-red-700">Refresh Page</button>\
+        </div>\
+      </div>';
   }
 }
 
 function attachEventListeners() {
   var page = AppState.currentPage;
   
+  // ========== PAGE 1.0 ==========
   if (page === '1.0') {
     var ageInput = document.getElementById('age-input');
     var budgetInput = document.getElementById('budget-input');
     var submitBtn = document.getElementById('submit-btn');
     
+    function updateButtonState() {
+      var canSubmit = AppState.age && AppState.budget && AppState.age >= 18 && AppState.age <= 64 && AppState.budget > 0;
+      if (submitBtn) {
+        submitBtn.className = 'w-full py-5 rounded-xl font-black text-xl shadow-xl transition-all ' + 
+          (canSubmit 
+            ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white cursor-pointer hover:from-blue-700 hover:to-blue-800 transform hover:scale-105' 
+            : 'bg-slate-300 text-slate-500 cursor-not-allowed');
+      }
+    }
+    
     if (ageInput) {
       ageInput.addEventListener('input', function(e) {
         AppState.age = e.target.value;
-        var canSubmit = AppState.age && AppState.budget && AppState.age >= 18 && AppState.age <= 64 && AppState.budget > 0;
-        if (submitBtn) {
-          submitBtn.className = 'w-full py-5 rounded-xl font-black text-xl shadow-xl transition-all ' + 
-            (canSubmit 
-              ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white cursor-pointer hover:from-blue-700 hover:to-blue-800 transform hover:scale-105' 
-              : 'bg-slate-300 text-slate-500 cursor-not-allowed');
-        }
+        updateButtonState();
       });
     }
     
     if (budgetInput) {
       budgetInput.addEventListener('input', function(e) {
         AppState.budget = e.target.value;
-        var canSubmit = AppState.age && AppState.budget && AppState.age >= 18 && AppState.age <= 64 && AppState.budget > 0;
-        if (submitBtn) {
-          submitBtn.className = 'w-full py-5 rounded-xl font-black text-xl shadow-xl transition-all ' + 
-            (canSubmit 
-              ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white cursor-pointer hover:from-blue-700 hover:to-blue-800 transform hover:scale-105' 
-              : 'bg-slate-300 text-slate-500 cursor-not-allowed');
-        }
+        updateButtonState();
       });
     }
     
     if (submitBtn) {
       submitBtn.addEventListener('click', function() {
         if (AppState.age && AppState.budget && AppState.age >= 18 && AppState.age <= 64 && AppState.budget > 0) {
-          navigateTo('1.00');
+          trackEvent('input_complete', {
+            age: AppState.age,
+            budget: AppState.budget
+          });
+          
+          showLoading();
+          setTimeout(function() {
+            hideLoading();
+            navigateTo('1.00');
+          }, 1000);
         }
       });
     }
   }
   
+  // ========== PAGE 1.00 ==========
   if (page === '1.00') {
     var retBtn = document.getElementById('retirement-btn');
     var famBtn = document.getElementById('family-btn');
     
-    if (retBtn) retBtn.addEventListener('click', function() { 
-      AppState.goal = 'retirement';
-      navigateTo('1.01'); 
-    });
-    if (famBtn) famBtn.addEventListener('click', function() { 
-      AppState.goal = 'family';
-      navigateTo('1.01'); 
-    });
+    if (retBtn) {
+      retBtn.addEventListener('click', function() {
+        AppState.goal = 'retirement';
+        trackEvent('goal_selected', { goal: 'retirement' });
+        navigateTo('1.01');
+      });
+    }
+    
+    if (famBtn) {
+      famBtn.addEventListener('click', function() {
+        AppState.goal = 'family';
+        trackEvent('goal_selected', { goal: 'family' });
+        navigateTo('1.01');
+      });
+    }
   }
   
+  // ========== PAGE 1.01 ==========
   if (page === '1.01') {
     var wantBtn = document.getElementById('want-btn');
     var waitBtn = document.getElementById('wait-btn');
     var backBtn = document.getElementById('back-btn');
     
-    if (wantBtn) wantBtn.addEventListener('click', function() { navigateTo('1.02'); });
-    if (waitBtn) waitBtn.addEventListener('click', function() { navigateTo('1.03'); });
-    if (backBtn) backBtn.addEventListener('click', function() { navigateTo('1.0'); });
+    var amount = AppState.goal === 'retirement' 
+      ? Calculator.retirement(Number(AppState.age), Number(AppState.budget))
+      : Calculator.death(Number(AppState.age), Number(AppState.budget));
+    
+    if (wantBtn) {
+      wantBtn.addEventListener('click', function() {
+        trackEvent('cta_want', { 
+          amount: amount,
+          goal: AppState.goal
+        });
+        navigateTo('1.02');
+      });
+    }
+    
+    if (waitBtn) {
+      waitBtn.addEventListener('click', function() {
+        trackEvent('cta_wait', { 
+          amount: amount,
+          goal: AppState.goal
+        });
+        navigateTo('1.03');
+      });
+    }
+    
+    if (backBtn) {
+      backBtn.addEventListener('click', function() {
+        navigateTo('1.0');
+      });
+    }
   }
   
+  // ========== PAGE 1.02 ==========
   if (page === '1.02') {
     var yesBtn = document.getElementById('yes-debt');
     var noBtn = document.getElementById('no-debt');
     
-    if (yesBtn) yesBtn.addEventListener('click', function() { AppState.hasDebt = true; navigateTo('1.04'); });
-    if (noBtn) noBtn.addEventListener('click', function() { AppState.hasDebt = false; navigateTo('1.05'); });
+    if (yesBtn) {
+      yesBtn.addEventListener('click', function() {
+        AppState.hasDebt = true;
+        trackEvent('debt_check', { has_debt: true });
+        navigateTo('1.04');
+      });
+    }
+    
+    if (noBtn) {
+      noBtn.addEventListener('click', function() {
+        AppState.hasDebt = false;
+        trackEvent('debt_check', { has_debt: false });
+        navigateTo('1.045');
+      });
+    }
   }
   
+  // ========== PAGE 1.03 ==========
   if (page === '1.03') {
     var startBtn = document.getElementById('start-btn');
     var laterBtn = document.getElementById('later-btn');
     
-    if (startBtn) startBtn.addEventListener('click', function() { navigateTo('1.02'); });
-    if (laterBtn) laterBtn.addEventListener('click', function() { navigateTo('1.0'); });
+    if (startBtn) {
+      startBtn.addEventListener('click', function() {
+        trackEvent('loss_aversion_convert', { converted: true });
+        navigateTo('1.02');
+      });
+    }
+    
+    if (laterBtn) {
+      laterBtn.addEventListener('click', function() {
+        trackEvent('loss_aversion_convert', { converted: false });
+        navigateTo('1.0');
+      });
+    }
   }
   
+  // ========== PAGE 1.04 ==========
   if (page === '1.04') {
     var gotitBtn = document.getElementById('gotit-btn');
-    if (gotitBtn) gotitBtn.addEventListener('click', function() { navigateTo('1.0'); });
+    
+    if (gotitBtn) {
+      gotitBtn.addEventListener('click', function() {
+        trackEvent('debt_redirect_acknowledge');
+        navigateTo('1.0');
+      });
+    }
+  }
+  
+  // ========== PAGE 1.045 (Email Capture) ==========
+if (sendBtn) {
+  sendBtn.addEventListener('click', function() {
+    var email = emailInput ? emailInput.value : '';
+    
+    if (!validateEmail(email)) {
+      if (emailError) emailError.classList.remove('hidden');
+      return;
+    }
+    
+    AppState.email = email;
+    
+    // GOOGLE FORMS SUBMISSION (ADD THIS)
+    var formUrl = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse';
+    var formData = new FormData();
+    formData.append('entry.EMAIL_FIELD_ID', email);
+    formData.append('entry.AGE_FIELD_ID', AppState.age);
+    formData.append('entry.BUDGET_FIELD_ID', AppState.budget);
+    formData.append('entry.GOAL_FIELD_ID', AppState.goal);
+    
+    fetch(formUrl, {
+      method: 'POST',
+      body: formData,
+      mode: 'no-cors'
+    });
+    
+    // ANALYTICS TRACKING (KEEP THIS)
+    trackEvent('email_captured', { 
+      email_provided: true,
+      age: AppState.age,
+      budget: AppState.budget,
+      goal: AppState.goal
+    });
+    
+    console.log('📧 Email captured:', email);
+    
+    navigateTo('1.05');
+  });
+}
+  
+  // ========== PAGE 1.05 (Setup Instructions) ==========
+  if (page === '1.05') {
+    var hasIncomeBtn = document.getElementById('has-income-btn');
+    var noIncomeBtn = document.getElementById('no-income-btn');
+    var accountResult = document.getElementById('account-type-result');
+    var accountName = document.getElementById('account-name');
+    var accountExplanation = document.getElementById('account-explanation');
+    var brokerageSection = document.getElementById('brokerage-section');
+    var fundSection = document.getElementById('fund-section');
+    var autoinvestSection = document.getElementById('autoinvest-section');
+    var timelineSection = document.getElementById('timeline-section');
+    var backHomeBtn = document.getElementById('back-home-btn');
+    
+    // Progressive disclosure on scroll (show sections as user scrolls down)
+    function showNextSections() {
+      if (accountResult) accountResult.classList.remove('hidden');
+      
+      setTimeout(function() {
+        if (brokerageSection) {
+          brokerageSection.classList.remove('hidden');
+          brokerageSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 500);
+      
+      setTimeout(function() {
+        if (fundSection) fundSection.classList.remove('hidden');
+      }, 1500);
+      
+      setTimeout(function() {
+        if (autoinvestSection) autoinvestSection.classList.remove('hidden');
+      }, 2500);
+      
+      setTimeout(function() {
+        if (timelineSection) timelineSection.classList.remove('hidden');
+      }, 3500);
+    }
+    
+    if (hasIncomeBtn) {
+      hasIncomeBtn.addEventListener('click', function() {
+        AppState.accountType = 'roth_ira';
+        
+        if (accountName) accountName.textContent = 'Roth IRA';
+        if (accountExplanation) accountExplanation.textContent = 'Tax-free growth forever. This is the best account type for building wealth. You already paid taxes on your income, so your investments grow tax-free and withdrawals in retirement are tax-free too.';
+        
+        trackEvent('account_type_selected', { account_type: 'roth_ira' });
+        showNextSections();
+      });
+    }
+    
+    if (noIncomeBtn) {
+      noIncomeBtn.addEventListener('click', function() {
+        AppState.accountType = 'taxable';
+        
+        if (accountName) accountName.textContent = 'Taxable Brokerage Account';
+        if (accountExplanation) accountExplanation.textContent = 'No income = no IRA eligibility. But taxable brokerage accounts still work great! You can access your money anytime, and if you hold for 1+ year, you get lower long-term capital gains tax rates.';
+        
+        trackEvent('account_type_selected', { account_type: 'taxable' });
+        showNextSections();
+      });
+    }
+    
+    if (backHomeBtn) {
+      backHomeBtn.addEventListener('click', function() {
+        navigateTo('1.0');
+      });
+    }
+    
+    // Track when user reaches final page
+    trackEvent('setup_page_reached', {
+      age: AppState.age,
+      budget: AppState.budget,
+      goal: AppState.goal,
+      has_debt: AppState.hasDebt,
+      email_provided: AppState.email ? true : false
+    });
   }
 }
 
