@@ -111,6 +111,26 @@ var Calculator = {
 };
 
 // ============================================================================
+// NAVIGATION FUNCTIONS (Must be global for onclick)
+// ============================================================================
+
+function navigateTo(page) {
+  var previousPage = AppState.currentPage;
+  AppState.currentPage = page;
+  render();
+  window.scrollTo(0, 0);
+  
+  // Track navigation
+  trackEvent('page_view', {
+    page_id: page,
+    from_page: previousPage,
+    user_age: AppState.age,
+    user_budget: AppState.budget,
+    user_goal: AppState.goal
+  });
+}
+
+// ============================================================================
 // UI HELPERS
 // ============================================================================
 
@@ -647,24 +667,8 @@ var Pages = {
 };
 
 // ============================================================================
-// NAVIGATION AND RENDERING
+// RENDERING
 // ============================================================================
-
-function navigateTo(page) {
-  var previousPage = AppState.currentPage;
-  AppState.currentPage = page;
-  render();
-  window.scrollTo(0, 0);
-  
-  // Track navigation
-  trackEvent('page_view', {
-    page_id: page,
-    from_page: previousPage,
-    user_age: AppState.age,
-    user_budget: AppState.budget,
-    user_goal: AppState.goal
-  });
-}
 
 function render() {
   var container = document.getElementById('app');
@@ -694,6 +698,9 @@ function render() {
 function attachEventListeners() {
   var page = AppState.currentPage;
   
+  console.log('🔌 Attaching listeners for page:', page);
+  
+  try {
   // ========== PAGE 1.0 ==========
   if (page === '1.0') {
     var ageInput = document.getElementById('age-input');
@@ -856,44 +863,57 @@ function attachEventListeners() {
   }
   
   // ========== PAGE 1.045 (Email Capture) ==========
-if (sendBtn) {
-  sendBtn.addEventListener('click', function() {
-    var email = emailInput ? emailInput.value : '';
+  if (page === '1.045') {
+    var emailInput = document.getElementById('email-input');
+    var sendBtn = document.getElementById('send-guide-btn');
+    var skipBtn = document.getElementById('skip-email-btn');
+    var emailError = document.getElementById('email-error');
     
-    if (!validateEmail(email)) {
-      if (emailError) emailError.classList.remove('hidden');
-      return;
+    function validateEmail(email) {
+      var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
     }
     
-    AppState.email = email;
+    if (sendBtn) {
+      sendBtn.addEventListener('click', function() {
+        var email = emailInput ? emailInput.value : '';
+        
+        if (!validateEmail(email)) {
+          if (emailError) emailError.classList.remove('hidden');
+          return;
+        }
+        
+        AppState.email = email;
+        
+        // TODO: Send email to your backend/email service
+        // Example: fetch('/api/subscribe', { method: 'POST', body: JSON.stringify({ email, age: AppState.age, budget: AppState.budget }) })
+        
+        trackEvent('email_captured', { 
+          email_provided: true,
+          age: AppState.age,
+          budget: AppState.budget,
+          goal: AppState.goal
+        });
+        
+        console.log('📧 Email captured:', email);
+        
+        navigateTo('1.05');
+      });
+    }
     
-    // GOOGLE FORMS SUBMISSION (ADD THIS)
-    var formUrl = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse';
-    var formData = new FormData();
-    formData.append('entry.EMAIL_FIELD_ID', email);
-    formData.append('entry.AGE_FIELD_ID', AppState.age);
-    formData.append('entry.BUDGET_FIELD_ID', AppState.budget);
-    formData.append('entry.GOAL_FIELD_ID', AppState.goal);
+    if (skipBtn) {
+      skipBtn.addEventListener('click', function() {
+        trackEvent('email_captured', { email_provided: false });
+        navigateTo('1.05');
+      });
+    }
     
-    fetch(formUrl, {
-      method: 'POST',
-      body: formData,
-      mode: 'no-cors'
-    });
-    
-    // ANALYTICS TRACKING (KEEP THIS)
-    trackEvent('email_captured', { 
-      email_provided: true,
-      age: AppState.age,
-      budget: AppState.budget,
-      goal: AppState.goal
-    });
-    
-    console.log('📧 Email captured:', email);
-    
-    navigateTo('1.05');
-  });
-}
+    if (emailInput) {
+      emailInput.addEventListener('input', function() {
+        if (emailError) emailError.classList.add('hidden');
+      });
+    }
+  }
   
   // ========== PAGE 1.05 (Setup Instructions) ==========
   if (page === '1.05') {
@@ -971,6 +991,11 @@ if (sendBtn) {
       email_provided: AppState.email ? true : false
     });
   }
+  
+  } catch (error) {
+    console.error('❌ Error in attachEventListeners for page ' + page + ':', error);
+    console.error('Stack:', error.stack);
+  }
 }
 
 // ============================================================================
@@ -978,7 +1003,16 @@ if (sendBtn) {
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', function() {
-  render();
+  console.log('🚀 App initializing...');
+  console.log('📍 Current page:', AppState.currentPage);
+  console.log('📦 AppState:', AppState);
+  
+  try {
+    render();
+    console.log('✅ Initial render successful');
+  } catch (error) {
+    console.error('❌ Initial render failed:', error);
+  }
 });
 </script>
 
