@@ -636,7 +636,7 @@ var PageTemplates = {
               <button id="toggle-family" class="relative z-10 px-4 py-2 rounded-full text-sm font-bold transition-colors ' + (!isRetirement ? 'text-white' : 'text-slate-600') + '">\
                 👨‍👩‍👧 Family\
               </button>\
-              <div id="toggle-slider" class="absolute top-1 left-1 w-[calc(50%-0.25rem)] h-[calc(100%-0.5rem)] bg-gradient-to-r from-' + accentColor + '-600 to-' + accentColor + '-700 rounded-full transition-transform duration-300 ease-in-out" style="transform: translateX(' + (isRetirement ? '0' : '100') + '%)"></div>\
+              <div id="toggle-slider" class="absolute top-1 left-1 w-[calc(50%-0.25rem)] h-[calc(100%-0.5rem)] rounded-full transition-all duration-300 ease-in-out" style="transform: translateX(' + (isRetirement ? '0%' : '100%') + '); background: linear-gradient(to right, ' + (isRetirement ? '#4f46e5, #4338ca' : '#9333ea, #7e22ce') + ')"></div>\
             </div>\
           </div>\
           \
@@ -644,7 +644,7 @@ var PageTemplates = {
           <div id="results-content">\
             <div class="text-center mb-6">\
               <p class="text-slate-600 text-sm mb-3 uppercase tracking-wide">' + eyebrow + '</p>\
-              <h1 class="text-4xl md:text-5xl font-black text-' + accentColor + '-600 mb-3 leading-tight">' + desc.header + '</h1>\
+              <h1 class="text-4xl md:text-5xl font-black mb-3 leading-tight" style="color: ' + (isRetirement ? '#4f46e5' : '#9333ea') + '">' + desc.header + '</h1>\
               ' + (desc.showNumber ? '<p class="text-3xl font-bold text-slate-700 mb-3">$' + amount.toLocaleString() + '</p>' : '') + '\
               <p class="text-slate-500 text-sm">' + yearsText + '</p>\
             </div>\
