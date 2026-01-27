@@ -629,14 +629,14 @@ var PageTemplates = {
           \
           <!-- Toggle Switch -->\
           <div class="mb-6 flex items-center justify-center">\
-            <div class="relative inline-flex items-center bg-slate-200 rounded-full p-1">\
-              <button id="toggle-retirement" class="relative z-10 px-4 py-2 rounded-full text-sm font-bold transition-colors ' + (isRetirement ? 'text-white' : 'text-slate-600') + '">\
+            <div class="relative inline-flex items-center bg-slate-200 rounded-full p-1.5 shadow-inner">\
+              <button id="toggle-retirement" class="relative z-10 px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-200 ' + (isRetirement ? 'text-white' : 'text-slate-600 hover:text-slate-800') + '">\
                 💰 Retirement\
               </button>\
-              <button id="toggle-family" class="relative z-10 px-4 py-2 rounded-full text-sm font-bold transition-colors ' + (!isRetirement ? 'text-white' : 'text-slate-600') + '">\
+              <button id="toggle-family" class="relative z-10 px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-200 ' + (!isRetirement ? 'text-white' : 'text-slate-600 hover:text-slate-800') + '">\
                 👨‍👩‍👧 Family\
               </button>\
-              <div id="toggle-slider" class="absolute top-1 left-1 w-[calc(50%-0.25rem)] h-[calc(100%-0.5rem)] rounded-full transition-all duration-300 ease-in-out" style="transform: translateX(' + (isRetirement ? '0%' : '100%') + '); background: linear-gradient(to right, ' + (isRetirement ? '#4f46e5, #4338ca' : '#9333ea, #7e22ce') + ')"></div>\
+              <div id="toggle-slider" class="absolute top-1.5 left-1.5 h-[calc(100%-0.75rem)] rounded-full transition-all duration-300 ease-in-out shadow-md" style="width: calc(50% - 0.375rem); transform: translateX(' + (isRetirement ? '0%' : 'calc(100% + 0.75rem))') + '); background: linear-gradient(to right, ' + (isRetirement ? '#4f46e5, #4338ca' : '#9333ea, #7e22ce') + ')"></div>\
             </div>\
           </div>\
           \
