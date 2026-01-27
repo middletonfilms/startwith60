@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title> See How $60/Month Becomes Half A Million Dollars | StartWith60</title>
-<meta name="description" content="Free retirement calculator shows how small monthly investments grow into life-changing wealth through compound interest. Start planning your financial freedom today.">
+<title>See How $60/Month Becomes Half A Million Dollars | StartWith60</title>
+<meta name="description" content="$60/month becomes half a million dollars by retirement. See your exact number in 30 seconds—no financial knowledge needed.">
 
 <!-- Open Graph for social sharing -->
-<meta property="og:title" content="See How $60/Month Becomes Half a Million Dollars | StartWith60">
+<meta property="og:title" content="See How $60/Month Becomes Half A Million Dollars">
 <meta property="og:description" content="$60/month becomes half a million dollars by retirement. See your exact number in 30 seconds—no financial knowledge needed.">
 <meta property="og:type" content="website">
 
@@ -27,6 +27,306 @@
 <div id="app"></div>
 
 <script>
+// ============================================================================
+// COPY MANAGEMENT - EDIT ALL TEXT HERE
+// ============================================================================
+
+var COPY = {
+  
+  // ==========================================================================
+  // PAGE 1.0 - INITIAL INPUT SCREEN
+  // ==========================================================================
+  PAGE_1_0: {
+    HEADLINE: 'STILL BROKE<br>AT 65?',
+    SUBHEAD_LINE_1: 'Most people are.',
+    SUBHEAD_LINE_2: 'You do not have to be.',
+    LABEL_AGE: 'YOUR AGE',
+    LABEL_BUDGET: 'PER MONTH',
+    PLACEHOLDER_AGE: 'AGE',
+    PLACEHOLDER_BUDGET: '60',
+    BUTTON_CTA: 'SHOW ME THE MATH',
+    ERROR_AGE: 'Age 18-64 only',
+    ERROR_BUDGET: 'Must be > $0',
+    FOOTER_TEXT: 'Takes 30 seconds. Changes everything.'
+  },
+  
+  // ==========================================================================
+  // PAGE 1.00 - GOAL SELECTION
+  // ==========================================================================
+  PAGE_1_00: {
+    HEADLINE: 'WHAT MATTERS MOST?',
+    SUBHEAD: 'Choose your primary goal:',
+    BUTTON_RETIREMENT: 'MY RETIREMENT',
+    BUTTON_RETIREMENT_SUB: 'Living comfortably when I stop working',
+    BUTTON_FAMILY: 'FAMILY LEGACY',
+    BUTTON_FAMILY_SUB: 'Leaving wealth for my loved ones',
+    FOOTER_TEXT: 'Both paths use the same strategy - just different emotional focus.',
+    BACK_BUTTON: 'Back'
+  },
+  
+  // ==========================================================================
+  // PAGE 1.01 - THE BIG REVEAL
+  // ==========================================================================
+  PAGE_1_01: {
+    EYEBROW: 'YOUR $[BUDGET]/MONTH BECOMES', // [BUDGET] will be replaced
+    YEARS_TEXT: 'You are [AGE]. That is [YEARS] years of compound growth.', // [AGE] and [YEARS] replaced
+    
+    // Benefits list varies by goal
+    BENEFITS_LABEL: 'That means:',
+    
+    // RETIREMENT GOAL benefits
+    RETIREMENT_BENEFIT_1: 'Never asking your kids for money',
+    RETIREMENT_BENEFIT_2: 'Retiring when YOU want to',
+    RETIREMENT_BENEFIT_3: 'Financial security for life',
+    RETIREMENT_BENEFIT_4: '$[INCOME]/year forever', // [INCOME] replaced
+    RETIREMENT_BENEFIT_4_SUFFIX: '(without touching your money)',
+    
+    // FAMILY GOAL benefits
+    FAMILY_BENEFIT_1: 'Your kids never struggle like you did',
+    FAMILY_BENEFIT_2: 'Generational wealth starts with YOU',
+    FAMILY_BENEFIT_3: '$[INCOME]/year for your family', // [INCOME] replaced
+    FAMILY_BENEFIT_4: 'If untouched 20 more years: $[FUTURE]', // [FUTURE] replaced
+    
+    DISCLAIMER_TITLE: 'Based on S&P 500 historical average',
+    DISCLAIMER_TEXT: '10.4% annual return (1926-2024). Past performance does not guarantee future results. Market values fluctuate.',
+    
+    CLOSING_TEXT: 'This money works for you while you sleep. Every single day. For decades.',
+    
+    BUTTON_WANT: 'THIS IS WHAT I WANT',
+    BUTTON_WAIT: 'Show me what happens if I wait',
+    BUTTON_BACK: 'Try different numbers',
+    
+    BACK_BUTTON: 'Back'
+  },
+  
+  // ==========================================================================
+  // PAGE 1.02 - DEBT CHECK
+  // ==========================================================================
+  PAGE_1_02: {
+    HEADLINE: 'QUICK QUESTION',
+    QUESTION: 'Do you have credit card debt or high-interest loans?',
+    BUTTON_YES: 'YES, I have debt',
+    BUTTON_NO: 'NO debt',
+    WHY_LABEL: 'Why we ask:',
+    WHY_TEXT: 'High-interest debt (typically 15-25% APR) costs more than stock market returns. Paying it off first is mathematically optimal and protects you from losing money.',
+    BACK_BUTTON: 'Back'
+  },
+  
+  // ==========================================================================
+  // PAGE 1.03 - LOSS AVERSION (THE HAMMER)
+  // ==========================================================================
+  PAGE_1_03: {
+    HEADLINE: 'WAIT.',
+    SUBHEAD: 'Before you decide to "come back later"...',
+    
+    LOSS_BOX_LABEL: 'EVERY DAY YOU WAIT:',
+    LOSS_DAILY: '$[DAILY]', // [DAILY] replaced
+    LOSS_MONTHLY: 'Every month: $[MONTHLY]', // [MONTHLY] replaced
+    LOSS_YEARLY: 'Every year: $[YEARLY]', // [YEARLY] replaced
+    LOSS_FIVE_YEAR: 'Wait just 5 years: -$[FIVE_YEAR]', // [FIVE_YEAR] replaced
+    
+    VIZ_LABEL: 'If you wait ONE YEAR to start:',
+    VIZ_TEXT: 'That\'s 75% of what most Americans save in a YEAR - gone forever',
+    
+    TESTIMONIAL: '"I waited 3 years to start. It cost me $42,000. Do not make my mistake. Start TODAY."',
+    TESTIMONIAL_ATTRIBUTION: '- Real user, started at age 35',
+    
+    WARNING_PRIMARY: 'That is money you will NEVER get back.',
+    WARNING_SECONDARY: 'Time is the only resource you cannot buy more of.',
+    
+    BUTTON_START: 'NO, LET\'S START NOW',
+    BUTTON_LATER: 'I will think about it',
+    
+    BACK_BUTTON: 'Go back'
+  },
+  
+  // ==========================================================================
+  // PAGE 1.04 - DEBT REDIRECT
+  // ==========================================================================
+  PAGE_1_04: {
+    HEADLINE: 'PAY THAT OFF FIRST',
+    
+    PARA_1: 'Credit card debt at 20% interest costs you more than the stock market will make you.',
+    PARA_2: 'Take your $[BUDGET]/month and attack that debt.', // [BUDGET] replaced
+    PARA_3: 'Once it is gone, come back here. Then that $[BUDGET] can start building wealth instead of paying interest.',
+    
+    MATH_BOX_LINE_1: 'Paying off a 20% loan = guaranteed 20% return',
+    MATH_BOX_LINE_2: 'S&P 500 averages 10%. Your debt costs 20%. Math favors debt payoff.',
+    
+    STRATEGY_LABEL: 'Smart strategy:',
+    STRATEGY_STEP_1: '1. Pay off high-interest debt first',
+    STRATEGY_STEP_2: '2. Then invest that same payment amount',
+    STRATEGY_STEP_3: '3. Build wealth without the debt burden',
+    
+    DISCLAIMER_LABEL: 'This is general guidance, not personal advice',
+    DISCLAIMER_TEXT: 'Everyone\'s financial situation is different. Consider consulting a financial advisor for personalized recommendations.',
+    
+    BUTTON_CTA: 'Got it. I will be back.',
+    
+    BACK_BUTTON: 'Back'
+  },
+  
+  // ==========================================================================
+  // PAGE 1.045 - EMAIL CAPTURE
+  // ==========================================================================
+  PAGE_1_045: {
+    HEADLINE: 'ONE MORE THING',
+    SUBHEAD: 'Get your step-by-step setup guide via email',
+    
+    BENEFITS_LABEL: 'We will send you:',
+    BENEFIT_1: 'Your personalized plan ($[BUDGET]/month)', // [BUDGET] replaced
+    BENEFIT_2: 'Account opening checklist',
+    BENEFIT_3: 'Screenshots of each step',
+    BENEFIT_4: 'What to do if you get stuck',
+    
+    PLACEHOLDER_EMAIL: 'your@email.com',
+    ERROR_EMAIL: 'Please enter a valid email',
+    
+    BUTTON_SEND: 'SEND ME THE GUIDE',
+    BUTTON_SKIP: 'Skip (I will figure it out myself)',
+    
+    PRIVACY_TEXT: 'We hate spam. Zero marketing emails. Unsubscribe anytime.',
+    
+    BACK_BUTTON: 'Back'
+  },
+  
+  // ==========================================================================
+  // PAGE 1.05 - SETUP INSTRUCTIONS
+  // ==========================================================================
+  PAGE_1_05: {
+    HEADLINE: 'LET\'S GET YOU SET UP',
+    
+    PLAN_SUMMARY_LABEL: 'Your Plan: $[BUDGET]/month', // [BUDGET] replaced
+    PLAN_SUMMARY_DETAIL: 'Age [AGE] → [GOAL]', // [AGE] and [GOAL] replaced
+    
+    // STEP 1: Account Type
+    STEP_1_TITLE: 'CHOOSE YOUR ACCOUNT TYPE',
+    STEP_1_QUESTION: 'Do you have earned income this year?',
+    STEP_1_EXPLANATION: 'Earned income = wages from a job, self-employment income, freelance work',
+    STEP_1_BUTTON_YES: 'YES',
+    STEP_1_BUTTON_NO: 'NO',
+    STEP_1_RESULT_PREFIX: '✓ Perfect! You will use a',
+    
+    ACCOUNT_ROTH_IRA_NAME: 'Roth IRA',
+    ACCOUNT_ROTH_IRA_EXPLANATION: 'Tax-free growth forever. This is the best account type for building wealth. You already paid taxes on your income, so your investments grow tax-free and withdrawals in retirement are tax-free too.',
+    
+    ACCOUNT_TAXABLE_NAME: 'Taxable Brokerage Account',
+    ACCOUNT_TAXABLE_EXPLANATION: 'No income = no IRA eligibility. But taxable brokerage accounts still work great! You can access your money anytime, and if you hold for 1+ year, you get lower long-term capital gains tax rates.',
+    
+    // STEP 2: Brokerage
+    STEP_2_TITLE: 'OPEN YOUR ACCOUNT',
+    STEP_2_INTRO: 'Choose one of these trusted brokerages:',
+    
+    FIDELITY_NAME: 'FIDELITY',
+    FIDELITY_BADGE: 'RECOMMENDED',
+    FIDELITY_TAGLINE: 'Easiest for beginners. Best mobile app. Excellent customer service.',
+    FIDELITY_BENEFIT_1: 'Zero fees, zero account minimums',
+    FIDELITY_BENEFIT_2: '24/7 customer service',
+    FIDELITY_BENEFIT_3: 'Can buy fractional shares (important for small monthly amounts)',
+    FIDELITY_CTA: 'Open Fidelity Account →',
+    
+    OTHER_OPTIONS_LABEL: 'See other options (Schwab, Vanguard)',
+    
+    SCHWAB_NAME: 'Charles Schwab',
+    SCHWAB_TAGLINE: 'Great all-around choice. Physical branches nationwide if you prefer in-person help.',
+    SCHWAB_CTA: 'Open Schwab Account →',
+    
+    VANGUARD_NAME: 'Vanguard',
+    VANGUARD_TAGLINE: 'Lowest fees in the industry. Invented index funds. Slightly less user-friendly interface.',
+    VANGUARD_CTA: 'Open Vanguard Account →',
+    
+    STEP_2_TIME_NOTE: '⏱️ Account opening takes 10-15 minutes',
+    STEP_2_REQUIREMENTS: 'You will need: Social Security Number, driver\'s license, bank account info for transfers.',
+    
+    // STEP 3: Fund Selection
+    STEP_3_TITLE: 'WHAT TO BUY',
+    STEP_3_INTRO: 'Buy ONE of these index funds:',
+    
+    FUND_VOO_TICKER: 'VOO',
+    FUND_VOO_NAME: 'Vanguard S&P 500 ETF',
+    FUND_VOO_BADGE: 'RECOMMENDED',
+    
+    FUND_VTI_TICKER: 'VTI',
+    FUND_VTI_NAME: 'Vanguard Total Stock Market',
+    
+    FUND_VT_TICKER: 'VT',
+    FUND_VT_NAME: 'Vanguard Total World Stock',
+    
+    STEP_3_EXPLANATION_LABEL: 'What are these?',
+    STEP_3_EXPLANATION_TEXT: 'These are NOT individual stocks. They are index funds that own hundreds of companies. When you buy VOO, you instantly own tiny pieces of Apple, Microsoft, Amazon, and 497 others. Instant diversification.',
+    
+    STEP_3_COST_LABEL: 'Cost per share:',
+    STEP_3_COST_TEXT: 'Around $500-600 (but you can buy fractional shares, so your $[BUDGET]/month works perfectly)', // [BUDGET] replaced
+    
+    // STEP 4: Auto-Invest
+    STEP_4_TITLE: 'SET IT AND FORGET IT',
+    STEP_4_WARNING_EMOJI: '⚡',
+    STEP_4_WARNING_LABEL: 'CRITICAL STEP',
+    STEP_4_WARNING_TEXT: 'Set up automatic investing so you never have to think about this again. This is what makes it work.',
+    
+    STEP_4_INSTRUCTION_1: 'In your brokerage app, find "Automatic Investment" or "Auto-Invest"',
+    STEP_4_INSTRUCTION_2: 'Choose your fund: VOO, VTI, or VT',
+    STEP_4_INSTRUCTION_3: 'Set amount: $[BUDGET] per month', // [BUDGET] replaced
+    STEP_4_INSTRUCTION_4: 'Set date: The day after your paycheck hits',
+    STEP_4_INSTRUCTION_5: 'Turn it ON',
+    
+    STEP_4_SUCCESS_LABEL: 'That\'s it!',
+    STEP_4_SUCCESS_TEXT: 'Your $[BUDGET] will automatically buy more shares every month. The compound interest machine runs on autopilot. You never have to think about it again.', // [BUDGET] replaced
+    
+    // Timeline
+    TIMELINE_TITLE: 'WHAT TO EXPECT',
+    TIMELINE_MONTH_1: 'You will have ~$[BUDGET] worth of shares', // [BUDGET] replaced
+    TIMELINE_YEAR_1: '~$[AMOUNT] (your $[CONTRIBUTED] grew ~10%)', // [AMOUNT] and [CONTRIBUTED] replaced
+    TIMELINE_YEAR_5: '~$[AMOUNT]', // [AMOUNT] replaced
+    TIMELINE_YEAR_10: 'Your money has DOUBLED (compound interest goes vertical)',
+    
+    TIMELINE_NOTE: 'The market will go up and down. Some months you will be down. Keep buying. Market drops are SALES - your money buys more shares when prices are low. That is when you make the most money long-term.',
+    
+    // FAQ
+    FAQ_TITLE: 'COMMON QUESTIONS',
+    
+    FAQ_Q1: 'What if I can only do $40 this month?',
+    FAQ_A1: 'That\'s completely fine. Do what you can. The key is consistency, not perfection. Even $20/month builds real wealth over time.',
+    
+    FAQ_Q2: 'Can I invest MORE if I have extra money?',
+    FAQ_A2: 'Yes! Absolutely. You can increase your auto-invest amount anytime, or make one-time purchases when you have extra cash. The more you invest, the faster it grows.',
+    
+    FAQ_Q3: 'What if the market crashes?',
+    FAQ_A3: 'Keep buying. Market crashes are SALES. Your $[BUDGET] buys MORE shares when prices drop. People who kept investing through 2008-2009 made the most money. Crashes are opportunities, not disasters.', // [BUDGET] replaced
+    
+    FAQ_Q4: 'When can I access this money?',
+    FAQ_A4: 'Roth IRA: Your contributions anytime (tax and penalty free), earnings at age 59½. Brokerage account: Anytime (but you may owe capital gains tax).',
+    
+    FAQ_Q5: 'Do I need to do my taxes differently?',
+    FAQ_A5: 'Roth IRA: No changes. Traditional IRA: You get a tax deduction. Brokerage: You will receive tax forms for investment income (usually minimal in early years).',
+    
+    FAQ_Q6: 'Should I pick individual stocks instead?',
+    FAQ_A6: 'No. 90% of professional stock pickers lose to index funds over 15 years. Index funds are boring, but boring wins. Stick with VOO/VTI/VT and let compound interest do the work.',
+    
+    // Legal
+    LEGAL_DISCLAIMER: 'Important: This tool provides educational information only, not personalized financial advice. All calculations use S&P 500 historical average returns (10.4% annually, 1926-2024). Past performance does not guarantee future results. Investments carry risk including possible loss of principal. Consider consulting a financial advisor for personalized recommendations.',
+    
+    BUTTON_BACK_HOME: 'Start over with different numbers'
+  },
+  
+  // ==========================================================================
+  // LOADING STATE
+  // ==========================================================================
+  LOADING: {
+    TITLE: 'Calculating your future...',
+    SUBTITLE: 'This changes everything.'
+  },
+  
+  // ==========================================================================
+  // ERROR STATE
+  // ==========================================================================
+  ERROR: {
+    TITLE: 'Oops! Something went wrong',
+    MESSAGE: 'We encountered an error. Please refresh the page to try again.',
+    BUTTON: 'Refresh Page'
+  }
+};
+
 // ============================================================================
 // ANALYTICS HELPER
 // ============================================================================
@@ -54,7 +354,7 @@ var AppState = {
   goal: 'retirement',
   hasDebt: false,
   email: '',
-  accountType: 'roth_ira' // Will be set by user choice
+  accountType: 'roth_ira'
 };
 
 var Calculator = {
@@ -90,24 +390,22 @@ var Calculator = {
   
   getDescription: function(amount) {
     if (amount < 100000) return { header: 'Over $' + Math.floor(amount/1000) + 'K', showNumber: true };
-    if (amount < 180000) return { header: 'OVER $100,000', showNumber: true };
-    if (amount < 220000) return { header: 'NEARLY $200,000', showNumber: true };
-    if (amount < 250000) return { header: 'ALMOST A QUARTER MILLION DOLLARS', showNumber: true };
-    if (amount < 295000) return { header: 'OVER A QUARTER MILLION DOLLARS', showNumber: true };
-    if (amount < 333333) return { header: 'NEARLY A THIRD OF A MILLION DOLLARS', showNumber: true };
-    if (amount < 380000) return { header: 'OVER A THIRD OF A MILLION DOLLARS', showNumber: true };
-    if (amount < 480000) return { header: 'NEARLY HALF OF A MILLION DOLLARS', showNumber: true };
-    if (amount < 500000) return { header: 'HALF A MILLION DOLLARS', showNumber: true };
-    if (amount < 580000) return { header: 'OVER HALF A MILLION DOLLARS', showNumber: true };
-    if (amount < 620000) return { header: 'NEARLY TWO THIRDS OF A MILLION DOLLARS', showNumber: true };
-    if (amount < 666666) return { header: 'TWO THIRDS OF A MILLION DOLLARS', showNumber: true };
-    if (amount < 720000) return { header: 'OVER TWO THIRDS OF A MILLION DOLLARS', showNumber: true };
-    if (amount < 750000) return { header: 'NEARLY THREE-QUARTERS OF A MILLION DOLLARS', showNumber: true };
-    if (amount < 825000) return { header: 'THREE-QUARTERS OF A MILLION DOLLARS', showNumber: true };
-    if (amount < 900000) return { header: 'OVER THREE-QUARTERS OF A MILLION DOLLARS', showNumber: true };
-    if (amount < 980000) return { header: 'NEARLY A MILLION DOLLARS', showNumber: true };
-    if (amount < 1000000) return { header: 'ONE MILLION DOLLARS', showNumber: true };
-    if (amount < 1075000) return { header: 'OVER ONE MILLION DOLLARS', showNumber: true };
+    if (amount < 180000) return { header: 'Over $100,000', showNumber: true };
+    if (amount < 220000) return { header: 'Nearly $200,000', showNumber: true };
+    if (amount < 250000) return { header: 'Almost a quarter million dollars', showNumber: true };
+    if (amount < 295000) return { header: 'Over a quarter million dollars', showNumber: true };
+    if (amount < 333333) return { header: 'Nearly a third of a million dollars', showNumber: true };
+    if (amount < 380000) return { header: 'Over a third of a million dollars', showNumber: true };
+    if (amount < 480000) return { header: 'Nearly half a million dollars', showNumber: true };
+    if (amount < 520000) return { header: 'HALF A MILLION DOLLARS', showNumber: true };
+    if (amount < 580000) return { header: 'Over half a million dollars', showNumber: true };
+    if (amount < 666666) return { header: 'Nearly two-thirds of a million dollars', showNumber: true };
+    if (amount < 720000) return { header: 'Over two-thirds of a million dollars', showNumber: true };
+    if (amount < 750000) return { header: 'Nearly three-quarters of a million dollars', showNumber: true };
+    if (amount < 825000) return { header: 'Three-quarters of a million dollars', showNumber: true };
+    if (amount < 900000) return { header: 'Over three-quarters of a million dollars', showNumber: true };
+    if (amount < 980000) return { header: 'Nearly a million dollars', showNumber: true };
+    if (amount < 1080000) return { header: 'OVER ONE MILLION DOLLARS', showNumber: true };
     return { header: (amount/1000000).toFixed(1) + ' MILLION DOLLARS', showNumber: true };
   }
 };
@@ -122,7 +420,6 @@ function navigateTo(page) {
   render();
   window.scrollTo(0, 0);
   
-  // Track navigation
   trackEvent('page_view', {
     page_id: page,
     from_page: previousPage,
@@ -143,8 +440,8 @@ function showLoading() {
   overlay.innerHTML = '\
     <div class="bg-white rounded-2xl p-8 shadow-2xl">\
       <div class="animate-pulse text-center">\
-        <div class="text-2xl font-black text-slate-900 mb-2">Calculating your future...</div>\
-        <div class="text-slate-600">This changes everything.</div>\
+        <div class="text-2xl font-black text-slate-900 mb-2">' + COPY.LOADING.TITLE + '</div>\
+        <div class="text-slate-600">' + COPY.LOADING.SUBTITLE + '</div>\
       </div>\
     </div>';
   document.body.appendChild(overlay);
@@ -155,9 +452,18 @@ function hideLoading() {
   if (overlay) overlay.remove();
 }
 
-function getBackButton(targetPage, label) {
-  label = label || 'Back';
+function getBackButton(targetPage, labelOverride) {
+  var label = labelOverride || COPY.PAGE_1_00.BACK_BUTTON; // Default to PAGE_1_00 back button text
   return '<button onclick="navigateTo(\'' + targetPage + '\')" class="absolute top-4 left-4 text-slate-600 hover:text-slate-900 flex items-center text-sm font-semibold transition-colors"><svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>' + label + '</button>';
+}
+
+// Helper to replace placeholders in copy
+function replacePlaceholders(text, replacements) {
+  var result = text;
+  for (var key in replacements) {
+    result = result.replace('[' + key + ']', replacements[key]);
+  }
+  return result;
 }
 
 // ============================================================================
@@ -165,7 +471,12 @@ function getBackButton(targetPage, label) {
 // ============================================================================
 
 var Pages = {
+  // ==========================================================================
+  // PAGE 1.0 - Uses COPY.PAGE_1_0
+  // ==========================================================================
   '1.0': function() {
+    var C = COPY.PAGE_1_0; // Local reference for this page's copy
+    
     var canSubmit = AppState.age && AppState.budget && AppState.age >= 18 && AppState.age <= 64 && AppState.budget > 0;
     var buttonClass = canSubmit 
       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white cursor-pointer hover:from-blue-700 hover:to-blue-800 transform hover:scale-105' 
@@ -177,58 +488,68 @@ var Pages = {
     return '\
       <div class="min-h-screen bg-gradient-to-br from-slate-900 to-slate-700 p-4 flex items-center justify-center">\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
-          <h1 class="text-5xl md:text-6xl font-black text-center mb-3 text-slate-900 leading-tight">STILL BROKE<br>AT 65?</h1>\
-          <p class="text-center text-xl text-slate-600 mb-8">Most people are.<br><span class="font-bold text-slate-900">You don\'t have to be.</span></p>\
+          <h1 class="text-5xl md:text-6xl font-black text-center mb-3 text-slate-900 leading-tight">' + C.HEADLINE + '</h1>\
+          <p class="text-center text-xl text-slate-600 mb-8">' + C.SUBHEAD_LINE_1 + '<br><span class="font-bold text-slate-900">' + C.SUBHEAD_LINE_2 + '</span></p>\
           \
           <div class="grid grid-cols-2 gap-4 mb-6">\
             <div>\
-              <label class="block text-xs font-bold text-slate-700 mb-2 text-center h-8 flex items-center justify-center">YOUR AGE</label>\
-              <input type="number" id="age-input" placeholder="AGE" min="18" max="64" value="' + AppState.age + '" class="w-full h-28 md:h-24 px-4 border-3 ' + (ageError ? 'border-red-500' : 'border-slate-400') + ' rounded-xl focus:border-blue-500 focus:outline-none text-4xl font-black text-center bg-slate-50 placeholder-slate-300">\
-              <p id="age-error" class="text-xs text-red-600 mt-1 text-center ' + (ageError ? '' : 'invisible') + '">Age 18-64 only</p>\
+              <label class="block text-xs font-bold text-slate-700 mb-2 text-center h-8 flex items-center justify-center">' + C.LABEL_AGE + '</label>\
+              <input type="number" id="age-input" placeholder="' + C.PLACEHOLDER_AGE + '" min="18" max="64" value="' + AppState.age + '" class="w-full h-28 md:h-24 px-4 border-3 ' + (ageError ? 'border-red-500' : 'border-slate-400') + ' rounded-xl focus:border-blue-500 focus:outline-none text-4xl font-black text-center bg-slate-50 placeholder-slate-300">\
+              <p id="age-error" class="text-xs text-red-600 mt-1 text-center ' + (ageError ? '' : 'invisible') + '">' + C.ERROR_AGE + '</p>\
             </div>\
             <div>\
-              <label class="block text-xs font-bold text-slate-700 mb-2 text-center h-8 flex items-center justify-center">HOW MUCH CAN YOU SET ASIDE PER MONTH?</label>\
+              <label class="block text-xs font-bold text-slate-700 mb-2 text-center h-8 flex items-center justify-center">' + C.LABEL_BUDGET + '</label>\
               <div class="relative">\
                 <span class="absolute left-3 top-8 md:top-7 text-3xl text-slate-400 font-black">$</span>\
-                <input type="number" id="budget-input" placeholder="60" min="1" value="' + AppState.budget + '" class="w-full h-28 md:h-24 pl-10 pr-3 border-3 ' + (budgetError ? 'border-red-500' : 'border-slate-400') + ' rounded-xl focus:border-blue-500 focus:outline-none text-4xl font-black text-center bg-slate-50 placeholder-slate-300">\
+                <input type="number" id="budget-input" placeholder="' + C.PLACEHOLDER_BUDGET + '" min="1" value="' + AppState.budget + '" class="w-full h-28 md:h-24 pl-10 pr-3 border-3 ' + (budgetError ? 'border-red-500' : 'border-slate-400') + ' rounded-xl focus:border-blue-500 focus:outline-none text-4xl font-black text-center bg-slate-50 placeholder-slate-300">\
               </div>\
-              <p id="budget-error" class="text-xs text-red-600 mt-1 text-center ' + (budgetError ? '' : 'invisible') + '">Must be > $0</p>\
+              <p id="budget-error" class="text-xs text-red-600 mt-1 text-center ' + (budgetError ? '' : 'invisible') + '">' + C.ERROR_BUDGET + '</p>\
             </div>\
           </div>\
           \
-          <button id="submit-btn" class="w-full py-5 rounded-xl font-black text-xl shadow-xl transition-all ' + buttonClass + '">SHOW ME THE MATH</button>\
+          <button id="submit-btn" class="w-full py-5 rounded-xl font-black text-xl shadow-xl transition-all ' + buttonClass + '">' + C.BUTTON_CTA + '</button>\
           \
-          <p class="text-center text-sm text-slate-500 mt-4">Takes 30 seconds. Changes everything.</p>\
+          <p class="text-center text-sm text-slate-500 mt-4">' + C.FOOTER_TEXT + '</p>\
         </div>\
       </div>';
   },
   
+  // ==========================================================================
+  // PAGE 1.00 - Uses COPY.PAGE_1_00
+  // ==========================================================================
   '1.00': function() {
+    var C = COPY.PAGE_1_00;
+    
     return '\
       <div class="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 p-4 flex items-center justify-center relative">\
-        ' + getBackButton('1.0') + '\
+        ' + getBackButton('1.0', C.BACK_BUTTON) + '\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
-          <h1 class="text-4xl font-black text-center mb-6 text-slate-900">WHAT MATTERS MOST?</h1>\
-          <p class="text-center text-lg text-slate-700 mb-8">Choose your primary goal:</p>\
+          <h1 class="text-4xl font-black text-center mb-6 text-slate-900">' + C.HEADLINE + '</h1>\
+          <p class="text-center text-lg text-slate-700 mb-8">' + C.SUBHEAD + '</p>\
           \
           <div class="space-y-4">\
             <button id="retirement-btn" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 text-white py-6 rounded-xl font-black text-xl hover:from-indigo-700 hover:to-indigo-800 transition-all shadow-lg transform hover:scale-105">\
-              <div class="text-2xl mb-1">MY RETIREMENT</div>\
-              <div class="text-sm font-normal opacity-90">Living comfortably when I stop working</div>\
+              <div class="text-2xl mb-1">' + C.BUTTON_RETIREMENT + '</div>\
+              <div class="text-sm font-normal opacity-90">' + C.BUTTON_RETIREMENT_SUB + '</div>\
             </button>\
             \
             <button id="family-btn" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-6 rounded-xl font-black text-xl hover:from-purple-700 hover:to-purple-800 transition-all shadow-lg transform hover:scale-105">\
-              <div class="text-2xl mb-1">FAMILY LEGACY</div>\
-              <div class="text-sm font-normal opacity-90">Leaving wealth for my loved ones</div>\
+              <div class="text-2xl mb-1">' + C.BUTTON_FAMILY + '</div>\
+              <div class="text-sm font-normal opacity-90">' + C.BUTTON_FAMILY_SUB + '</div>\
             </button>\
           </div>\
           \
-          <p class="text-center text-sm text-slate-500 mt-6">Both paths use the same strategy - just different emotional focus.</p>\
+          <p class="text-center text-sm text-slate-500 mt-6">' + C.FOOTER_TEXT + '</p>\
         </div>\
       </div>';
   },
   
+  // ==========================================================================
+  // PAGE 1.01 - Uses COPY.PAGE_1_01
+  // ==========================================================================
   '1.01': function() {
+    var C = COPY.PAGE_1_01;
+    
     var isRetirement = AppState.goal === 'retirement';
     var years = isRetirement ? (65 - Number(AppState.age)) : (80 - Number(AppState.age));
     var amount = isRetirement 
@@ -238,431 +559,489 @@ var Pages = {
     var desc = Calculator.getDescription(amount);
     var future20 = Calculator.future20Years(amount);
     
+    // Replace placeholders
+    var eyebrow = replacePlaceholders(C.EYEBROW, { BUDGET: AppState.budget });
+    var yearsText = replacePlaceholders(C.YEARS_TEXT, { AGE: AppState.age, YEARS: years });
+    
+    // Build benefits list based on goal
+    var benefitsList = '';
+    if (isRetirement) {
+      var benefit4 = replacePlaceholders(C.RETIREMENT_BENEFIT_4, { INCOME: income.toLocaleString() });
+      benefitsList = '\
+        <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.RETIREMENT_BENEFIT_1 + '</span></p>\
+        <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.RETIREMENT_BENEFIT_2 + '</span></p>\
+        <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.RETIREMENT_BENEFIT_3 + '</span></p>\
+        <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span class="font-bold">' + benefit4 + '</span> ' + C.RETIREMENT_BENEFIT_4_SUFFIX + '</p>';
+    } else {
+      var benefit3 = replacePlaceholders(C.FAMILY_BENEFIT_3, { INCOME: income.toLocaleString() });
+      var benefit4 = replacePlaceholders(C.FAMILY_BENEFIT_4, { FUTURE: future20.toLocaleString() });
+      benefitsList = '\
+        <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + C.FAMILY_BENEFIT_1 + '</span></p>\
+        <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + C.FAMILY_BENEFIT_2 + '</span></p>\
+        <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span class="font-bold">' + benefit3 + '</span></p>\
+        <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + benefit4 + '</span></p>';
+    }
+    
     return '\
       <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 flex items-center justify-center relative">\
-        ' + getBackButton('1.00') + '\
+        ' + getBackButton('1.00', C.BACK_BUTTON) + '\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
           <div class="text-center mb-6">\
-            <p class="text-slate-600 text-sm mb-3 uppercase tracking-wide">YOUR $' + AppState.budget + '/MONTH BECOMES</p>\
+            <p class="text-slate-600 text-sm mb-3 uppercase tracking-wide">' + eyebrow + '</p>\
             <h1 class="text-4xl md:text-5xl font-black ' + (isRetirement ? 'text-indigo-600' : 'text-purple-600') + ' mb-3 leading-tight">' + desc.header + '</h1>\
             ' + (desc.showNumber ? '<p class="text-3xl font-bold text-slate-700 mb-3">$' + amount.toLocaleString() + '</p>' : '') + '\
-            <p class="text-slate-500 text-sm">You are ' + AppState.age + '. That is <span class="font-bold text-slate-900">' + years + ' years</span> of compound growth.</p>\
+            <p class="text-slate-500 text-sm">' + yearsText + '</p>\
           </div>\
           \
           <div class="bg-emerald-50 rounded-xl p-6 mb-6 space-y-3">\
-            <p class="text-lg font-bold text-slate-900">That means:</p>\
-            <div class="space-y-2 text-slate-700">' +
-              (isRetirement ? '\
-                <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>Never asking your kids for money</span></p>\
-                <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>Retiring when <span class="font-bold">YOU</span> want to</span></p>\
-                <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>Financial security for life</span></p>\
-                <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span class="font-bold">$' + income.toLocaleString() + '/year forever</span> (without touching your money)</p>' 
-              : '\
-                <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>Your kids never struggle like you did</span></p>\
-                <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>Generational wealth starts with YOU</span></p>\
-                <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span class="font-bold">$' + income.toLocaleString() + '/year for your family</span></p>\
-                <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>If untouched 20 more years: <span class="font-bold">$' + future20.toLocaleString() + '</span></span></p>') + '\
-            </div>\
+            <p class="text-lg font-bold text-slate-900">' + C.BENEFITS_LABEL + '</p>\
+            <div class="space-y-2 text-slate-700">' + benefitsList + '</div>\
           </div>\
           \
           <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4 text-xs text-slate-600">\
-            <p class="font-semibold text-blue-900 mb-1">Based on S&P 500 historical average</p>\
-            <p>10.4% annual return (1926-2024). Past performance does not guarantee future results. Market values fluctuate.</p>\
+            <p class="font-semibold text-blue-900 mb-1">' + C.DISCLAIMER_TITLE + '</p>\
+            <p>' + C.DISCLAIMER_TEXT + '</p>\
           </div>\
           \
-          <p class="text-center text-slate-700 mb-6 text-lg leading-relaxed">This money <span class="font-bold">works for you while you sleep</span>. Every single day. For decades.</p>\
+          <p class="text-center text-slate-700 mb-6 text-lg leading-relaxed">' + C.CLOSING_TEXT + '</p>\
           \
           <div class="space-y-3">\
-            <button id="want-btn" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-4 rounded-lg font-black text-lg hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg">THIS IS WHAT I WANT</button>\
-            <button id="wait-btn" class="w-full bg-slate-200 text-slate-600 py-3 rounded-lg font-semibold hover:bg-slate-300 transition-colors text-sm">Show me what happens if I wait</button>\
-            <button id="back-btn" class="w-full text-slate-500 underline text-sm hover:text-slate-700">Try different numbers</button>\
+            <button id="want-btn" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-4 rounded-lg font-black text-lg hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg">' + C.BUTTON_WANT + '</button>\
+            <button id="wait-btn" class="w-full bg-slate-200 text-slate-600 py-3 rounded-lg font-semibold hover:bg-slate-300 transition-colors text-sm">' + C.BUTTON_WAIT + '</button>\
+            <button id="back-btn" class="w-full text-slate-500 underline text-sm hover:text-slate-700">' + C.BUTTON_BACK + '</button>\
           </div>\
         </div>\
       </div>';
   },
   
+  // ==========================================================================
+  // PAGE 1.02 - Uses COPY.PAGE_1_02
+  // ==========================================================================
   '1.02': function() {
+    var C = COPY.PAGE_1_02;
+    
     return '\
       <div class="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 p-4 flex items-center justify-center relative">\
-        ' + getBackButton('1.01') + '\
+        ' + getBackButton('1.01', C.BACK_BUTTON) + '\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
-          <h1 class="text-3xl font-black text-center mb-6 text-slate-900">QUICK QUESTION</h1>\
-          <p class="text-xl text-center text-slate-700 mb-8">Do you have credit card debt or high-interest loans?</p>\
+          <h1 class="text-3xl font-black text-center mb-6 text-slate-900">' + C.HEADLINE + '</h1>\
+          <p class="text-xl text-center text-slate-700 mb-8">' + C.QUESTION + '</p>\
           \
           <div class="space-y-3 mb-6">\
-            <button id="yes-debt" class="w-full bg-red-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-red-700 transition-colors shadow-lg">YES, I have debt</button>\
-            <button id="no-debt" class="w-full bg-emerald-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-emerald-700 transition-colors shadow-lg">NO debt</button>\
+            <button id="yes-debt" class="w-full bg-red-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-red-700 transition-colors shadow-lg">' + C.BUTTON_YES + '</button>\
+            <button id="no-debt" class="w-full bg-emerald-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-emerald-700 transition-colors shadow-lg">' + C.BUTTON_NO + '</button>\
           </div>\
           \
           <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 text-xs text-slate-600">\
-            <p class="font-semibold text-slate-700 mb-1">Why we ask:</p>\
-            <p>High-interest debt (typically 15-25% APR) costs more than stock market returns. Paying it off first is mathematically optimal and protects you from losing money.</p>\
+            <p class="font-semibold text-slate-700 mb-1">' + C.WHY_LABEL + '</p>\
+            <p>' + C.WHY_TEXT + '</p>\
           </div>\
         </div>\
       </div>';
   },
   
+  // ==========================================================================
+  // PAGE 1.03 - Uses COPY.PAGE_1_03
+  // ==========================================================================
   '1.03': function() {
+    var C = COPY.PAGE_1_03;
+    
     var daily = Calculator.dailyLoss(Number(AppState.age), Number(AppState.budget));
     var monthly = daily * 30;
     var yearly = daily * 365;
     var fiveYear = yearly * 5;
     
+    // Replace placeholders
+    var lossDaily = replacePlaceholders(C.LOSS_DAILY, { DAILY: daily.toLocaleString() });
+    var lossMonthly = replacePlaceholders(C.LOSS_MONTHLY, { MONTHLY: monthly.toLocaleString() });
+    var lossYearly = replacePlaceholders(C.LOSS_YEARLY, { YEARLY: yearly.toLocaleString() });
+    var lossFiveYear = replacePlaceholders(C.LOSS_FIVE_YEAR, { FIVE_YEAR: fiveYear.toLocaleString() });
+    
     return '\
       <div class="min-h-screen bg-gradient-to-br from-red-900 to-red-700 p-4 flex items-center justify-center relative">\
-        ' + getBackButton('1.01', 'Go back') + '\
+        ' + getBackButton('1.01', C.BACK_BUTTON) + '\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
-          <h1 class="text-6xl font-black text-center mb-2 text-red-600">WAIT.</h1>\
-          <p class="text-center text-slate-600 mb-8">Before you decide to "come back later"...</p>\
+          <h1 class="text-6xl font-black text-center mb-2 text-red-600">' + C.HEADLINE + '</h1>\
+          <p class="text-center text-slate-600 mb-8">' + C.SUBHEAD + '</p>\
           \
-          <!-- Daily Loss -->\
           <div class="bg-red-50 border-4 border-red-200 rounded-xl p-6 mb-6">\
-            <p class="text-center text-lg font-bold text-slate-700 mb-4">EVERY DAY YOU WAIT:</p>\
-            <p class="text-center text-5xl font-black text-red-600 mb-6">$' + daily.toLocaleString() + '</p>\
+            <p class="text-center text-lg font-bold text-slate-700 mb-4">' + C.LOSS_BOX_LABEL + '</p>\
+            <p class="text-center text-5xl font-black text-red-600 mb-6">' + lossDaily + '</p>\
             <div class="space-y-2 text-center text-slate-600">\
-              <p>Every month: <span class="font-bold text-red-600">$' + monthly.toLocaleString() + '</span></p>\
-              <p>Every year: <span class="font-bold text-red-600">$' + yearly.toLocaleString() + '</span></p>\
-              <p class="text-lg pt-3 mt-3 border-t border-red-200 font-bold">Wait just 5 years: <span class="text-red-700 text-2xl">-$' + fiveYear.toLocaleString() + '</span></p>\
+              <p>' + lossMonthly + '</p>\
+              <p>' + lossYearly + '</p>\
+              <p class="text-lg pt-3 mt-3 border-t border-red-200 font-bold">' + lossFiveYear + '</p>\
             </div>\
           </div>\
           \
-          <!-- Visualization -->\
           <div class="bg-slate-100 rounded-lg p-4 mb-6">\
-            <p class="text-sm font-bold text-slate-700 mb-3">If you wait ONE YEAR to start:</p>\
+            <p class="text-sm font-bold text-slate-700 mb-3">' + C.VIZ_LABEL + '</p>\
             <div class="relative h-4 bg-red-200 rounded-full overflow-hidden mb-2">\
               <div class="absolute h-full bg-red-600 rounded-full animate-pulse" style="width: 75%"></div>\
             </div>\
-            <p class="text-xs text-slate-600 text-center">That\'s 75% of what most Americans save in a YEAR - gone forever</p>\
+            <p class="text-xs text-slate-600 text-center">' + C.VIZ_TEXT + '</p>\
           </div>\
           \
-          <!-- Social Proof -->\
           <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">\
-            <p class="text-sm text-slate-700 italic">"I waited 3 years to start. It cost me $42,000. Do not make my mistake. Start TODAY."</p>\
-            <p class="text-xs text-slate-500 mt-2">- Real user, started at age 35</p>\
+            <p class="text-sm text-slate-700 italic">' + C.TESTIMONIAL + '</p>\
+            <p class="text-xs text-slate-500 mt-2">' + C.TESTIMONIAL_ATTRIBUTION + '</p>\
           </div>\
           \
           <div class="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4 mb-6">\
-            <p class="text-center font-bold text-slate-900">That is money you will <span class="text-red-600">NEVER</span> get back.</p>\
-            <p class="text-center text-sm text-slate-600 mt-2">Time is the only resource you cannot buy more of.</p>\
+            <p class="text-center font-bold text-slate-900">' + C.WARNING_PRIMARY + '</p>\
+            <p class="text-center text-sm text-slate-600 mt-2">' + C.WARNING_SECONDARY + '</p>\
           </div>\
           \
           <div class="space-y-3">\
-            <button id="start-btn" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-5 rounded-lg font-black text-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-xl">NO, LET\'S START NOW</button>\
-            <button id="later-btn" class="w-full bg-slate-200 text-slate-600 py-3 rounded-lg font-semibold hover:bg-slate-300 transition-colors text-sm">I will think about it</button>\
+            <button id="start-btn" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-5 rounded-lg font-black text-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-xl">' + C.BUTTON_START + '</button>\
+            <button id="later-btn" class="w-full bg-slate-200 text-slate-600 py-3 rounded-lg font-semibold hover:bg-slate-300 transition-colors text-sm">' + C.BUTTON_LATER + '</button>\
           </div>\
         </div>\
       </div>';
   },
   
+  // ==========================================================================
+  // PAGE 1.04 - Uses COPY.PAGE_1_04
+  // ==========================================================================
   '1.04': function() {
+    var C = COPY.PAGE_1_04;
+    
+    var para2 = replacePlaceholders(C.PARA_2, { BUDGET: AppState.budget });
+    var para3 = replacePlaceholders(C.PARA_3, { BUDGET: AppState.budget });
+    
     return '\
       <div class="min-h-screen bg-gradient-to-br from-amber-50 to-amber-100 p-4 flex items-center justify-center relative">\
-        ' + getBackButton('1.02') + '\
+        ' + getBackButton('1.02', C.BACK_BUTTON) + '\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
-          <h1 class="text-4xl font-black text-center mb-6 text-amber-900">PAY THAT OFF FIRST</h1>\
+          <h1 class="text-4xl font-black text-center mb-6 text-amber-900">' + C.HEADLINE + '</h1>\
           \
           <div class="space-y-4 text-lg text-slate-700 mb-6">\
-            <p>Credit card debt at <span class="font-bold text-red-600">20% interest</span> costs you more than the stock market will make you.</p>\
-            <p class="font-bold text-slate-900">Take your $' + AppState.budget + '/month and attack that debt.</p>\
-            <p>Once it is gone, <span class="font-bold">come back here</span>. Then that $' + AppState.budget + ' can start building wealth instead of paying interest.</p>\
+            <p>' + C.PARA_1 + '</p>\
+            <p class="font-bold text-slate-900">' + para2 + '</p>\
+            <p>' + para3 + '</p>\
           </div>\
           \
           <div class="bg-amber-50 border-2 border-amber-300 rounded-lg p-4 mb-4">\
-            <p class="text-center font-bold text-slate-900 mb-2">Paying off a 20% loan = <span class="text-emerald-600">guaranteed 20% return</span></p>\
-            <p class="text-center text-sm text-slate-600">S&P 500 averages 10%. Your debt costs 20%. Math favors debt payoff.</p>\
+            <p class="text-center font-bold text-slate-900 mb-2">' + C.MATH_BOX_LINE_1 + '</p>\
+            <p class="text-center text-sm text-slate-600">' + C.MATH_BOX_LINE_2 + '</p>\
           </div>\
           \
           <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">\
-            <p class="text-sm text-slate-700 mb-2"><span class="font-bold">Smart strategy:</span></p>\
-            <p class="text-sm text-slate-600">1. Pay off high-interest debt first<br>2. Then invest that same payment amount<br>3. Build wealth without the debt burden</p>\
+            <p class="text-sm text-slate-700 mb-2"><span class="font-bold">' + C.STRATEGY_LABEL + '</span></p>\
+            <p class="text-sm text-slate-600">' + C.STRATEGY_STEP_1 + '<br>' + C.STRATEGY_STEP_2 + '<br>' + C.STRATEGY_STEP_3 + '</p>\
           </div>\
           \
           <div class="bg-slate-50 border border-slate-200 rounded p-3 mb-6 text-xs text-slate-600">\
-            <p class="font-semibold text-slate-700 mb-1">This is general guidance, not personal advice</p>\
-            <p>Everyone\'s financial situation is different. Consider consulting a financial advisor for personalized recommendations.</p>\
+            <p class="font-semibold text-slate-700 mb-1">' + C.DISCLAIMER_LABEL + '</p>\
+            <p>' + C.DISCLAIMER_TEXT + '</p>\
           </div>\
           \
-          <button id="gotit-btn" class="w-full bg-slate-700 text-white py-4 rounded-lg font-bold text-lg hover:bg-slate-800 transition-colors shadow-lg">Got it. I will be back.</button>\
+          <button id="gotit-btn" class="w-full bg-slate-700 text-white py-4 rounded-lg font-bold text-lg hover:bg-slate-800 transition-colors shadow-lg">' + C.BUTTON_CTA + '</button>\
         </div>\
       </div>';
   },
   
+  // ==========================================================================
+  // PAGE 1.045 - Uses COPY.PAGE_1_045
+  // ==========================================================================
   '1.045': function() {
+    var C = COPY.PAGE_1_045;
+    
+    var benefit1 = replacePlaceholders(C.BENEFIT_1, { BUDGET: AppState.budget });
+    
     return '\
       <div class="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-4 flex items-center justify-center relative">\
-        ' + getBackButton('1.02') + '\
+        ' + getBackButton('1.02', C.BACK_BUTTON) + '\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
-          <h1 class="text-3xl font-black text-center mb-4 text-slate-900">ONE MORE THING</h1>\
-          <p class="text-center text-lg text-slate-700 mb-6">Get your step-by-step setup guide via email</p>\
+          <h1 class="text-3xl font-black text-center mb-4 text-slate-900">' + C.HEADLINE + '</h1>\
+          <p class="text-center text-lg text-slate-700 mb-6">' + C.SUBHEAD + '</p>\
           \
           <div class="bg-blue-50 rounded-lg p-6 mb-6">\
-            <p class="text-sm font-bold text-slate-700 mb-3">We will send you:</p>\
+            <p class="text-sm font-bold text-slate-700 mb-3">' + C.BENEFITS_LABEL + '</p>\
             <ul class="space-y-2 text-sm text-slate-700">\
-              <li class="flex items-start"><span class="mr-2 text-blue-600">✓</span>Your personalized plan ($' + AppState.budget + '/month)</li>\
-              <li class="flex items-start"><span class="mr-2 text-blue-600">✓</span>Account opening checklist</li>\
-              <li class="flex items-start"><span class="mr-2 text-blue-600">✓</span>Screenshots of each step</li>\
-              <li class="flex items-start"><span class="mr-2 text-blue-600">✓</span>What to do if you get stuck</li>\
+              <li class="flex items-start"><span class="mr-2 text-blue-600">✓</span>' + benefit1 + '</li>\
+              <li class="flex items-start"><span class="mr-2 text-blue-600">✓</span>' + C.BENEFIT_2 + '</li>\
+              <li class="flex items-start"><span class="mr-2 text-blue-600">✓</span>' + C.BENEFIT_3 + '</li>\
+              <li class="flex items-start"><span class="mr-2 text-blue-600">✓</span>' + C.BENEFIT_4 + '</li>\
             </ul>\
           </div>\
           \
-          <input type="email" id="email-input" placeholder="your@email.com" class="w-full px-4 py-4 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg mb-4" required>\
-          <p id="email-error" class="text-xs text-red-600 mb-4 hidden">Please enter a valid email</p>\
+          <input type="email" id="email-input" placeholder="' + C.PLACEHOLDER_EMAIL + '" class="w-full px-4 py-4 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg mb-4" required>\
+          <p id="email-error" class="text-xs text-red-600 mb-4 hidden">' + C.ERROR_EMAIL + '</p>\
           \
-          <button id="send-guide-btn" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-lg font-black text-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg mb-3">SEND ME THE GUIDE</button>\
+          <button id="send-guide-btn" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-lg font-black text-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg mb-3">' + C.BUTTON_SEND + '</button>\
           \
-          <button id="skip-email-btn" class="w-full text-slate-500 underline text-sm hover:text-slate-700">Skip (I will figure it out myself)</button>\
+          <button id="skip-email-btn" class="w-full text-slate-500 underline text-sm hover:text-slate-700">' + C.BUTTON_SKIP + '</button>\
           \
-          <p class="text-xs text-slate-400 text-center mt-4">We hate spam. Zero marketing emails. Unsubscribe anytime.</p>\
+          <p class="text-xs text-slate-400 text-center mt-4">' + C.PRIVACY_TEXT + '</p>\
         </div>\
       </div>';
   },
   
+  // ==========================================================================
+  // PAGE 1.05 - Uses COPY.PAGE_1_05
+  // ==========================================================================
   '1.05': function() {
+    var C = COPY.PAGE_1_05;
+    
     var isRetirement = AppState.goal === 'retirement';
+    var goalText = isRetirement ? 'Retirement Security' : 'Family Legacy';
+    
+    // Replace placeholders
+    var planLabel = replacePlaceholders(C.PLAN_SUMMARY_LABEL, { BUDGET: AppState.budget });
+    var planDetail = replacePlaceholders(C.PLAN_SUMMARY_DETAIL, { AGE: AppState.age, GOAL: goalText });
+    
+    var step3CostText = replacePlaceholders(C.STEP_3_COST_TEXT, { BUDGET: AppState.budget });
+    var step4Instruction3 = replacePlaceholders(C.STEP_4_INSTRUCTION_3, { BUDGET: AppState.budget });
+    var step4SuccessText = replacePlaceholders(C.STEP_4_SUCCESS_TEXT, { BUDGET: AppState.budget });
+    
+    var timelineMonth1 = replacePlaceholders(C.TIMELINE_MONTH_1, { BUDGET: AppState.budget });
+    var year1Amount = Math.round(AppState.budget * 12 * 1.104).toLocaleString();
+    var year1Contributed = (AppState.budget * 12).toLocaleString();
+    var timelineYear1 = replacePlaceholders(C.TIMELINE_YEAR_1, { AMOUNT: year1Amount, CONTRIBUTED: year1Contributed });
+    var year5Amount = Math.round(Calculator.retirement(AppState.age, AppState.budget) * (5 / (65 - AppState.age))).toLocaleString();
+    var timelineYear5 = replacePlaceholders(C.TIMELINE_YEAR_5, { AMOUNT: year5Amount });
+    
+    var faqA3 = replacePlaceholders(C.FAQ_A3, { BUDGET: AppState.budget });
     
     return '\
       <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 py-12">\
         <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-2xl p-8">\
           \
-          <!-- Header -->\
           <div class="text-center mb-8">\
-            <h1 class="text-4xl font-black text-emerald-900 mb-3">LET\'S GET YOU SET UP</h1>\
+            <h1 class="text-4xl font-black text-emerald-900 mb-3">' + C.HEADLINE + '</h1>\
             <div class="bg-emerald-50 rounded-lg p-4">\
-              <p class="text-xl font-bold text-slate-900">Your Plan: $' + AppState.budget + '/month</p>\
-              <p class="text-sm text-slate-600">Age ' + AppState.age + ' → ' + (isRetirement ? 'Retirement Security' : 'Family Legacy') + '</p>\
+              <p class="text-xl font-bold text-slate-900">' + planLabel + '</p>\
+              <p class="text-sm text-slate-600">' + planDetail + '</p>\
             </div>\
           </div>\
           \
-          <!-- Step 1: Account Type -->\
+          <!-- STEP 1 -->\
           <div class="mb-8 pb-8 border-b border-slate-200">\
             <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center">\
               <span class="bg-emerald-600 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 text-lg flex-shrink-0">1</span>\
-              <span>CHOOSE YOUR ACCOUNT TYPE</span>\
+              <span>' + C.STEP_1_TITLE + '</span>\
             </h2>\
             \
             <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">\
-              <p class="font-semibold text-blue-900 mb-2">Do you have earned income this year?</p>\
-              <p class="text-sm text-slate-600">Earned income = wages from a job, self-employment income, freelance work</p>\
+              <p class="font-semibold text-blue-900 mb-2">' + C.STEP_1_QUESTION + '</p>\
+              <p class="text-sm text-slate-600">' + C.STEP_1_EXPLANATION + '</p>\
             </div>\
             \
             <div class="grid grid-cols-2 gap-3 mb-4">\
-              <button id="has-income-btn" class="bg-emerald-600 text-white py-4 px-6 rounded-lg font-bold hover:bg-emerald-700 transition-colors">YES</button>\
-              <button id="no-income-btn" class="bg-slate-300 text-slate-700 py-4 px-6 rounded-lg font-bold hover:bg-slate-400 transition-colors">NO</button>\
+              <button id="has-income-btn" class="bg-emerald-600 text-white py-4 px-6 rounded-lg font-bold hover:bg-emerald-700 transition-colors">' + C.STEP_1_BUTTON_YES + '</button>\
+              <button id="no-income-btn" class="bg-slate-300 text-slate-700 py-4 px-6 rounded-lg font-bold hover:bg-slate-400 transition-colors">' + C.STEP_1_BUTTON_NO + '</button>\
             </div>\
             \
             <div id="account-type-result" class="bg-emerald-50 border-2 border-emerald-500 rounded-lg p-6 hidden">\
-              <p class="font-bold text-emerald-900 text-lg mb-2">✓ Perfect! You will use a <span id="account-name">Roth IRA</span></p>\
-              <p class="text-sm text-slate-600" id="account-explanation">Tax-free growth forever. This is the best account type for building wealth.</p>\
+              <p class="font-bold text-emerald-900 text-lg mb-2">' + C.STEP_1_RESULT_PREFIX + ' <span id="account-name"></span></p>\
+              <p class="text-sm text-slate-600" id="account-explanation"></p>\
             </div>\
           </div>\
           \
-          <!-- Step 2: Brokerage (shown after account type selected) -->\
+          <!-- STEP 2 -->\
           <div id="brokerage-section" class="mb-8 pb-8 border-b border-slate-200 hidden">\
             <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center">\
               <span class="bg-emerald-600 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 text-lg flex-shrink-0">2</span>\
-              <span>OPEN YOUR ACCOUNT</span>\
+              <span>' + C.STEP_2_TITLE + '</span>\
             </h2>\
             \
-            <p class="text-slate-700 mb-4">Choose one of these trusted brokerages:</p>\
+            <p class="text-slate-700 mb-4">' + C.STEP_2_INTRO + '</p>\
             \
             <div class="space-y-4">\
-              <!-- Fidelity (Recommended) -->\
               <div class="bg-white border-2 border-emerald-500 rounded-lg p-6">\
                 <div class="flex justify-between items-start mb-3">\
-                  <h3 class="text-2xl font-black text-slate-900">FIDELITY</h3>\
-                  <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full">RECOMMENDED</span>\
+                  <h3 class="text-2xl font-black text-slate-900">' + C.FIDELITY_NAME + '</h3>\
+                  <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full">' + C.FIDELITY_BADGE + '</span>\
                 </div>\
-                <p class="text-sm text-slate-600 mb-3">Easiest for beginners. Best mobile app. Excellent customer service.</p>\
+                <p class="text-sm text-slate-600 mb-3">' + C.FIDELITY_TAGLINE + '</p>\
                 <ul class="space-y-2 text-sm text-slate-700 mb-4">\
-                  <li class="flex items-start"><span class="text-emerald-600 mr-2">✓</span><span>Zero fees, zero account minimums</span></li>\
-                  <li class="flex items-start"><span class="text-emerald-600 mr-2">✓</span><span>24/7 customer service</span></li>\
-                  <li class="flex items-start"><span class="text-emerald-600 mr-2">✓</span><span>Can buy fractional shares (important for small monthly amounts)</span></li>\
+                  <li class="flex items-start"><span class="text-emerald-600 mr-2">✓</span><span>' + C.FIDELITY_BENEFIT_1 + '</span></li>\
+                  <li class="flex items-start"><span class="text-emerald-600 mr-2">✓</span><span>' + C.FIDELITY_BENEFIT_2 + '</span></li>\
+                  <li class="flex items-start"><span class="text-emerald-600 mr-2">✓</span><span>' + C.FIDELITY_BENEFIT_3 + '</span></li>\
                 </ul>\
-                <a href="https://www.fidelity.com/open-account/overview" target="_blank" rel="noopener" class="block bg-emerald-600 text-white text-center py-3 rounded-lg font-bold hover:bg-emerald-700 transition-colors">Open Fidelity Account →</a>\
+                <a href="https://www.fidelity.com/open-account/overview" target="_blank" rel="noopener" class="block bg-emerald-600 text-white text-center py-3 rounded-lg font-bold hover:bg-emerald-700 transition-colors">' + C.FIDELITY_CTA + '</a>\
               </div>\
               \
-              <!-- Other Options -->\
               <details class="bg-slate-50 rounded-lg p-4">\
-                <summary class="font-bold text-slate-700 cursor-pointer hover:text-slate-900">See other options (Schwab, Vanguard)</summary>\
+                <summary class="font-bold text-slate-700 cursor-pointer hover:text-slate-900">' + C.OTHER_OPTIONS_LABEL + '</summary>\
                 <div class="mt-4 space-y-3">\
                   <div class="bg-white border border-slate-300 rounded p-4">\
-                    <h4 class="font-bold text-slate-900 mb-2">Charles Schwab</h4>\
-                    <p class="text-sm text-slate-600 mb-3">Great all-around choice. Physical branches nationwide if you prefer in-person help.</p>\
-                    <a href="https://www.schwab.com" target="_blank" rel="noopener" class="text-blue-600 underline text-sm hover:text-blue-800">Open Schwab Account →</a>\
+                    <h4 class="font-bold text-slate-900 mb-2">' + C.SCHWAB_NAME + '</h4>\
+                    <p class="text-sm text-slate-600 mb-3">' + C.SCHWAB_TAGLINE + '</p>\
+                    <a href="https://www.schwab.com" target="_blank" rel="noopener" class="text-blue-600 underline text-sm hover:text-blue-800">' + C.SCHWAB_CTA + '</a>\
                   </div>\
                   <div class="bg-white border border-slate-300 rounded p-4">\
-                    <h4 class="font-bold text-slate-900 mb-2">Vanguard</h4>\
-                    <p class="text-sm text-slate-600 mb-3">Lowest fees in the industry. Invented index funds. Slightly less user-friendly interface.</p>\
-                    <a href="https://investor.vanguard.com" target="_blank" rel="noopener" class="text-blue-600 underline text-sm hover:text-blue-800">Open Vanguard Account →</a>\
+                    <h4 class="font-bold text-slate-900 mb-2">' + C.VANGUARD_NAME + '</h4>\
+                    <p class="text-sm text-slate-600 mb-3">' + C.VANGUARD_TAGLINE + '</p>\
+                    <a href="https://investor.vanguard.com" target="_blank" rel="noopener" class="text-blue-600 underline text-sm hover:text-blue-800">' + C.VANGUARD_CTA + '</a>\
                   </div>\
                 </div>\
               </details>\
             </div>\
             \
             <div class="mt-4 bg-yellow-50 border-l-4 border-yellow-400 p-4 text-sm text-slate-700">\
-              <p class="font-semibold mb-1">⏱️ Account opening takes 10-15 minutes</p>\
-              <p>You will need: Social Security Number, driver\'s license, bank account info for transfers.</p>\
+              <p class="font-semibold mb-1">' + C.STEP_2_TIME_NOTE + '</p>\
+              <p>' + C.STEP_2_REQUIREMENTS + '</p>\
             </div>\
           </div>\
           \
-          <!-- Step 3: What to Buy -->\
+          <!-- STEP 3 -->\
           <div id="fund-section" class="mb-8 pb-8 border-b border-slate-200 hidden">\
             <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center">\
               <span class="bg-emerald-600 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 text-lg flex-shrink-0">3</span>\
-              <span>WHAT TO BUY</span>\
+              <span>' + C.STEP_3_TITLE + '</span>\
             </h2>\
             \
             <div class="bg-emerald-50 rounded-lg p-6">\
-              <p class="font-bold text-slate-900 mb-4">Buy ONE of these index funds:</p>\
+              <p class="font-bold text-slate-900 mb-4">' + C.STEP_3_INTRO + '</p>\
               \
               <div class="space-y-3 mb-4">\
                 <div class="bg-white rounded-lg p-4 border-2 border-emerald-500">\
                   <div class="flex justify-between items-center">\
                     <div>\
-                      <p class="font-mono font-bold text-2xl text-emerald-600">VOO</p>\
-                      <p class="text-sm text-slate-600">Vanguard S&P 500 ETF</p>\
+                      <p class="font-mono font-bold text-2xl text-emerald-600">' + C.FUND_VOO_TICKER + '</p>\
+                      <p class="text-sm text-slate-600">' + C.FUND_VOO_NAME + '</p>\
                     </div>\
-                    <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-1 rounded">RECOMMENDED</span>\
+                    <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-1 rounded">' + C.FUND_VOO_BADGE + '</span>\
                   </div>\
                 </div>\
                 \
                 <div class="bg-white rounded-lg p-4">\
-                  <p class="font-mono font-bold text-xl text-slate-700">VTI</p>\
-                  <p class="text-sm text-slate-600">Vanguard Total Stock Market</p>\
+                  <p class="font-mono font-bold text-xl text-slate-700">' + C.FUND_VTI_TICKER + '</p>\
+                  <p class="text-sm text-slate-600">' + C.FUND_VTI_NAME + '</p>\
                 </div>\
                 \
                 <div class="bg-white rounded-lg p-4">\
-                  <p class="font-mono font-bold text-xl text-slate-700">VT</p>\
-                  <p class="text-sm text-slate-600">Vanguard Total World Stock</p>\
+                  <p class="font-mono font-bold text-xl text-slate-700">' + C.FUND_VT_TICKER + '</p>\
+                  <p class="text-sm text-slate-600">' + C.FUND_VT_NAME + '</p>\
                 </div>\
               </div>\
               \
               <div class="bg-blue-50 border-l-4 border-blue-400 p-3 text-sm">\
-                <p class="font-semibold text-blue-900 mb-1">What are these?</p>\
-                <p class="text-slate-700">These are NOT individual stocks. They are index funds that own hundreds of companies. When you buy VOO, you instantly own tiny pieces of Apple, Microsoft, Amazon, and 497 others. Instant diversification.</p>\
+                <p class="font-semibold text-blue-900 mb-1">' + C.STEP_3_EXPLANATION_LABEL + '</p>\
+                <p class="text-slate-700">' + C.STEP_3_EXPLANATION_TEXT + '</p>\
               </div>\
             </div>\
             \
             <div class="mt-4 bg-slate-50 rounded p-4 text-sm text-slate-600">\
-              <p class="font-semibold text-slate-700 mb-2">Cost per share:</p>\
-              <p>Around $500-600 (but you can buy fractional shares, so your $' + AppState.budget + '/month works perfectly)</p>\
+              <p class="font-semibold text-slate-700 mb-2">' + C.STEP_3_COST_LABEL + '</p>\
+              <p>' + step3CostText + '</p>\
             </div>\
           </div>\
           \
-          <!-- Step 4: Auto-Invest -->\
+          <!-- STEP 4 -->\
           <div id="autoinvest-section" class="mb-8 pb-8 border-b border-slate-200 hidden">\
             <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center">\
               <span class="bg-emerald-600 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 text-lg flex-shrink-0">4</span>\
-              <span>SET IT AND FORGET IT</span>\
+              <span>' + C.STEP_4_TITLE + '</span>\
             </h2>\
             \
             <div class="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-6 mb-4">\
-              <p class="font-bold text-yellow-900 mb-3 flex items-center"><span class="text-2xl mr-2">⚡</span> CRITICAL STEP</p>\
-              <p class="text-slate-700 mb-4">Set up automatic investing so you never have to think about this again. This is what makes it work.</p>\
+              <p class="font-bold text-yellow-900 mb-3 flex items-center"><span class="text-2xl mr-2">' + C.STEP_4_WARNING_EMOJI + '</span> ' + C.STEP_4_WARNING_LABEL + '</p>\
+              <p class="text-slate-700 mb-4">' + C.STEP_4_WARNING_TEXT + '</p>\
               \
               <ol class="space-y-3 text-slate-700">\
                 <li class="flex items-start">\
                   <span class="font-bold mr-2 flex-shrink-0">1.</span>\
-                  <span>In your brokerage app, find <strong>"Automatic Investment"</strong> or <strong>"Auto-Invest"</strong></span>\
+                  <span>' + C.STEP_4_INSTRUCTION_1 + '</span>\
                 </li>\
                 <li class="flex items-start">\
                   <span class="font-bold mr-2 flex-shrink-0">2.</span>\
-                  <span>Choose your fund: <strong>VOO</strong>, VTI, or VT</span>\
+                  <span>' + C.STEP_4_INSTRUCTION_2 + '</span>\
                 </li>\
                 <li class="flex items-start">\
                   <span class="font-bold mr-2 flex-shrink-0">3.</span>\
-                  <span>Set amount: <strong class="text-emerald-600">$' + AppState.budget + ' per month</strong></span>\
+                  <span>' + step4Instruction3 + '</span>\
                 </li>\
                 <li class="flex items-start">\
                   <span class="font-bold mr-2 flex-shrink-0">4.</span>\
-                  <span>Set date: The day after your paycheck hits</span>\
+                  <span>' + C.STEP_4_INSTRUCTION_4 + '</span>\
                 </li>\
                 <li class="flex items-start">\
                   <span class="font-bold mr-2 flex-shrink-0">5.</span>\
-                  <span>Turn it <strong>ON</strong></span>\
+                  <span>' + C.STEP_4_INSTRUCTION_5 + '</span>\
                 </li>\
               </ol>\
             </div>\
             \
             <div class="bg-emerald-50 rounded p-4">\
-              <p class="font-bold text-emerald-900 mb-2">That\'s it!</p>\
-              <p class="text-sm text-slate-700">Your $' + AppState.budget + ' will automatically buy more shares every month. The compound interest machine runs on autopilot. You never have to think about it again.</p>\
+              <p class="font-bold text-emerald-900 mb-2">' + C.STEP_4_SUCCESS_LABEL + '</p>\
+              <p class="text-sm text-slate-700">' + step4SuccessText + '</p>\
             </div>\
           </div>\
           \
-          <!-- What Happens Next -->\
+          <!-- TIMELINE -->\
           <div id="timeline-section" class="mb-8 hidden">\
-            <h2 class="text-2xl font-black text-slate-900 mb-4">WHAT TO EXPECT</h2>\
+            <h2 class="text-2xl font-black text-slate-900 mb-4">' + C.TIMELINE_TITLE + '</h2>\
             \
             <div class="space-y-3 text-slate-700">\
               <div class="flex items-start">\
                 <span class="font-bold mr-3 text-emerald-600 flex-shrink-0">Month 1:</span>\
-                <span>You will have ~$' + AppState.budget + ' worth of shares</span>\
+                <span>' + timelineMonth1 + '</span>\
               </div>\
               <div class="flex items-start">\
                 <span class="font-bold mr-3 text-emerald-600 flex-shrink-0">Year 1:</span>\
-                <span>~$' + Math.round(AppState.budget * 12 * 1.104).toLocaleString() + ' (your $' + (AppState.budget * 12).toLocaleString() + ' grew ~10%)</span>\
+                <span>' + timelineYear1 + '</span>\
               </div>\
               <div class="flex items-start">\
                 <span class="font-bold mr-3 text-emerald-600 flex-shrink-0">Year 5:</span>\
-                <span>~$' + Math.round(Calculator.retirement(AppState.age, AppState.budget) * (5 / (65 - AppState.age))).toLocaleString() + '</span>\
+                <span>' + timelineYear5 + '</span>\
               </div>\
               <div class="flex items-start">\
-                <span class="font-bold mr-3 text-emerald-600 flex-shrink-0">Year 7:</span>\
-                <span>Your money has DOUBLED (compound interest goes vertical)</span>\
+                <span class="font-bold mr-3 text-emerald-600 flex-shrink-0">Year 10:</span>\
+                <span>' + C.TIMELINE_YEAR_10 + '</span>\
               </div>\
             </div>\
             \
             <div class="mt-4 bg-blue-50 rounded p-4 text-sm text-slate-600">\
-              <p>The market will go up and down. Some months you will be down. <strong>Keep buying.</strong> Market drops are SALES - your money buys more shares when prices are low. That is when you make the most money long-term.</p>\
+              <p>' + C.TIMELINE_NOTE + '</p>\
             </div>\
           </div>\
           \
           <!-- FAQ -->\
           <div class="border-t border-slate-200 pt-6">\
-            <h3 class="font-black text-xl text-slate-900 mb-4">COMMON QUESTIONS</h3>\
+            <h3 class="font-black text-xl text-slate-900 mb-4">' + C.FAQ_TITLE + '</h3>\
             \
             <div class="space-y-3">\
               <details class="bg-slate-50 rounded-lg p-4">\
-                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">What if I can only do $40 this month?</summary>\
-                <p class="mt-2 text-sm text-slate-600">That\'s completely fine. Do $40. Do what you can. The key is <strong>consistency</strong>, not perfection. Even $20/month builds real wealth over time.</p>\
+                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">' + C.FAQ_Q1 + '</summary>\
+                <p class="mt-2 text-sm text-slate-600">' + C.FAQ_A1 + '</p>\
               </details>\
               \
               <details class="bg-slate-50 rounded-lg p-4">\
-                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">Can I invest MORE if I have extra money?</summary>\
-                <p class="mt-2 text-sm text-slate-600">Yes! Absolutely. You can increase your auto-invest amount anytime, or make one-time purchases when you have extra cash. The more you invest, the faster it grows.</p>\
+                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">' + C.FAQ_Q2 + '</summary>\
+                <p class="mt-2 text-sm text-slate-600">' + C.FAQ_A2 + '</p>\
               </details>\
               \
               <details class="bg-slate-50 rounded-lg p-4">\
-                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">What if the market crashes?</summary>\
-                <p class="mt-2 text-sm text-slate-600"><strong>Keep buying.</strong> Market crashes are SALES. Your $' + AppState.budget + ' buys MORE shares when prices drop. People who kept investing through 2008-2009 made the most money. Crashes are opportunities, not disasters.</p>\
+                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">' + C.FAQ_Q3 + '</summary>\
+                <p class="mt-2 text-sm text-slate-600">' + faqA3 + '</p>\
               </details>\
               \
               <details class="bg-slate-50 rounded-lg p-4">\
-                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">When can I access this money?</summary>\
-                <p class="mt-2 text-sm text-slate-600"><strong>Roth IRA:</strong> Your contributions anytime (tax and penalty free), earnings at age 59½. <strong>Brokerage account:</strong> Anytime (but you may owe capital gains tax).</p>\
+                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">' + C.FAQ_Q4 + '</summary>\
+                <p class="mt-2 text-sm text-slate-600">' + C.FAQ_A4 + '</p>\
               </details>\
               \
               <details class="bg-slate-50 rounded-lg p-4">\
-                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">Do I need to do my taxes differently?</summary>\
-                <p class="mt-2 text-sm text-slate-600"><strong>Roth IRA:</strong> No changes. <strong>Traditional IRA:</strong> You get a tax deduction. <strong>Brokerage:</strong> You will receive tax forms for investment income (usually minimal in early years).</p>\
+                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">' + C.FAQ_Q5 + '</summary>\
+                <p class="mt-2 text-sm text-slate-600">' + C.FAQ_A5 + '</p>\
               </details>\
               \
               <details class="bg-slate-50 rounded-lg p-4">\
-                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">Should I pick individual stocks instead?</summary>\
-                <p class="mt-2 text-sm text-slate-600">No. 90% of professional stock pickers lose to index funds over 15 years. Index funds are boring, but boring wins. Stick with VOO/VTI/VT and let compound interest do the work.</p>\
+                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">' + C.FAQ_Q6 + '</summary>\
+                <p class="mt-2 text-sm text-slate-600">' + C.FAQ_A6 + '</p>\
               </details>\
             </div>\
           </div>\
           \
-          <!-- Legal Disclaimer -->\
+          <!-- LEGAL -->\
           <div class="border-t border-slate-200 pt-6 mt-6">\
-            <p class="text-xs text-slate-500 text-center leading-relaxed">\
-              <span class="font-semibold text-slate-700">Important:</span> This tool provides educational information only, not personalized financial advice. All calculations use S&P 500 historical average returns (10.4% annually, 1926-2024). Past performance does not guarantee future results. Investments carry risk including possible loss of principal. Consider consulting a financial advisor for personalized recommendations.\
-            </p>\
+            <p class="text-xs text-slate-500 text-center leading-relaxed">' + C.LEGAL_DISCLAIMER + '</p>\
           </div>\
           \
-          <button id="back-home-btn" class="w-full mt-6 text-slate-500 underline text-sm hover:text-slate-700">Start over with different numbers</button>\
+          <button id="back-home-btn" class="w-full mt-6 text-slate-500 underline text-sm hover:text-slate-700">' + C.BUTTON_BACK_HOME + '</button>\
         </div>\
       </div>';
   }
@@ -685,13 +1064,13 @@ function render() {
       throw new Error('Page not found: ' + AppState.currentPage);
     }
   } catch (error) {
-    console.error('Render error:', error);
+    console.error('❌ Render error:', error);
     container.innerHTML = '\
       <div class="min-h-screen flex items-center justify-center bg-red-50 p-4">\
         <div class="max-w-md bg-white rounded-lg p-8 shadow-xl">\
-          <h1 class="text-2xl font-bold text-red-600 mb-4">Oops! Something went wrong</h1>\
-          <p class="text-slate-700 mb-4">We encountered an error. Please refresh the page to try again.</p>\
-          <button onclick="location.reload()" class="w-full bg-red-600 text-white px-6 py-3 rounded font-bold hover:bg-red-700">Refresh Page</button>\
+          <h1 class="text-2xl font-bold text-red-600 mb-4">' + COPY.ERROR.TITLE + '</h1>\
+          <p class="text-slate-700 mb-4">' + COPY.ERROR.MESSAGE + '</p>\
+          <button onclick="location.reload()" class="w-full bg-red-600 text-white px-6 py-3 rounded font-bold hover:bg-red-700">' + COPY.ERROR.BUTTON + '</button>\
         </div>\
       </div>';
   }
@@ -703,7 +1082,8 @@ function attachEventListeners() {
   console.log('🔌 Attaching listeners for page:', page);
   
   try {
-  // ========== PAGE 1.0 ==========
+  
+  // PAGE 1.0
   if (page === '1.0') {
     var ageInput = document.getElementById('age-input');
     var budgetInput = document.getElementById('budget-input');
@@ -751,7 +1131,7 @@ function attachEventListeners() {
     }
   }
   
-  // ========== PAGE 1.00 ==========
+  // PAGE 1.00
   if (page === '1.00') {
     var retBtn = document.getElementById('retirement-btn');
     var famBtn = document.getElementById('family-btn');
@@ -773,7 +1153,7 @@ function attachEventListeners() {
     }
   }
   
-  // ========== PAGE 1.01 ==========
+  // PAGE 1.01
   if (page === '1.01') {
     var wantBtn = document.getElementById('want-btn');
     var waitBtn = document.getElementById('wait-btn');
@@ -810,7 +1190,7 @@ function attachEventListeners() {
     }
   }
   
-  // ========== PAGE 1.02 ==========
+  // PAGE 1.02
   if (page === '1.02') {
     var yesBtn = document.getElementById('yes-debt');
     var noBtn = document.getElementById('no-debt');
@@ -832,7 +1212,7 @@ function attachEventListeners() {
     }
   }
   
-  // ========== PAGE 1.03 ==========
+  // PAGE 1.03
   if (page === '1.03') {
     var startBtn = document.getElementById('start-btn');
     var laterBtn = document.getElementById('later-btn');
@@ -852,7 +1232,7 @@ function attachEventListeners() {
     }
   }
   
-  // ========== PAGE 1.04 ==========
+  // PAGE 1.04
   if (page === '1.04') {
     var gotitBtn = document.getElementById('gotit-btn');
     
@@ -864,7 +1244,7 @@ function attachEventListeners() {
     }
   }
   
-  // ========== PAGE 1.045 (Email Capture) ==========
+  // PAGE 1.045
   if (page === '1.045') {
     var emailInput = document.getElementById('email-input');
     var sendBtn = document.getElementById('send-guide-btn');
@@ -917,7 +1297,7 @@ function attachEventListeners() {
     }
   }
   
-  // ========== PAGE 1.05 (Setup Instructions) ==========
+  // PAGE 1.05
   if (page === '1.05') {
     var hasIncomeBtn = document.getElementById('has-income-btn');
     var noIncomeBtn = document.getElementById('no-income-btn');
@@ -930,7 +1310,6 @@ function attachEventListeners() {
     var timelineSection = document.getElementById('timeline-section');
     var backHomeBtn = document.getElementById('back-home-btn');
     
-    // Progressive disclosure on scroll (show sections as user scrolls down)
     function showNextSections() {
       if (accountResult) accountResult.classList.remove('hidden');
       
@@ -958,8 +1337,8 @@ function attachEventListeners() {
       hasIncomeBtn.addEventListener('click', function() {
         AppState.accountType = 'roth_ira';
         
-        if (accountName) accountName.textContent = 'Roth IRA';
-        if (accountExplanation) accountExplanation.textContent = 'Tax-free growth forever. This is the best account type for building wealth. You already paid taxes on your income, so your investments grow tax-free and withdrawals in retirement are tax-free too.';
+        if (accountName) accountName.textContent = COPY.PAGE_1_05.ACCOUNT_ROTH_IRA_NAME;
+        if (accountExplanation) accountExplanation.textContent = COPY.PAGE_1_05.ACCOUNT_ROTH_IRA_EXPLANATION;
         
         trackEvent('account_type_selected', { account_type: 'roth_ira' });
         showNextSections();
@@ -970,8 +1349,8 @@ function attachEventListeners() {
       noIncomeBtn.addEventListener('click', function() {
         AppState.accountType = 'taxable';
         
-        if (accountName) accountName.textContent = 'Taxable Brokerage Account';
-        if (accountExplanation) accountExplanation.textContent = 'No income = no IRA eligibility. But taxable brokerage accounts still work great! You can access your money anytime, and if you hold for 1+ year, you get lower long-term capital gains tax rates.';
+        if (accountName) accountName.textContent = COPY.PAGE_1_05.ACCOUNT_TAXABLE_NAME;
+        if (accountExplanation) accountExplanation.textContent = COPY.PAGE_1_05.ACCOUNT_TAXABLE_EXPLANATION;
         
         trackEvent('account_type_selected', { account_type: 'taxable' });
         showNextSections();
@@ -984,7 +1363,6 @@ function attachEventListeners() {
       });
     }
     
-    // Track when user reaches final page
     trackEvent('setup_page_reached', {
       age: AppState.age,
       budget: AppState.budget,
