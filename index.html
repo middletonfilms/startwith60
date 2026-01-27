@@ -558,18 +558,35 @@ var Pages = {
     var future20 = Calculator.future20Years(amount);
     
     // Replace placeholders
+    var retireAge = isRetirement ? 65 : 80;
     var eyebrow = replacePlaceholders(C.EYEBROW, { BUDGET: AppState.budget });
-    var yearsText = replacePlaceholders(C.YEARS_TEXT, { AGE: AppState.age, YEARS: years });
+    var yearsText = replacePlaceholders(C.YEARS_TEXT, { 
+      AGE: AppState.age, 
+      YEARS: years,
+      RETIREAGE: retireAge 
+    });
     
     // Build benefits list based on goal
     var benefitsList = '';
     if (isRetirement) {
-      var benefit4 = replacePlaceholders(C.RETIREMENT_BENEFIT_4, { INCOME: income.toLocaleString() });
+      var benefit3 = replacePlaceholders(C.RETIREMENT_BENEFIT_3, { 
+        RETIREAGE: retireAge,
+        AMOUNT: amount.toLocaleString(),
+        INCOME: income.toLocaleString() 
+      });
+      benefitsList = '\
+        <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.RETIREMENT_BENEFIT_1 + '</span></p>\
+        <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.RETIREMENT_BENEFIT_2 + '</span></p>\
+        <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + benefit3 + '</span></p>';
+    } else {
+      var benefit3 = replacePlaceholders(C.FAMILY_BENEFIT_3, { 
+        INCOME: income.toLocaleString(),
+        AMOUNT: amount.toLocaleString()
+      });
       benefitsList = '\
         <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.RETIREMENT_BENEFIT_1 + '</span></p>\
         <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.RETIREMENT_BENEFIT_2 + '</span></p>\
         <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.RETIREMENT_BENEFIT_3 + '</span></p>\
-        <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span class="font-bold">' + benefit4 + '</span> ' + C.RETIREMENT_BENEFIT_4_SUFFIX + '</p>';
     } else {
       var benefit3 = replacePlaceholders(C.FAMILY_BENEFIT_3, { INCOME: income.toLocaleString() });
       var benefit4 = replacePlaceholders(C.FAMILY_BENEFIT_4, { FUTURE: future20.toLocaleString() });
