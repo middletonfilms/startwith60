@@ -528,12 +528,12 @@ var PageTemplates = {
   'landing_main': function() {
     var C = COPY.LANDING_MAIN;
     
-    var canSubmit = AppState.age && AppState.budget && AppState.age >= 18 && AppState.age <= 64 && AppState.budget > 0;
+    var canSubmit = AppState.age && AppState.budget && AppState.age >= 0 && AppState.age <= 64 && AppState.budget > 0;
     var buttonClass = canSubmit 
       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white cursor-pointer hover:from-blue-700 hover:to-blue-800 transform hover:scale-105' 
       : 'bg-slate-300 text-slate-500 cursor-not-allowed';
     
-    var ageError = AppState.age && (AppState.age < 18 || AppState.age > 64);
+    var ageError = AppState.age && (AppState.age < 0 || AppState.age > 64);
     var budgetError = AppState.budget && AppState.budget <= 0;
     
     return '\
@@ -545,7 +545,7 @@ var PageTemplates = {
           <div class="grid grid-cols-2 gap-4 mb-6">\
             <div>\
               <label class="block text-xs font-bold text-slate-700 mb-2 text-center h-8 flex items-center justify-center">' + C.LABEL_AGE + '</label>\
-              <input type="number" id="age-input" placeholder="' + C.PLACEHOLDER_AGE + '" min="18" max="64" value="' + AppState.age + '" class="w-full h-28 md:h-24 px-4 border-3 ' + (ageError ? 'border-red-500' : 'border-slate-400') + ' rounded-xl focus:border-blue-500 focus:outline-none text-4xl font-black text-center bg-slate-50 placeholder-slate-300">\
+              <input type="number" id="age-input" placeholder="' + C.PLACEHOLDER_AGE + '" min="0" max="64" value="' + AppState.age + '" class="w-full h-28 md:h-24 px-4 border-3 ' + (ageError ? 'border-red-500' : 'border-slate-400') + ' rounded-xl focus:border-blue-500 focus:outline-none text-4xl font-black text-center bg-slate-50 placeholder-slate-300">\
               <p id="age-error" class="text-xs text-red-600 mt-1 text-center ' + (ageError ? '' : 'invisible') + '">' + C.ERROR_AGE + '</p>\
             </div>\
             <div>\
