@@ -389,30 +389,29 @@ var Calculator = {
   },
   
   dailyLoss: function(age, budget) {
-    var finalToday = this.retirement(age, budget);
-    var finalIfWaitYear = this.retirement(age + 1, budget);
-    var finalIfWaitYearThenGrow = finalIfWaitYear * Math.pow(1.104, 364/365);
-    return Math.round(finalToday - finalIfWaitYearThenGrow);
+    var years = 65 - age;
+    var growthFactor = Math.pow(1.104, years);
+    var dailyContribution = budget / 30;
+    return Math.round(dailyContribution * growthFactor);
   },
   
   weeklyLoss: function(age, budget) {
-    var finalToday = this.retirement(age, budget);
-    var finalIfWaitYear = this.retirement(age + 1, budget);
-    var finalIfWaitYearThenGrow = finalIfWaitYear * Math.pow(1.104, 51/52);
-    return Math.round(finalToday - finalIfWaitYearThenGrow);
+    var years = 65 - age;
+    var growthFactor = Math.pow(1.104, years);
+    var weeklyContribution = (budget * 7) / 30;
+    return Math.round(weeklyContribution * growthFactor);
   },
   
   monthlyLoss: function(age, budget) {
-    var finalToday = this.retirement(age, budget);
-    var finalIfWaitYear = this.retirement(age + 1, budget);
-    var finalIfWaitYearThenGrow = finalIfWaitYear * Math.pow(1.104, 11/12);
-    return Math.round(finalToday - finalIfWaitYearThenGrow);
+    var years = 65 - age;
+    var growthFactor = Math.pow(1.104, years);
+    return Math.round(budget * growthFactor);
   },
   
   yearlyLoss: function(age, budget) {
     var finalToday = this.retirement(age, budget);
-    var finalIfWaitYear = this.retirement(age + 1, budget);
-    return Math.round(finalToday - finalIfWaitYear);
+    var finalIfWait1Year = this.retirement(age + 1, budget);
+    return Math.round(finalToday - finalIfWait1Year);
   },
   
   getDescription: function(amount) {
