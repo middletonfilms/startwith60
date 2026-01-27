@@ -1231,7 +1231,7 @@ function attachEventListeners() {
     }
   }
   
-  // ═══════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
   // BEHAVIOR: Goal Selection
   // ═══════════════════════════════════════════════════════════════════════
   if (page === 'goal_selection') {
@@ -1242,7 +1242,7 @@ function attachEventListeners() {
       retBtn.addEventListener('click', function() {
         AppState.goal = 'retirement';
         trackEvent('goal_selected', { goal: 'retirement' });
-        navigateTo('results_retirement');
+        navigateTo('results');  // ← FIXED!
       });
     }
     
@@ -1250,7 +1250,7 @@ function attachEventListeners() {
       famBtn.addEventListener('click', function() {
         AppState.goal = 'family';
         trackEvent('goal_selected', { goal: 'family' });
-        navigateTo('results_family');
+        navigateTo('results');  // ← FIXED!
       });
     }
   }
