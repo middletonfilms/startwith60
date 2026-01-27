@@ -299,12 +299,9 @@ var NavigationFlows = {
     routes: {
       'landing_main': 'goal_selection',
       
-      'goal_selection': function(state) {
-        return state.goal === 'retirement' ? 'results_retirement' : 'results_family';
-      },
+      'goal_selection': 'results',
       
-      'results_retirement': 'debt_check',
-      'results_family': 'debt_check',
+      'results': 'debt_check',
       
       'debt_check': function(state) {
         return state.hasDebt ? 'debt_payoff' : 'email_capture';
@@ -571,18 +568,25 @@ var PageTemplates = {
       </div>';
   },
   
-  // ==========================================================================
+ // ==========================================================================
   // ═══════════════════════════════════════════════════════════════════════
-  // TEMPLATE: Results Page (Retirement)
-  // COPY SOURCE: COPY.RESULTS_RETIREMENT
+  // TEMPLATE: Results Page (Unified with Toggle)
+  // COPY SOURCE: COPY.RESULTS_RETIREMENT + COPY.RESULTS_FAMILY
   // NAVIGATION: → debt_check OR loss_aversion
   // ═══════════════════════════════════════════════════════════════════════
   // ==========================================================================
-  'results_retirement': function() {
-    var C = COPY.RESULTS_RETIREMENT;
+  'results': function() {
+    var isRetirement = AppState.goal === 'retirement';
+    var C = isRetirement ? COPY.RESULTS_RETIREMENT : COPY.RESULTS_FAMILY;
     
-    var years = AppState.retireage - Number(AppState.age);
-    var amount = Calculator.retirement(Number(AppState.age), Number(AppState.budget));
+    var years = isRetirement 
+      ? (AppState.retireage - Number(AppState.age))
+      : (AppState.deathage - Number(AppState.age));
+    
+    var amount = isRetirement 
+      ? Calculator.retirement(Number(AppState.age), Number(AppState.budget))
+      : Calculator.death(Number(AppState.age), Number(AppState.budget));
+    
     var income = Calculator.income(amount);
     var desc = Calculator.getDescription(amount);
     
@@ -590,103 +594,73 @@ var PageTemplates = {
     var yearsText = replacePlaceholders(C.YEARS_TEXT, { 
       AGE: AppState.age, 
       YEARS: years,
-      RETIREAGE: AppState.retireage
-    });
-    
-    var benefit3 = replacePlaceholders(C.BENEFIT_3, { 
       RETIREAGE: AppState.retireage,
-      AMOUNT: amount.toLocaleString(),
-      INCOME: income.toLocaleString() 
-    });
-    
-    return '\
-      <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 flex items-center justify-center relative">\
-        ' + getBackButton('goal_selection', C.BACK_BUTTON) + '\
-        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
-          <div class="text-center mb-6">\
-            <p class="text-slate-600 text-sm mb-3 uppercase tracking-wide">' + eyebrow + '</p>\
-            <h1 class="text-4xl md:text-5xl font-black text-indigo-600 mb-3 leading-tight">' + desc.header + '</h1>\
-            ' + (desc.showNumber ? '<p class="text-3xl font-bold text-slate-700 mb-3">$' + amount.toLocaleString() + '</p>' : '') + '\
-            <p class="text-slate-500 text-sm">' + yearsText + '</p>\
-          </div>\
-          \
-          <div class="bg-emerald-50 rounded-xl p-6 mb-6 space-y-3">\
-            <p class="text-lg font-bold text-slate-900">' + C.BENEFITS_LABEL + '</p>\
-            <div class="space-y-2 text-slate-700">\
-              <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.BENEFIT_1 + '</span></p>\
-              <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.BENEFIT_2 + '</span></p>\
-              <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + benefit3 + '</span></p>\
-            </div>\
-          </div>\
-          \
-          <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4 text-xs text-slate-600">\
-            <p class="font-semibold text-blue-900 mb-1">' + C.DISCLAIMER_TITLE + '</p>\
-            <p>' + C.DISCLAIMER_TEXT + '</p>\
-          </div>\
-          \
-          <p class="text-center text-slate-700 mb-6 text-lg leading-relaxed">' + C.CLOSING_TEXT + '</p>\
-          \
-          <div class="space-y-3">\
-            <button id="want-btn" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-4 rounded-lg font-black text-lg hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg">' + C.BUTTON_WANT + '</button>\
-            <button id="wait-btn" class="w-full bg-slate-200 text-slate-600 py-3 rounded-lg font-semibold hover:bg-slate-300 transition-colors text-sm">' + C.BUTTON_WAIT + '</button>\
-            <button id="back-btn" class="w-full text-slate-500 underline text-sm hover:text-slate-700">' + C.BUTTON_BACK + '</button>\
-          </div>\
-        </div>\
-      </div>';
-  },
-  
-  // ==========================================================================
-  // ═══════════════════════════════════════════════════════════════════════
-  // TEMPLATE: Results Page (Family Legacy)
-  // COPY SOURCE: COPY.RESULTS_FAMILY
-  // NAVIGATION: → debt_check OR loss_aversion
-  // ═══════════════════════════════════════════════════════════════════════
-  // ==========================================================================
-  'results_family': function() {
-    var C = COPY.RESULTS_FAMILY;
-    
-    var years = AppState.deathage - Number(AppState.age);
-    var amount = Calculator.death(Number(AppState.age), Number(AppState.budget));
-    var income = Calculator.income(amount);
-    var desc = Calculator.getDescription(amount);
-    
-    var eyebrow = replacePlaceholders(C.EYEBROW, { BUDGET: AppState.budget });
-    var yearsText = replacePlaceholders(C.YEARS_TEXT, { 
-      AGE: AppState.age, 
-      YEARS: years,
       DEATHAGE: AppState.deathage
     });
     
-    var benefit2 = replacePlaceholders(C.BENEFIT_2, { 
-      INCOME: income.toLocaleString(),
-      AMOUNT: amount.toLocaleString()
-    });
+    // Build benefits based on goal
+    var benefitsList = '';
+    if (isRetirement) {
+      var benefit3 = replacePlaceholders(C.BENEFIT_3, { 
+        RETIREAGE: AppState.retireage,
+        AMOUNT: amount.toLocaleString(),
+        INCOME: income.toLocaleString() 
+      });
+      benefitsList = '\
+        <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.BENEFIT_1 + '</span></p>\
+        <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.BENEFIT_2 + '</span></p>\
+        <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + benefit3 + '</span></p>';
+    } else {
+      var benefit2 = replacePlaceholders(C.BENEFIT_2, { 
+        INCOME: income.toLocaleString(),
+        AMOUNT: amount.toLocaleString()
+      });
+      benefitsList = '\
+        <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + C.BENEFIT_1 + '</span></p>\
+        <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + benefit2 + '</span></p>';
+    }
+    
+    var accentColor = isRetirement ? 'indigo' : 'purple';
     
     return '\
       <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 flex items-center justify-center relative">\
         ' + getBackButton('goal_selection', C.BACK_BUTTON) + '\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
-          <div class="text-center mb-6">\
-            <p class="text-slate-600 text-sm mb-3 uppercase tracking-wide">' + eyebrow + '</p>\
-            <h1 class="text-4xl md:text-5xl font-black text-purple-600 mb-3 leading-tight">' + desc.header + '</h1>\
-            ' + (desc.showNumber ? '<p class="text-3xl font-bold text-slate-700 mb-3">$' + amount.toLocaleString() + '</p>' : '') + '\
-            <p class="text-slate-500 text-sm">' + yearsText + '</p>\
-          </div>\
           \
-          <div class="bg-emerald-50 rounded-xl p-6 mb-6 space-y-3">\
-            <p class="text-lg font-bold text-slate-900">' + C.BENEFITS_LABEL + '</p>\
-            <div class="space-y-2 text-slate-700">\
-              <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + C.BENEFIT_1 + '</span></p>\
-              <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + benefit2 + '</span></p>\
+          <!-- Toggle Switch -->\
+          <div class="mb-6 flex items-center justify-center">\
+            <div class="relative inline-flex items-center bg-slate-200 rounded-full p-1">\
+              <button id="toggle-retirement" class="relative z-10 px-4 py-2 rounded-full text-sm font-bold transition-colors ' + (isRetirement ? 'text-white' : 'text-slate-600') + '">\
+                💰 Retirement\
+              </button>\
+              <button id="toggle-family" class="relative z-10 px-4 py-2 rounded-full text-sm font-bold transition-colors ' + (!isRetirement ? 'text-white' : 'text-slate-600') + '">\
+                👨‍👩‍👧 Family\
+              </button>\
+              <div id="toggle-slider" class="absolute top-1 left-1 w-[calc(50%-0.25rem)] h-[calc(100%-0.5rem)] bg-gradient-to-r from-' + accentColor + '-600 to-' + accentColor + '-700 rounded-full transition-transform duration-300 ease-in-out" style="transform: translateX(' + (isRetirement ? '0' : '100') + '%)"></div>\
             </div>\
           </div>\
           \
-          <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4 text-xs text-slate-600">\
-            <p class="font-semibold text-blue-900 mb-1">' + C.DISCLAIMER_TITLE + '</p>\
-            <p>' + C.DISCLAIMER_TEXT + '</p>\
+          <!-- Results Content -->\
+          <div id="results-content">\
+            <div class="text-center mb-6">\
+              <p class="text-slate-600 text-sm mb-3 uppercase tracking-wide">' + eyebrow + '</p>\
+              <h1 class="text-4xl md:text-5xl font-black text-' + accentColor + '-600 mb-3 leading-tight">' + desc.header + '</h1>\
+              ' + (desc.showNumber ? '<p class="text-3xl font-bold text-slate-700 mb-3">$' + amount.toLocaleString() + '</p>' : '') + '\
+              <p class="text-slate-500 text-sm">' + yearsText + '</p>\
+            </div>\
+            \
+            <div class="bg-emerald-50 rounded-xl p-6 mb-6 space-y-3">\
+              <p class="text-lg font-bold text-slate-900">' + C.BENEFITS_LABEL + '</p>\
+              <div class="space-y-2 text-slate-700">' + benefitsList + '</div>\
+            </div>\
+            \
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4 text-xs text-slate-600">\
+              <p class="font-semibold text-blue-900 mb-1">' + C.DISCLAIMER_TITLE + '</p>\
+              <p>' + C.DISCLAIMER_TEXT + '</p>\
+            </div>\
+            \
+            <p class="text-center text-slate-700 mb-6 text-lg leading-relaxed">' + C.CLOSING_TEXT + '</p>\
           </div>\
-          \
-          <p class="text-center text-slate-700 mb-6 text-lg leading-relaxed">' + C.CLOSING_TEXT + '</p>\
           \
           <div class="space-y-3">\
             <button id="want-btn" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-4 rounded-lg font-black text-lg hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg">' + C.BUTTON_WANT + '</button>\
@@ -706,7 +680,7 @@ var PageTemplates = {
   // ==========================================================================
   'debt_check': function() {
     var C = COPY.DEBT_CHECK;
-    var prevPage = AppState.goal === 'retirement' ? 'results_retirement' : 'results_family';
+    var prevPage = 'results';
     
     return '\
       <div class="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 p-4 flex items-center justify-center relative">\
@@ -737,7 +711,7 @@ var PageTemplates = {
   // ==========================================================================
   'loss_aversion': function() {
     var C = COPY.LOSS_AVERSION;
-    var prevPage = AppState.goal === 'retirement' ? 'results_retirement' : 'results_family';
+    var prevPage = 'results';
     
     var daily = Calculator.dailyLoss(Number(AppState.age), Number(AppState.budget));
     var monthly = daily * 30;
@@ -1284,14 +1258,75 @@ function attachEventListeners() {
   // ═══════════════════════════════════════════════════════════════════════
   // BEHAVIOR: Results Pages (Retirement & Family)
   // ═══════════════════════════════════════════════════════════════════════
-  if (page === 'results_retirement' || page === 'results_family') {
+ // ═══════════════════════════════════════════════════════════════════════
+  // BEHAVIOR: Results Page (Unified)
+  // ═══════════════════════════════════════════════════════════════════════
+  if (page === 'results') {
     var wantBtn = document.getElementById('want-btn');
     var waitBtn = document.getElementById('wait-btn');
     var backBtn = document.getElementById('back-btn');
+    var toggleRetirement = document.getElementById('toggle-retirement');
+    var toggleFamily = document.getElementById('toggle-family');
+    var resultsContent = document.getElementById('results-content');
+    var toggleSlider = document.getElementById('toggle-slider');
     
     var amount = AppState.goal === 'retirement' 
       ? Calculator.retirement(Number(AppState.age), Number(AppState.budget))
       : Calculator.death(Number(AppState.age), Number(AppState.budget));
+    
+    // Toggle switch behavior
+    function switchGoal(newGoal) {
+      if (AppState.goal === newGoal) return; // Already on this goal
+      
+      var oldGoal = AppState.goal;
+      AppState.goal = newGoal;
+      
+      trackEvent('goal_toggled', { 
+        from: oldGoal,
+        to: newGoal
+      });
+      
+      // Slide out animation
+      if (resultsContent) {
+        resultsContent.style.transform = oldGoal === 'retirement' ? 'translateX(-100%)' : 'translateX(100%)';
+        resultsContent.style.opacity = '0';
+        resultsContent.style.transition = 'transform 0.3s ease-in-out, opacity 0.3s ease-in-out';
+      }
+      
+      // Move slider
+      if (toggleSlider) {
+        toggleSlider.style.transform = newGoal === 'retirement' ? 'translateX(0%)' : 'translateX(100%)';
+      }
+      
+      // After animation, re-render
+      setTimeout(function() {
+        render();
+        
+        // Slide in animation
+        var newContent = document.getElementById('results-content');
+        if (newContent) {
+          newContent.style.transform = newGoal === 'retirement' ? 'translateX(100%)' : 'translateX(-100%)';
+          newContent.style.opacity = '0';
+          
+          setTimeout(function() {
+            newContent.style.transform = 'translateX(0)';
+            newContent.style.opacity = '1';
+          }, 10);
+        }
+      }, 300);
+    }
+    
+    if (toggleRetirement) {
+      toggleRetirement.addEventListener('click', function() {
+        switchGoal('retirement');
+      });
+    }
+    
+    if (toggleFamily) {
+      toggleFamily.addEventListener('click', function() {
+        switchGoal('family');
+      });
+    }
     
     if (wantBtn) {
       wantBtn.addEventListener('click', function() {
