@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Retirement Calculator: See How $60/Month Becomes $500K+ | StartWith60</title>
+<title> See How $60/Month Becomes Half A Million Dollars | StartWith60</title>
 <meta name="description" content="Free retirement calculator shows how small monthly investments grow into life-changing wealth through compound interest. Start planning your financial freedom today.">
 
 <!-- Open Graph for social sharing -->
-<meta property="og:title" content="I just calculated my retirement. $60/month = $500K by age 65.">
-<meta property="og:description" content="This free tool opened my eyes. Find out what your monthly savings could become.">
+<meta property="og:title" content="See How $60/Month Becomes Half a Million Dollars | StartWith60">
+<meta property="og:description" content="$60/month becomes half a million dollars by retirement. See your exact number in 30 seconds—no financial knowledge needed.">
 <meta property="og:type" content="website">
 
 <script src="https://cdn.tailwindcss.com"></script>
@@ -90,22 +90,24 @@ var Calculator = {
   
   getDescription: function(amount) {
     if (amount < 100000) return { header: 'Over $' + Math.floor(amount/1000) + 'K', showNumber: true };
-    if (amount < 180000) return { header: 'Over $100,000', showNumber: true };
-    if (amount < 220000) return { header: 'Nearly $200,000', showNumber: true };
-    if (amount < 250000) return { header: 'Almost a quarter million dollars', showNumber: true };
-    if (amount < 295000) return { header: 'Over a quarter million dollars', showNumber: true };
-    if (amount < 333333) return { header: 'Nearly a third of a million dollars', showNumber: true };
-    if (amount < 380000) return { header: 'Over a third of a million dollars', showNumber: true };
-    if (amount < 480000) return { header: 'Nearly half a million dollars', showNumber: true };
-    if (amount < 520000) return { header: 'HALF A MILLION DOLLARS', showNumber: true };
-    if (amount < 580000) return { header: 'Over half a million dollars', showNumber: true };
-    if (amount < 666666) return { header: 'Nearly two-thirds of a million dollars', showNumber: true };
-    if (amount < 720000) return { header: 'Over two-thirds of a million dollars', showNumber: true };
-    if (amount < 750000) return { header: 'Nearly three-quarters of a million dollars', showNumber: true };
-    if (amount < 825000) return { header: 'Three-quarters of a million dollars', showNumber: true };
-    if (amount < 900000) return { header: 'Over three-quarters of a million dollars', showNumber: true };
-    if (amount < 980000) return { header: 'Nearly a million dollars', showNumber: true };
-    if (amount < 1080000) return { header: 'OVER ONE MILLION DOLLARS', showNumber: true };
+    if (amount < 180000) return { header: 'OVER $100,000', showNumber: true };
+    if (amount < 220000) return { header: 'NEARLY $200,000', showNumber: true };
+    if (amount < 250000) return { header: 'ALMOST A QUARTER MILLION DOLLARS', showNumber: true };
+    if (amount < 295000) return { header: 'OVER A QUARTER MILLION DOLLARS', showNumber: true };
+    if (amount < 333333) return { header: 'NEARLY A THIRD OF A MILLION DOLLARS', showNumber: true };
+    if (amount < 380000) return { header: 'OVER A THIRD OF A MILLION DOLLARS', showNumber: true };
+    if (amount < 480000) return { header: 'NEARLY HALF OF A MILLION DOLLARS', showNumber: true };
+    if (amount < 500000) return { header: 'HALF A MILLION DOLLARS', showNumber: true };
+    if (amount < 580000) return { header: 'OVER HALF A MILLION DOLLARS', showNumber: true };
+    if (amount < 620000) return { header: 'NEARLY TWO THIRDS OF A MILLION DOLLARS', showNumber: true };
+    if (amount < 666666) return { header: 'TWO THIRDS OF A MILLION DOLLARS', showNumber: true };
+    if (amount < 720000) return { header: 'OVER TWO THIRDS OF A MILLION DOLLARS', showNumber: true };
+    if (amount < 750000) return { header: 'NEARLY THREE-QUARTERS OF A MILLION DOLLARS', showNumber: true };
+    if (amount < 825000) return { header: 'THREE-QUARTERS OF A MILLION DOLLARS', showNumber: true };
+    if (amount < 900000) return { header: 'OVER THREE-QUARTERS OF A MILLION DOLLARS', showNumber: true };
+    if (amount < 980000) return { header: 'NEARLY A MILLION DOLLARS', showNumber: true };
+    if (amount < 1000000) return { header: 'ONE MILLION DOLLARS', showNumber: true };
+    if (amount < 1075000) return { header: 'OVER ONE MILLION DOLLARS', showNumber: true };
     return { header: (amount/1000000).toFixed(1) + ' MILLION DOLLARS', showNumber: true };
   }
 };
@@ -176,7 +178,7 @@ var Pages = {
       <div class="min-h-screen bg-gradient-to-br from-slate-900 to-slate-700 p-4 flex items-center justify-center">\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
           <h1 class="text-5xl md:text-6xl font-black text-center mb-3 text-slate-900 leading-tight">STILL BROKE<br>AT 65?</h1>\
-          <p class="text-center text-xl text-slate-600 mb-8">Most people are.<br><span class="font-bold text-slate-900">You do not have to be.</span></p>\
+          <p class="text-center text-xl text-slate-600 mb-8">Most people are.<br><span class="font-bold text-slate-900">You don\'t have to be.</span></p>\
           \
           <div class="grid grid-cols-2 gap-4 mb-6">\
             <div>\
@@ -185,7 +187,7 @@ var Pages = {
               <p id="age-error" class="text-xs text-red-600 mt-1 text-center ' + (ageError ? '' : 'invisible') + '">Age 18-64 only</p>\
             </div>\
             <div>\
-              <label class="block text-xs font-bold text-slate-700 mb-2 text-center h-8 flex items-center justify-center">PER MONTH</label>\
+              <label class="block text-xs font-bold text-slate-700 mb-2 text-center h-8 flex items-center justify-center">HOW MUCH CAN YOU SET ASIDE PER MONTH?</label>\
               <div class="relative">\
                 <span class="absolute left-3 top-8 md:top-7 text-3xl text-slate-400 font-black">$</span>\
                 <input type="number" id="budget-input" placeholder="60" min="1" value="' + AppState.budget + '" class="w-full h-28 md:h-24 pl-10 pr-3 border-3 ' + (budgetError ? 'border-red-500' : 'border-slate-400') + ' rounded-xl focus:border-blue-500 focus:outline-none text-4xl font-black text-center bg-slate-50 placeholder-slate-300">\
