@@ -82,9 +82,9 @@ var COPY = {
     RETIREMENT_BENEFIT_3: 'Age [RETIREAGE]: $[AMOUNT] in your account. Take out $[INCOME]/year. Forever. The account never empties.',
     
     // FAMILY GOAL benefits
-    FAMILY_BENEFIT_1: 'Your kids never struggle like you did.',
-    FAMILY_BENEFIT_2: 'College. Wedding. First house. All covered.',
-    FAMILY_BENEFIT_3: 'They collect $[INCOME] / year. Forever. Without even shrinking the $[AMOUNT] in the account.',
+    FAMILY_BENEFIT_1: 'College. Wedding. First house. All covered.',
+    FAMILY_BENEFIT_2: 'They collect $[INCOME] / year. Forever. Without even shrinking the $[AMOUNT] in the account.',
+    FAMILY_BENEFIT_3: ''
   
     
     DISCLAIMER_TITLE: 'Based on S&P 500 historical average',
@@ -586,14 +586,13 @@ var Pages = {
         <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.RETIREMENT_BENEFIT_2 + '</span></p>\
         <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + benefit3 + '</span></p>';
     } else {
-  var benefit3 = replacePlaceholders(C.FAMILY_BENEFIT_3, { 
+  var benefit2 = replacePlaceholders(C.FAMILY_BENEFIT_2, { 
     INCOME: income.toLocaleString(),
     AMOUNT: amount.toLocaleString()
   });
   benefitsList = '\
     <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + C.FAMILY_BENEFIT_1 + '</span></p>\
-    <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + C.FAMILY_BENEFIT_2 + '</span></p>\
-    <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + benefit3 + '</span></p>';
+    <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + benefit2 + '</span></p>';
 }
     
     return '\
