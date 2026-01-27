@@ -5,15 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>See How $60/Month Becomes Half A Million Dollars | StartWith60</title>
 <meta name="description" content="$60/month becomes half a million dollars by retirement. See your exact number in 30 seconds—no financial knowledge needed.">
-
-<!-- Open Graph for social sharing -->
 <meta property="og:title" content="See How $60/Month Becomes Half A Million Dollars">
 <meta property="og:description" content="$60/month becomes half a million dollars by retirement. See your exact number in 30 seconds—no financial knowledge needed.">
 <meta property="og:type" content="website">
-
 <script src="https://cdn.tailwindcss.com"></script>
-
-<!-- Google Analytics - REPLACE WITH YOUR ID -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -23,20 +18,26 @@
 </script>
 </head>
 <body>
-
 <div id="app"></div>
-
 <script>
 // ============================================================================
-// COPY MANAGEMENT - EDIT ALL TEXT HERE
+// ██████╗ ██████╗ ██████╗ ██╗   ██╗
+// ██╔════╝██╔═══██╗██╔══██╗╚██╗ ██╔╝
+// ██║     ██║   ██║██████╔╝ ╚████╔╝ 
+// ██║     ██║   ██║██╔═══╝   ╚██╔╝  
+// ╚██████╗╚██████╔╝██║        ██║   
+//  ╚═════╝ ╚═════╝ ╚═╝        ╚═╝   
+// 
+// COPY MANAGEMENT - ALL TEXT LIVES HERE
+// Edit copy here to change any text on any page
 // ============================================================================
 
 var COPY = {
   
   // ==========================================================================
-  // PAGE 1.0 - INITIAL INPUT SCREEN
+  // LANDING: Main Entry Point (Age/Budget Input)
   // ==========================================================================
-  PAGE_1_0: {
+  LANDING_MAIN: {
     HEADLINE: 'STILL BROKE<br>AT 65?',
     SUBHEAD_LINE_1: 'Most people are.',
     SUBHEAD_LINE_2: 'You don\'t have to be.',
@@ -46,63 +47,63 @@ var COPY = {
     PLACEHOLDER_BUDGET: '60',
     BUTTON_CTA: 'SHOW ME THE MATH',
     ERROR_AGE: 'Age 18-64 only',
-    ERROR_BUDGET: 'Must be > $0',
-    FOOTER_TEXT: 'Takes 30 seconds. Changes everything.'
+    ERROR_BUDGET: 'Must be > $0'
   },
   
   // ==========================================================================
-  // PAGE 1.00 - GOAL SELECTION
+  // GOAL SELECTION: Retirement vs Family Legacy
   // ==========================================================================
-  PAGE_1_00: {
+  GOAL_SELECTION: {
     HEADLINE: 'WHAT MATTERS MOST?',
     SUBHEAD: 'Choose your primary goal:',
     BUTTON_RETIREMENT: 'MY RETIREMENT',
     BUTTON_RETIREMENT_SUB: 'Living comfortably when I stop working',
     BUTTON_FAMILY: 'FAMILY LEGACY',
     BUTTON_FAMILY_SUB: 'Leaving wealth for my loved ones',
-    FOOTER_TEXT: '',
     BACK_BUTTON: 'Back'
   },
   
   // ==========================================================================
-  // PAGE 1.01 - THE BIG REVEAL
+  // RESULTS: The Big Reveal (Retirement Goal)
   // ==========================================================================
-  PAGE_1_01: {
-    EYEBROW: 'YOUR $[BUDGET]/MONTH BECOMES', // [BUDGET] will be replaced
-    YEARS_TEXT_RETIREMENT: 'You are [AGE]. If you retire at [RETIREAGE], that is [YEARS] years of compound growth.', // [AGE] and [YEARS] replaced
-    YEARS_TEXT_FAMILY: 'You are [AGE]. If you leave this to your family at [DEATHAGE], that is [YEARS] years of compound growth.',
-  
-    
-    // Benefits list varies by goal
+  RESULTS_RETIREMENT: {
+    EYEBROW: 'YOUR $[BUDGET]/MONTH BECOMES',
+    YEARS_TEXT: 'You are [AGE]. If you retire at [RETIREAGE], that is [YEARS] years of compound growth.',
     BENEFITS_LABEL: 'That means:',
-    
-    // RETIREMENT GOAL benefits
-    RETIREMENT_BENEFIT_1: 'Never asking your kids for money',
-    RETIREMENT_BENEFIT_2: 'Retiring when YOU want to',
-    RETIREMENT_BENEFIT_3: 'Age [RETIREAGE]: $[AMOUNT] in your account. Take out $[INCOME] / year. Forever. The account never empties.',
-    
-    // FAMILY GOAL benefits
-    FAMILY_BENEFIT_1: 'College. Wedding. First house. All covered.',
-    FAMILY_BENEFIT_2: 'They collect $[INCOME] / year. Forever. Without even shrinking the $[AMOUNT] in the account.',
-    FAMILY_BENEFIT_3: '',
-  
-    
+    BENEFIT_1: 'Never asking your kids for money',
+    BENEFIT_2: 'Retiring when YOU want to',
+    BENEFIT_3: 'Age [RETIREAGE]: $[AMOUNT] in your account. Take out $[INCOME]/year. Forever. The account never empties.',
     DISCLAIMER_TITLE: 'Based on S&P 500 historical average',
     DISCLAIMER_TEXT: '10.4% annual return (1926-2024). Past performance does not guarantee future results. Market values fluctuate.',
-    
     CLOSING_TEXT: 'This money makes MORE money. Every day. While you do nothing.',
-    
     BUTTON_WANT: 'LET\'S GET THIS DONE',
     BUTTON_WAIT: 'Show me what happens if I wait',
     BUTTON_BACK: 'Try different numbers',
-    
     BACK_BUTTON: 'Back'
   },
   
   // ==========================================================================
-  // PAGE 1.02 - DEBT CHECK
+  // RESULTS: The Big Reveal (Family Legacy Goal)
   // ==========================================================================
-  PAGE_1_02: {
+  RESULTS_FAMILY: {
+    EYEBROW: 'YOUR $[BUDGET]/MONTH BECOMES',
+    YEARS_TEXT: 'You are [AGE]. If you leave this to your family at [DEATHAGE], that is [YEARS] years of compound growth.',
+    BENEFITS_LABEL: 'That means:',
+    BENEFIT_1: 'College. Wedding. First house. All covered.',
+    BENEFIT_2: 'They collect $[INCOME]/year. Forever. Without even shrinking the $[AMOUNT] in the account.',
+    DISCLAIMER_TITLE: 'Based on S&P 500 historical average',
+    DISCLAIMER_TEXT: '10.4% annual return (1926-2024). Past performance does not guarantee future results. Market values fluctuate.',
+    CLOSING_TEXT: 'This money makes MORE money. Every day. While you do nothing.',
+    BUTTON_WANT: 'LET\'S GET THIS DONE',
+    BUTTON_WAIT: 'Show me what happens if I wait',
+    BUTTON_BACK: 'Try different numbers',
+    BACK_BUTTON: 'Back'
+  },
+
+  // ==========================================================================
+  // DEBT CHECK: Quick Yes/No Question
+  // ==========================================================================
+  DEBT_CHECK: {
     HEADLINE: 'QUICK QUESTION',
     QUESTION: 'Do you have credit card debt or high-interest loans?',
     BUTTON_YES: 'YES, I have debt',
@@ -113,110 +114,87 @@ var COPY = {
   },
   
   // ==========================================================================
-  // PAGE 1.03 - LOSS AVERSION (THE HAMMER)
+  // LOSS AVERSION: The Hammer (Cost of Waiting)
   // ==========================================================================
-  PAGE_1_03: {
+  LOSS_AVERSION: {
     HEADLINE: 'WAIT.',
     SUBHEAD: 'Before you decide to "come back later"...',
-    
     LOSS_BOX_LABEL: 'EVERY DAY YOU WAIT:',
-    LOSS_DAILY: '$[DAILY]', // [DAILY] replaced
-    LOSS_MONTHLY: 'Every month: $[MONTHLY]', // [MONTHLY] replaced
-    LOSS_YEARLY: 'Every year: $[YEARLY]', // [YEARLY] replaced
-    LOSS_FIVE_YEAR: 'Wait just 5 years: -$[FIVE_YEAR]', // [FIVE_YEAR] replaced
-    
+    LOSS_DAILY: '$[DAILY]',
+    LOSS_MONTHLY: 'Every month: $[MONTHLY]',
+    LOSS_YEARLY: 'Every year: $[YEARLY]',
+    LOSS_FIVE_YEAR: 'Wait just 5 years: -$[FIVE_YEAR]',
     VIZ_LABEL: 'If you wait ONE YEAR to start:',
     VIZ_TEXT: 'That\'s 75% of what most Americans save in a YEAR - gone forever',
-    
     TESTIMONIAL: '"I waited 3 years to start. It cost me $42,000. Do not make my mistake. Start TODAY."',
     TESTIMONIAL_ATTRIBUTION: '- Real user, started at age 35',
-    
     WARNING_PRIMARY: 'That is money you will NEVER get back.',
     WARNING_SECONDARY: 'Time is the only resource you cannot buy more of.',
-    
     BUTTON_START: 'NO, LET\'S START NOW',
     BUTTON_LATER: 'I will think about it',
-    
     BACK_BUTTON: 'Go back'
   },
   
   // ==========================================================================
-  // PAGE 1.04 - DEBT REDIRECT
+  // DEBT PAYOFF: Redirect Page
   // ==========================================================================
-  PAGE_1_04: {
+  DEBT_PAYOFF: {
     HEADLINE: 'PAY THAT OFF FIRST',
-    
     PARA_1: 'Credit card debt at 20% interest costs you more than the stock market will make you.',
-    PARA_2: 'Take your $[BUDGET]/month and attack that debt.', // [BUDGET] replaced
+    PARA_2: 'Take your $[BUDGET]/month and attack that debt.',
     PARA_3: 'Once it is gone, come back here. Then that $[BUDGET] can start building wealth instead of paying interest.',
-    
     MATH_BOX_LINE_1: 'Paying off a 20% loan = guaranteed 20% return',
     MATH_BOX_LINE_2: 'S&P 500 averages 10%. Your debt costs 20%. Math favors debt payoff.',
-    
     STRATEGY_LABEL: 'Smart strategy:',
     STRATEGY_STEP_1: '1. Pay off high-interest debt first',
     STRATEGY_STEP_2: '2. Then invest that same payment amount',
     STRATEGY_STEP_3: '3. Build wealth without the debt burden',
-    
     DISCLAIMER_LABEL: 'This is general guidance, not personal advice',
     DISCLAIMER_TEXT: 'Everyone\'s financial situation is different. Consider consulting a financial advisor for personalized recommendations.',
-    
     BUTTON_CTA: 'Got it. I will be back.',
-    
     BACK_BUTTON: 'Back'
   },
   
   // ==========================================================================
-  // PAGE 1.045 - EMAIL CAPTURE
+  // EMAIL CAPTURE: Optional Step-by-Step Guide
   // ==========================================================================
-  PAGE_1_045: {
+  EMAIL_CAPTURE: {
     HEADLINE: 'ONE MORE THING',
     SUBHEAD: 'Get your step-by-step setup guide via email',
-    
     BENEFITS_LABEL: 'We will send you:',
-    BENEFIT_1: 'Your personalized plan ($[BUDGET]/month)', // [BUDGET] replaced
+    BENEFIT_1: 'Your personalized plan ($[BUDGET]/month)',
     BENEFIT_2: 'Account opening checklist',
     BENEFIT_3: 'Screenshots of each step',
     BENEFIT_4: 'What to do if you get stuck',
-    
     PLACEHOLDER_EMAIL: 'your@email.com',
     ERROR_EMAIL: 'Please enter a valid email',
-    
     BUTTON_SEND: 'SEND ME THE GUIDE',
     BUTTON_SKIP: 'Skip (I will figure it out myself)',
-    
     PRIVACY_TEXT: 'We hate spam. Zero marketing emails. Unsubscribe anytime.',
-    
     BACK_BUTTON: 'Back'
   },
   
   // ==========================================================================
-  // PAGE 1.05 - SETUP INSTRUCTIONS
+  // BROKERAGE SETUP: Final Instructions Page
   // ==========================================================================
-  PAGE_1_05: {
+  BROKERAGE_SETUP: {
     HEADLINE: 'LET\'S GET YOU SET UP',
+    PLAN_SUMMARY_LABEL: 'Your Plan: $[BUDGET]/month',
+    PLAN_SUMMARY_DETAIL: 'Age [AGE] → [GOAL]',
     
-    PLAN_SUMMARY_LABEL: 'Your Plan: $[BUDGET]/month', // [BUDGET] replaced
-    PLAN_SUMMARY_DETAIL: 'Age [AGE] → [GOAL]', // [AGE] and [GOAL] replaced
-    
-    // STEP 1: Account Type
     STEP_1_TITLE: 'CHOOSE YOUR ACCOUNT TYPE',
     STEP_1_QUESTION: 'Do you have earned income this year?',
     STEP_1_EXPLANATION: 'Earned income = wages from a job, self-employment income, freelance work',
     STEP_1_BUTTON_YES: 'YES',
     STEP_1_BUTTON_NO: 'NO',
     STEP_1_RESULT_PREFIX: '✓ Perfect! You will use a',
-    
     ACCOUNT_ROTH_IRA_NAME: 'Roth IRA',
     ACCOUNT_ROTH_IRA_EXPLANATION: 'Tax-free growth forever. This is the best account type for building wealth. You already paid taxes on your income, so your investments grow tax-free and withdrawals in retirement are tax-free too.',
-    
     ACCOUNT_TAXABLE_NAME: 'Taxable Brokerage Account',
     ACCOUNT_TAXABLE_EXPLANATION: 'No income = no IRA eligibility. But taxable brokerage accounts still work great! You can access your money anytime, and if you hold for 1+ year, you get lower long-term capital gains tax rates.',
     
-    // STEP 2: Brokerage
     STEP_2_TITLE: 'OPEN YOUR ACCOUNT',
     STEP_2_INTRO: 'Choose one of these trusted brokerages:',
-    
     FIDELITY_NAME: 'FIDELITY',
     FIDELITY_BADGE: 'RECOMMENDED',
     FIDELITY_TAGLINE: 'Easiest for beginners. Best mobile app. Excellent customer service.',
@@ -224,102 +202,75 @@ var COPY = {
     FIDELITY_BENEFIT_2: '24/7 customer service',
     FIDELITY_BENEFIT_3: 'Can buy fractional shares (important for small monthly amounts)',
     FIDELITY_CTA: 'Open Fidelity Account →',
-    
     OTHER_OPTIONS_LABEL: 'See other options (Schwab, Vanguard)',
-    
     SCHWAB_NAME: 'Charles Schwab',
     SCHWAB_TAGLINE: 'Great all-around choice. Physical branches nationwide if you prefer in-person help.',
     SCHWAB_CTA: 'Open Schwab Account →',
-    
     VANGUARD_NAME: 'Vanguard',
     VANGUARD_TAGLINE: 'Lowest fees in the industry. Invented index funds. Slightly less user-friendly interface.',
     VANGUARD_CTA: 'Open Vanguard Account →',
-    
     STEP_2_TIME_NOTE: '⏱️ Account opening takes 10-15 minutes',
     STEP_2_REQUIREMENTS: 'You will need: Social Security Number, driver\'s license, bank account info for transfers.',
     
-    // STEP 3: Fund Selection
     STEP_3_TITLE: 'WHAT TO BUY',
     STEP_3_INTRO: 'Buy ONE of these index funds:',
-    
     FUND_VOO_TICKER: 'VOO',
     FUND_VOO_NAME: 'Vanguard S&P 500 ETF',
     FUND_VOO_BADGE: 'RECOMMENDED',
-    
     FUND_VTI_TICKER: 'VTI',
     FUND_VTI_NAME: 'Vanguard Total Stock Market',
-    
     FUND_VT_TICKER: 'VT',
     FUND_VT_NAME: 'Vanguard Total World Stock',
-    
     STEP_3_EXPLANATION_LABEL: 'What are these?',
     STEP_3_EXPLANATION_TEXT: 'These are NOT individual stocks. They are index funds that own hundreds of companies. When you buy VOO, you instantly own tiny pieces of Apple, Microsoft, Amazon, and 497 others. Instant diversification.',
-    
     STEP_3_COST_LABEL: 'Cost per share:',
-    STEP_3_COST_TEXT: 'Around $500-600 (but you can buy fractional shares, so your $[BUDGET]/month works perfectly)', // [BUDGET] replaced
+    STEP_3_COST_TEXT: 'Around $500-600 (but you can buy fractional shares, so your $[BUDGET]/month works perfectly)',
     
-    // STEP 4: Auto-Invest
     STEP_4_TITLE: 'SET IT AND FORGET IT',
     STEP_4_WARNING_EMOJI: '⚡',
     STEP_4_WARNING_LABEL: 'CRITICAL STEP',
     STEP_4_WARNING_TEXT: 'Set up automatic investing so you never have to think about this again. This is what makes it work.',
-    
     STEP_4_INSTRUCTION_1: 'In your brokerage app, find "Automatic Investment" or "Auto-Invest"',
     STEP_4_INSTRUCTION_2: 'Choose your fund: VOO, VTI, or VT',
-    STEP_4_INSTRUCTION_3: 'Set amount: $[BUDGET] per month', // [BUDGET] replaced
+    STEP_4_INSTRUCTION_3: 'Set amount: $[BUDGET] per month',
     STEP_4_INSTRUCTION_4: 'Set date: The day after your paycheck hits',
     STEP_4_INSTRUCTION_5: 'Turn it ON',
-    
     STEP_4_SUCCESS_LABEL: 'That\'s it!',
-    STEP_4_SUCCESS_TEXT: 'Your $[BUDGET] will automatically buy more shares every month. The compound interest machine runs on autopilot. You never have to think about it again.', // [BUDGET] replaced
+    STEP_4_SUCCESS_TEXT: 'Your $[BUDGET] will automatically buy more shares every month. The compound interest machine runs on autopilot. You never have to think about it again.',
     
-    // Timeline
     TIMELINE_TITLE: 'WHAT TO EXPECT',
-    TIMELINE_MONTH_1: 'You will have ~$[BUDGET] worth of shares', // [BUDGET] replaced
-    TIMELINE_YEAR_1: '~$[AMOUNT] (your $[CONTRIBUTED] grew ~10%)', // [AMOUNT] and [CONTRIBUTED] replaced
-    TIMELINE_YEAR_5: '~$[AMOUNT]', // [AMOUNT] replaced
+    TIMELINE_MONTH_1: 'You will have ~$[BUDGET] worth of shares',
+    TIMELINE_YEAR_1: '~$[AMOUNT] (your $[CONTRIBUTED] grew ~10%)',
+    TIMELINE_YEAR_5: '~$[AMOUNT]',
     TIMELINE_YEAR_10: 'Your money has DOUBLED (compound interest goes vertical)',
-    
     TIMELINE_NOTE: 'The market will go up and down. Some months you will be down. Keep buying. Market drops are SALES - your money buys more shares when prices are low. That is when you make the most money long-term.',
     
-    // FAQ
     FAQ_TITLE: 'COMMON QUESTIONS',
-    
     FAQ_Q1: 'What if I can only do $40 this month?',
     FAQ_A1: 'That\'s completely fine. Do what you can. The key is consistency, not perfection. Even $20/month builds real wealth over time.',
-    
     FAQ_Q2: 'Can I invest MORE if I have extra money?',
     FAQ_A2: 'Yes! Absolutely. You can increase your auto-invest amount anytime, or make one-time purchases when you have extra cash. The more you invest, the faster it grows.',
-    
     FAQ_Q3: 'What if the market crashes?',
-    FAQ_A3: 'Keep buying. Market crashes are SALES. Your $[BUDGET] buys MORE shares when prices drop. People who kept investing through 2008-2009 made the most money. Crashes are opportunities, not disasters.', // [BUDGET] replaced
-    
+    FAQ_A3: 'Keep buying. Market crashes are SALES. Your $[BUDGET] buys MORE shares when prices drop. People who kept investing through 2008-2009 made the most money. Crashes are opportunities, not disasters.',
     FAQ_Q4: 'When can I access this money?',
     FAQ_A4: 'Roth IRA: Your contributions anytime (tax and penalty free), earnings at age 59½. Brokerage account: Anytime (but you may owe capital gains tax).',
-    
     FAQ_Q5: 'Do I need to do my taxes differently?',
     FAQ_A5: 'Roth IRA: No changes. Traditional IRA: You get a tax deduction. Brokerage: You will receive tax forms for investment income (usually minimal in early years).',
-    
     FAQ_Q6: 'Should I pick individual stocks instead?',
     FAQ_A6: 'No. 90% of professional stock pickers lose to index funds over 15 years. Index funds are boring, but boring wins. Stick with VOO/VTI/VT and let compound interest do the work.',
     
-    // Legal
     LEGAL_DISCLAIMER: 'Important: This tool provides educational information only, not personalized financial advice. All calculations use S&P 500 historical average returns (10.4% annually, 1926-2024). Past performance does not guarantee future results. Investments carry risk including possible loss of principal. Consider consulting a financial advisor for personalized recommendations.',
-    
     BUTTON_BACK_HOME: 'Start over with different numbers'
   },
   
   // ==========================================================================
-  // LOADING STATE
+  // UI STATES: Loading and Error Messages
   // ==========================================================================
   LOADING: {
     TITLE: 'Calculating your future...',
     SUBTITLE: 'This changes everything.'
   },
   
-  // ==========================================================================
-  // ERROR STATE
-  // ==========================================================================
   ERROR: {
     TITLE: 'Oops! Something went wrong',
     MESSAGE: 'We encountered an error. Please refresh the page to try again.',
@@ -327,28 +278,64 @@ var COPY = {
   }
 };
 
-// ============================================================================
-// ANALYTICS HELPER
+  // ============================================================================
+// ███╗   ██╗ █████╗ ██╗   ██╗██╗ ██████╗  █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
+// ████╗  ██║██╔══██╗██║   ██║██║██╔════╝ ██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║
+// ██╔██╗ ██║███████║██║   ██║██║██║  ███╗███████║   ██║   ██║██║   ██║██╔██╗ ██║
+// ██║╚██╗██║██╔══██║╚██╗ ██╔╝██║██║   ██║██╔══██║   ██║   ██║██║   ██║██║╚██╗██║
+// ██║ ╚████║██║  ██║ ╚████╔╝ ██║╚██████╔╝██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
+// ╚═╝  ╚═══╝╚═╝  ╚═╝  ╚═══╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+// 
+// NAVIGATION SYSTEM
+// Controls page flow and routing logic
 // ============================================================================
 
-function trackEvent(eventName, properties) {
-  properties = properties || {};
+var NavigationFlows = {
+  current: 'default',
   
-  // Google Analytics
-  if (typeof gtag !== 'undefined') {
-    gtag('event', eventName, properties);
+  default: {
+    start: 'landing_main',
+    
+    routes: {
+      'landing_main': 'goal_selection',
+      
+      'goal_selection': function(state) {
+        return state.goal === 'retirement' ? 'results_retirement' : 'results_family';
+      },
+      
+      'results_retirement': 'debt_check',
+      'results_family': 'debt_check',
+      
+      'debt_check': function(state) {
+        return state.hasDebt ? 'debt_payoff' : 'email_capture';
+      },
+      
+      'loss_aversion': 'debt_check',
+      
+      'debt_payoff': 'landing_main',
+      
+      'email_capture': 'brokerage_setup',
+      
+      'brokerage_setup': 'landing_main'
+    }
   }
-  
-  // Console logging for debugging
-  console.log('📊 Event:', eventName, properties);
-}
+};
+
 
 // ============================================================================
-// STATE AND CALCULATIONS
+// ███████╗████████╗ █████╗ ████████╗███████╗
+// ██╔════╝╚══██╔══╝██╔══██╗╚══██╔══╝██╔════╝
+// ███████╗   ██║   ███████║   ██║   █████╗  
+// ╚════██║   ██║   ██╔══██║   ██║   ██╔══╝  
+// ███████║   ██║   ██║  ██║   ██║   ███████╗
+// ╚══════╝   ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚══════╝
+// 
+// APPLICATION STATE
+// Stores user data and current page
 // ============================================================================
 
 var AppState = {
-  currentPage: '1.0',
+  currentPage: 'landing_main',
   age: '',
   budget: '',
   retireage: 65,
@@ -358,6 +345,19 @@ var AppState = {
   email: '',
   accountType: 'roth_ira'
 };
+
+
+// ============================================================================
+//  ██████╗ █████╗ ██╗      ██████╗██╗   ██╗██╗      █████╗ ████████╗ ██████╗ ██████╗ 
+// ██╔════╝██╔══██╗██║     ██╔════╝██║   ██║██║     ██╔══██╗╚══██╔══╝██╔═══██╗██╔══██╗
+// ██║     ███████║██║     ██║     ██║   ██║██║     ███████║   ██║   ██║   ██║██████╔╝
+// ██║     ██╔══██║██║     ██║     ██║   ██║██║     ██╔══██║   ██║   ██║   ██║██╔══██╗
+// ╚██████╗██║  ██║███████╗╚██████╗╚██████╔╝███████╗██║  ██║   ██║   ╚██████╔╝██║  ██║
+//  ╚═════╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝
+// 
+// CALCULATOR FUNCTIONS
+// Financial calculations and formatting
+// ============================================================================
 
 var Calculator = {
   retirement: function(age, budget) {
@@ -412,9 +412,26 @@ var Calculator = {
   }
 };
 
+
 // ============================================================================
-// NAVIGATION FUNCTIONS (Must be global for onclick)
+// ██╗   ██╗████████╗██╗██╗     ██╗████████╗██╗███████╗███████╗
+// ██║   ██║╚══██╔══╝██║██║     ██║╚══██╔══╝██║██╔════╝██╔════╝
+// ██║   ██║   ██║   ██║██║     ██║   ██║   ██║█████╗  ███████╗
+// ██║   ██║   ██║   ██║██║     ██║   ██║   ██║██╔══╝  ╚════██║
+// ╚██████╔╝   ██║   ██║███████╗██║   ██║   ██║███████╗███████║
+//  ╚═════╝    ╚═╝   ╚═╝╚══════╝╚═╝   ╚═╝   ╚═╝╚══════╝╚══════╝
+// 
+// UTILITY FUNCTIONS
+// Helper functions used across templates
 // ============================================================================
+
+function trackEvent(eventName, properties) {
+  properties = properties || {};
+  if (typeof gtag !== 'undefined') {
+    gtag('event', eventName, properties);
+  }
+  console.log('📊 Event:', eventName, properties);
+}
 
 function navigateTo(page) {
   var previousPage = AppState.currentPage;
@@ -430,10 +447,6 @@ function navigateTo(page) {
     user_goal: AppState.goal
   });
 }
-
-// ============================================================================
-// UI HELPERS
-// ============================================================================
 
 function showLoading() {
   var overlay = document.createElement('div');
@@ -455,29 +468,41 @@ function hideLoading() {
 }
 
 function getBackButton(targetPage, labelOverride) {
-  var label = labelOverride || COPY.PAGE_1_00.BACK_BUTTON; // Default to PAGE_1_00 back button text
+  var label = labelOverride || 'Back';
   return '<button onclick="navigateTo(\'' + targetPage + '\')" class="absolute top-4 left-4 text-slate-600 hover:text-slate-900 flex items-center text-sm font-semibold transition-colors"><svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>' + label + '</button>';
 }
 
-// Helper to replace placeholders in copy
 function replacePlaceholders(text, replacements) {
   var result = text;
   for (var key in replacements) {
-    result = result.replace('[' + key + ']', replacements[key]);
+    result = result.replace(new RegExp('\\[' + key + '\\]', 'g'), replacements[key]);
   }
   return result;
 }
 
-// ============================================================================
+  // ============================================================================
+// ████████╗███████╗███╗   ███╗██████╗ ██╗      █████╗ ████████╗███████╗███████╗
+// ╚══██╔══╝██╔════╝████╗ ████║██╔══██╗██║     ██╔══██╗╚══██╔══╝██╔════╝██╔════╝
+//    ██║   █████╗  ██╔████╔██║██████╔╝██║     ███████║   ██║   █████╗  ███████╗
+//    ██║   ██╔══╝  ██║╚██╔╝██║██╔═══╝ ██║     ██╔══██║   ██║   ██╔══╝  ╚════██║
+//    ██║   ███████╗██║ ╚═╝ ██║██║     ███████╗██║  ██║   ██║   ███████╗███████║
+//    ╚═╝   ╚══════╝╚═╝     ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚══════╝
+// 
 // PAGE TEMPLATES
+// HTML generation for each page type
 // ============================================================================
 
-var Pages = {
+var PageTemplates = {
+  
   // ==========================================================================
-  // PAGE 1.0 - Uses COPY.PAGE_1_0
+  // ═══════════════════════════════════════════════════════════════════════
+  // TEMPLATE: Landing Page (Main Entry)
+  // COPY SOURCE: COPY.LANDING_MAIN
+  // NAVIGATION: → goal_selection
+  // ═══════════════════════════════════════════════════════════════════════
   // ==========================================================================
-  '1.0': function() {
-    var C = COPY.PAGE_1_0; // Local reference for this page's copy
+  'landing_main': function() {
+    var C = COPY.LANDING_MAIN;
     
     var canSubmit = AppState.age && AppState.budget && AppState.age >= 18 && AppState.age <= 64 && AppState.budget > 0;
     var buttonClass = canSubmit 
@@ -510,20 +535,23 @@ var Pages = {
           </div>\
           \
           <button id="submit-btn" class="w-full py-5 rounded-xl font-black text-xl shadow-xl transition-all ' + buttonClass + '">' + C.BUTTON_CTA + '</button>\
-          \
         </div>\
       </div>';
   },
   
   // ==========================================================================
-  // PAGE 1.00 - Uses COPY.PAGE_1_00
+  // ═══════════════════════════════════════════════════════════════════════
+  // TEMPLATE: Goal Selection
+  // COPY SOURCE: COPY.GOAL_SELECTION
+  // NAVIGATION: → results_retirement OR results_family
+  // ═══════════════════════════════════════════════════════════════════════
   // ==========================================================================
-  '1.00': function() {
-    var C = COPY.PAGE_1_00;
+  'goal_selection': function() {
+    var C = COPY.GOAL_SELECTION;
     
     return '\
       <div class="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 p-4 flex items-center justify-center relative">\
-        ' + getBackButton('1.0', C.BACK_BUTTON) + '\
+        ' + getBackButton('landing_main', C.BACK_BUTTON) + '\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
           <h1 class="text-4xl font-black text-center mb-6 text-slate-900">' + C.HEADLINE + '</h1>\
           <p class="text-center text-lg text-slate-700 mb-8">' + C.SUBHEAD + '</p>\
@@ -539,76 +567,56 @@ var Pages = {
               <div class="text-sm font-normal opacity-90">' + C.BUTTON_FAMILY_SUB + '</div>\
             </button>\
           </div>\
-          \
-          <p class="text-center text-sm text-slate-500 mt-6">' + C.FOOTER_TEXT + '</p>\
         </div>\
       </div>';
   },
   
   // ==========================================================================
-  // PAGE 1.01 - Uses COPY.PAGE_1_01
+  // ═══════════════════════════════════════════════════════════════════════
+  // TEMPLATE: Results Page (Retirement)
+  // COPY SOURCE: COPY.RESULTS_RETIREMENT
+  // NAVIGATION: → debt_check OR loss_aversion
+  // ═══════════════════════════════════════════════════════════════════════
   // ==========================================================================
-  '1.01': function() {
-    var C = COPY.PAGE_1_01;
+  'results_retirement': function() {
+    var C = COPY.RESULTS_RETIREMENT;
     
-    var isRetirement = AppState.goal === 'retirement';
-    var years = isRetirement ? (65 - Number(AppState.age)) : (80 - Number(AppState.age));
-    var amount = isRetirement 
-      ? Calculator.retirement(Number(AppState.age), Number(AppState.budget))
-      : Calculator.death(Number(AppState.age), Number(AppState.budget));
+    var years = AppState.retireage - Number(AppState.age);
+    var amount = Calculator.retirement(Number(AppState.age), Number(AppState.budget));
     var income = Calculator.income(amount);
     var desc = Calculator.getDescription(amount);
-    var future20 = Calculator.future20Years(amount);
     
-    // Replace placeholders
-    var targetAge = isRetirement ? AppState.retireage : AppState.deathage;
     var eyebrow = replacePlaceholders(C.EYEBROW, { BUDGET: AppState.budget });
-    
-    // Use different copy based on goal
-    var yearsTextTemplate = isRetirement ? C.YEARS_TEXT_RETIREMENT : C.YEARS_TEXT_FAMILY;
-    var yearsText = replacePlaceholders(yearsTextTemplate, { 
+    var yearsText = replacePlaceholders(C.YEARS_TEXT, { 
       AGE: AppState.age, 
       YEARS: years,
-      RETIREAGE: AppState.retireage,
-      DEATHAGE: AppState.deathage
+      RETIREAGE: AppState.retireage
     });
     
-    // Build benefits list based on goal
-    var benefitsList = '';
-    if (isRetirement) {
-      var benefit3 = replacePlaceholders(C.RETIREMENT_BENEFIT_3, { 
-        RETIREAGE: AppState.retireage,  // Use AppState instead of local var
-        AMOUNT: amount.toLocaleString(),
-        INCOME: income.toLocaleString() 
-      });
-      benefitsList = '\
-        <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.RETIREMENT_BENEFIT_1 + '</span></p>\
-        <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.RETIREMENT_BENEFIT_2 + '</span></p>\
-        <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + benefit3 + '</span></p>';
-    } else {
-  var benefit2 = replacePlaceholders(C.FAMILY_BENEFIT_2, { 
-    INCOME: income.toLocaleString(),
-    AMOUNT: amount.toLocaleString()
-  });
-  benefitsList = '\
-    <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + C.FAMILY_BENEFIT_1 + '</span></p>\
-    <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + benefit2 + '</span></p>';
-}
+    var benefit3 = replacePlaceholders(C.BENEFIT_3, { 
+      RETIREAGE: AppState.retireage,
+      AMOUNT: amount.toLocaleString(),
+      INCOME: income.toLocaleString() 
+    });
     
     return '\
       <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 flex items-center justify-center relative">\
-        ' + getBackButton('1.00', C.BACK_BUTTON) + '\
+        ' + getBackButton('goal_selection', C.BACK_BUTTON) + '\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
           <div class="text-center mb-6">\
             <p class="text-slate-600 text-sm mb-3 uppercase tracking-wide">' + eyebrow + '</p>\
-            <h1 class="text-4xl md:text-5xl font-black ' + (isRetirement ? 'text-indigo-600' : 'text-purple-600') + ' mb-3 leading-tight">' + desc.header + '</h1>\
+            <h1 class="text-4xl md:text-5xl font-black text-indigo-600 mb-3 leading-tight">' + desc.header + '</h1>\
             ' + (desc.showNumber ? '<p class="text-3xl font-bold text-slate-700 mb-3">$' + amount.toLocaleString() + '</p>' : '') + '\
             <p class="text-slate-500 text-sm">' + yearsText + '</p>\
           </div>\
           \
           <div class="bg-emerald-50 rounded-xl p-6 mb-6 space-y-3">\
             <p class="text-lg font-bold text-slate-900">' + C.BENEFITS_LABEL + '</p>\
-            <div class="space-y-2 text-slate-700">' + benefitsList + '</div>\
+            <div class="space-y-2 text-slate-700">\
+              <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.BENEFIT_1 + '</span></p>\
+              <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.BENEFIT_2 + '</span></p>\
+              <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + benefit3 + '</span></p>\
+            </div>\
           </div>\
           \
           <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4 text-xs text-slate-600">\
@@ -628,14 +636,81 @@ var Pages = {
   },
   
   // ==========================================================================
-  // PAGE 1.02 - Uses COPY.PAGE_1_02
+  // ═══════════════════════════════════════════════════════════════════════
+  // TEMPLATE: Results Page (Family Legacy)
+  // COPY SOURCE: COPY.RESULTS_FAMILY
+  // NAVIGATION: → debt_check OR loss_aversion
+  // ═══════════════════════════════════════════════════════════════════════
   // ==========================================================================
-  '1.02': function() {
-    var C = COPY.PAGE_1_02;
+  'results_family': function() {
+    var C = COPY.RESULTS_FAMILY;
+    
+    var years = AppState.deathage - Number(AppState.age);
+    var amount = Calculator.death(Number(AppState.age), Number(AppState.budget));
+    var income = Calculator.income(amount);
+    var desc = Calculator.getDescription(amount);
+    
+    var eyebrow = replacePlaceholders(C.EYEBROW, { BUDGET: AppState.budget });
+    var yearsText = replacePlaceholders(C.YEARS_TEXT, { 
+      AGE: AppState.age, 
+      YEARS: years,
+      DEATHAGE: AppState.deathage
+    });
+    
+    var benefit2 = replacePlaceholders(C.BENEFIT_2, { 
+      INCOME: income.toLocaleString(),
+      AMOUNT: amount.toLocaleString()
+    });
+    
+    return '\
+      <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 flex items-center justify-center relative">\
+        ' + getBackButton('goal_selection', C.BACK_BUTTON) + '\
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
+          <div class="text-center mb-6">\
+            <p class="text-slate-600 text-sm mb-3 uppercase tracking-wide">' + eyebrow + '</p>\
+            <h1 class="text-4xl md:text-5xl font-black text-purple-600 mb-3 leading-tight">' + desc.header + '</h1>\
+            ' + (desc.showNumber ? '<p class="text-3xl font-bold text-slate-700 mb-3">$' + amount.toLocaleString() + '</p>' : '') + '\
+            <p class="text-slate-500 text-sm">' + yearsText + '</p>\
+          </div>\
+          \
+          <div class="bg-emerald-50 rounded-xl p-6 mb-6 space-y-3">\
+            <p class="text-lg font-bold text-slate-900">' + C.BENEFITS_LABEL + '</p>\
+            <div class="space-y-2 text-slate-700">\
+              <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + C.BENEFIT_1 + '</span></p>\
+              <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + benefit2 + '</span></p>\
+            </div>\
+          </div>\
+          \
+          <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4 text-xs text-slate-600">\
+            <p class="font-semibold text-blue-900 mb-1">' + C.DISCLAIMER_TITLE + '</p>\
+            <p>' + C.DISCLAIMER_TEXT + '</p>\
+          </div>\
+          \
+          <p class="text-center text-slate-700 mb-6 text-lg leading-relaxed">' + C.CLOSING_TEXT + '</p>\
+          \
+          <div class="space-y-3">\
+            <button id="want-btn" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-4 rounded-lg font-black text-lg hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg">' + C.BUTTON_WANT + '</button>\
+            <button id="wait-btn" class="w-full bg-slate-200 text-slate-600 py-3 rounded-lg font-semibold hover:bg-slate-300 transition-colors text-sm">' + C.BUTTON_WAIT + '</button>\
+            <button id="back-btn" class="w-full text-slate-500 underline text-sm hover:text-slate-700">' + C.BUTTON_BACK + '</button>\
+          </div>\
+        </div>\
+      </div>';
+  },
+
+  // ==========================================================================
+  // ═══════════════════════════════════════════════════════════════════════
+  // TEMPLATE: Debt Check
+  // COPY SOURCE: COPY.DEBT_CHECK
+  // NAVIGATION: → debt_payoff OR email_capture
+  // ═══════════════════════════════════════════════════════════════════════
+  // ==========================================================================
+  'debt_check': function() {
+    var C = COPY.DEBT_CHECK;
+    var prevPage = AppState.goal === 'retirement' ? 'results_retirement' : 'results_family';
     
     return '\
       <div class="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 p-4 flex items-center justify-center relative">\
-        ' + getBackButton('1.01', C.BACK_BUTTON) + '\
+        ' + getBackButton(prevPage, C.BACK_BUTTON) + '\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
           <h1 class="text-3xl font-black text-center mb-6 text-slate-900">' + C.HEADLINE + '</h1>\
           <p class="text-xl text-center text-slate-700 mb-8">' + C.QUESTION + '</p>\
@@ -654,17 +729,21 @@ var Pages = {
   },
   
   // ==========================================================================
-  // PAGE 1.03 - Uses COPY.PAGE_1_03
+  // ═══════════════════════════════════════════════════════════════════════
+  // TEMPLATE: Loss Aversion (The Hammer)
+  // COPY SOURCE: COPY.LOSS_AVERSION
+  // NAVIGATION: → debt_check OR landing_main
+  // ═══════════════════════════════════════════════════════════════════════
   // ==========================================================================
-  '1.03': function() {
-    var C = COPY.PAGE_1_03;
+  'loss_aversion': function() {
+    var C = COPY.LOSS_AVERSION;
+    var prevPage = AppState.goal === 'retirement' ? 'results_retirement' : 'results_family';
     
     var daily = Calculator.dailyLoss(Number(AppState.age), Number(AppState.budget));
     var monthly = daily * 30;
     var yearly = daily * 365;
     var fiveYear = yearly * 5;
     
-    // Replace placeholders
     var lossDaily = replacePlaceholders(C.LOSS_DAILY, { DAILY: daily.toLocaleString() });
     var lossMonthly = replacePlaceholders(C.LOSS_MONTHLY, { MONTHLY: monthly.toLocaleString() });
     var lossYearly = replacePlaceholders(C.LOSS_YEARLY, { YEARLY: yearly.toLocaleString() });
@@ -672,7 +751,7 @@ var Pages = {
     
     return '\
       <div class="min-h-screen bg-gradient-to-br from-red-900 to-red-700 p-4 flex items-center justify-center relative">\
-        ' + getBackButton('1.01', C.BACK_BUTTON) + '\
+        ' + getBackButton(prevPage, C.BACK_BUTTON) + '\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
           <h1 class="text-6xl font-black text-center mb-2 text-red-600">' + C.HEADLINE + '</h1>\
           <p class="text-center text-slate-600 mb-8">' + C.SUBHEAD + '</p>\
@@ -714,17 +793,21 @@ var Pages = {
   },
   
   // ==========================================================================
-  // PAGE 1.04 - Uses COPY.PAGE_1_04
+  // ═══════════════════════════════════════════════════════════════════════
+  // TEMPLATE: Debt Payoff (Redirect Page)
+  // COPY SOURCE: COPY.DEBT_PAYOFF
+  // NAVIGATION: → landing_main
+  // ═══════════════════════════════════════════════════════════════════════
   // ==========================================================================
-  '1.04': function() {
-    var C = COPY.PAGE_1_04;
+  'debt_payoff': function() {
+    var C = COPY.DEBT_PAYOFF;
     
     var para2 = replacePlaceholders(C.PARA_2, { BUDGET: AppState.budget });
     var para3 = replacePlaceholders(C.PARA_3, { BUDGET: AppState.budget });
     
     return '\
       <div class="min-h-screen bg-gradient-to-br from-amber-50 to-amber-100 p-4 flex items-center justify-center relative">\
-        ' + getBackButton('1.02', C.BACK_BUTTON) + '\
+        ' + getBackButton('debt_check', C.BACK_BUTTON) + '\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
           <h1 class="text-4xl font-black text-center mb-6 text-amber-900">' + C.HEADLINE + '</h1>\
           \
@@ -755,16 +838,20 @@ var Pages = {
   },
   
   // ==========================================================================
-  // PAGE 1.045 - Uses COPY.PAGE_1_045
+  // ═══════════════════════════════════════════════════════════════════════
+  // TEMPLATE: Email Capture
+  // COPY SOURCE: COPY.EMAIL_CAPTURE
+  // NAVIGATION: → brokerage_setup
+  // ═══════════════════════════════════════════════════════════════════════
   // ==========================================================================
-  '1.045': function() {
-    var C = COPY.PAGE_1_045;
+  'email_capture': function() {
+    var C = COPY.EMAIL_CAPTURE;
     
     var benefit1 = replacePlaceholders(C.BENEFIT_1, { BUDGET: AppState.budget });
     
     return '\
       <div class="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-4 flex items-center justify-center relative">\
-        ' + getBackButton('1.02', C.BACK_BUTTON) + '\
+        ' + getBackButton('debt_check', C.BACK_BUTTON) + '\
         <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
           <h1 class="text-3xl font-black text-center mb-4 text-slate-900">' + C.HEADLINE + '</h1>\
           <p class="text-center text-lg text-slate-700 mb-6">' + C.SUBHEAD + '</p>\
@@ -790,17 +877,20 @@ var Pages = {
         </div>\
       </div>';
   },
-  
+
   // ==========================================================================
-  // PAGE 1.05 - Uses COPY.PAGE_1_05
+  // ═══════════════════════════════════════════════════════════════════════
+  // TEMPLATE: Brokerage Setup (Final Instructions)
+  // COPY SOURCE: COPY.BROKERAGE_SETUP
+  // NAVIGATION: → landing_main (end of flow)
+  // ═══════════════════════════════════════════════════════════════════════
   // ==========================================================================
-  '1.05': function() {
-    var C = COPY.PAGE_1_05;
+  'brokerage_setup': function() {
+    var C = COPY.BROKERAGE_SETUP;
     
     var isRetirement = AppState.goal === 'retirement';
     var goalText = isRetirement ? 'Retirement Security' : 'Family Legacy';
     
-    // Replace placeholders
     var planLabel = replacePlaceholders(C.PLAN_SUMMARY_LABEL, { BUDGET: AppState.budget });
     var planDetail = replacePlaceholders(C.PLAN_SUMMARY_DETAIL, { AGE: AppState.age, GOAL: goalText });
     
@@ -1060,8 +1150,16 @@ var Pages = {
   }
 };
 
-// ============================================================================
-// RENDERING
+  // ============================================================================
+// ██████╗ ███████╗███╗   ██╗██████╗ ███████╗██████╗ ██╗███╗   ██╗ ██████╗ 
+// ██╔══██╗██╔════╝████╗  ██║██╔══██╗██╔════╝██╔══██╗██║████╗  ██║██╔════╝ 
+// ██████╔╝█████╗  ██╔██╗ ██║██║  ██║█████╗  ██████╔╝██║██╔██╗ ██║██║  ███╗
+// ██╔══██╗██╔══╝  ██║╚██╗██║██║  ██║██╔══╝  ██╔══██╗██║██║╚██╗██║██║   ██║
+// ██║  ██║███████╗██║ ╚████║██████╔╝███████╗██║  ██║██║██║ ╚████║╚██████╔╝
+// ╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
+// 
+// RENDERING ENGINE
+// Renders current page template
 // ============================================================================
 
 function render() {
@@ -1069,12 +1167,12 @@ function render() {
   if (!container) return;
   
   try {
-    var pageHTML = Pages[AppState.currentPage];
-    if (pageHTML) {
-      container.innerHTML = pageHTML();
+    var template = PageTemplates[AppState.currentPage];
+    if (template) {
+      container.innerHTML = template();
       attachEventListeners();
     } else {
-      throw new Error('Page not found: ' + AppState.currentPage);
+      throw new Error('Page template not found: ' + AppState.currentPage);
     }
   } catch (error) {
     console.error('❌ Render error:', error);
@@ -1089,6 +1187,19 @@ function render() {
   }
 }
 
+
+// ============================================================================
+// ██████╗ ███████╗██╗  ██╗ █████╗ ██╗   ██╗██╗ ██████╗ ██████╗ 
+// ██╔══██╗██╔════╝██║  ██║██╔══██╗██║   ██║██║██╔═══██╗██╔══██╗
+// ██████╔╝█████╗  ███████║███████║██║   ██║██║██║   ██║██████╔╝
+// ██╔══██╗██╔══╝  ██╔══██║██╔══██║╚██╗ ██╔╝██║██║   ██║██╔══██╗
+// ██████╔╝███████╗██║  ██║██║  ██║ ╚████╔╝ ██║╚██████╔╝██║  ██║
+// ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝
+// 
+// EVENT LISTENERS
+// Button clicks and user interactions for each page
+// ============================================================================
+
 function attachEventListeners() {
   var page = AppState.currentPage;
   
@@ -1096,8 +1207,10 @@ function attachEventListeners() {
   
   try {
   
-  // PAGE 1.0
-  if (page === '1.0') {
+  // ═══════════════════════════════════════════════════════════════════════
+  // BEHAVIOR: Landing Page (Main)
+  // ═══════════════════════════════════════════════════════════════════════
+  if (page === 'landing_main') {
     var ageInput = document.getElementById('age-input');
     var budgetInput = document.getElementById('budget-input');
     var submitBtn = document.getElementById('submit-btn');
@@ -1137,15 +1250,17 @@ function attachEventListeners() {
           showLoading();
           setTimeout(function() {
             hideLoading();
-            navigateTo('1.00');
+            navigateTo('goal_selection');
           }, 1000);
         }
       });
     }
   }
   
-  // PAGE 1.00
-  if (page === '1.00') {
+  // ═══════════════════════════════════════════════════════════════════════
+  // BEHAVIOR: Goal Selection
+  // ═══════════════════════════════════════════════════════════════════════
+  if (page === 'goal_selection') {
     var retBtn = document.getElementById('retirement-btn');
     var famBtn = document.getElementById('family-btn');
     
@@ -1153,7 +1268,7 @@ function attachEventListeners() {
       retBtn.addEventListener('click', function() {
         AppState.goal = 'retirement';
         trackEvent('goal_selected', { goal: 'retirement' });
-        navigateTo('1.01');
+        navigateTo('results_retirement');
       });
     }
     
@@ -1161,13 +1276,15 @@ function attachEventListeners() {
       famBtn.addEventListener('click', function() {
         AppState.goal = 'family';
         trackEvent('goal_selected', { goal: 'family' });
-        navigateTo('1.01');
+        navigateTo('results_family');
       });
     }
   }
   
-  // PAGE 1.01
-  if (page === '1.01') {
+  // ═══════════════════════════════════════════════════════════════════════
+  // BEHAVIOR: Results Pages (Retirement & Family)
+  // ═══════════════════════════════════════════════════════════════════════
+  if (page === 'results_retirement' || page === 'results_family') {
     var wantBtn = document.getElementById('want-btn');
     var waitBtn = document.getElementById('wait-btn');
     var backBtn = document.getElementById('back-btn');
@@ -1182,7 +1299,7 @@ function attachEventListeners() {
           amount: amount,
           goal: AppState.goal
         });
-        navigateTo('1.02');
+        navigateTo('debt_check');
       });
     }
     
@@ -1192,19 +1309,21 @@ function attachEventListeners() {
           amount: amount,
           goal: AppState.goal
         });
-        navigateTo('1.03');
+        navigateTo('loss_aversion');
       });
     }
     
     if (backBtn) {
       backBtn.addEventListener('click', function() {
-        navigateTo('1.0');
+        navigateTo('landing_main');
       });
     }
   }
   
-  // PAGE 1.02
-  if (page === '1.02') {
+  // ═══════════════════════════════════════════════════════════════════════
+  // BEHAVIOR: Debt Check
+  // ═══════════════════════════════════════════════════════════════════════
+  if (page === 'debt_check') {
     var yesBtn = document.getElementById('yes-debt');
     var noBtn = document.getElementById('no-debt');
     
@@ -1212,7 +1331,7 @@ function attachEventListeners() {
       yesBtn.addEventListener('click', function() {
         AppState.hasDebt = true;
         trackEvent('debt_check', { has_debt: true });
-        navigateTo('1.04');
+        navigateTo('debt_payoff');
       });
     }
     
@@ -1220,45 +1339,51 @@ function attachEventListeners() {
       noBtn.addEventListener('click', function() {
         AppState.hasDebt = false;
         trackEvent('debt_check', { has_debt: false });
-        navigateTo('1.045');
+        navigateTo('email_capture');
       });
     }
   }
   
-  // PAGE 1.03
-  if (page === '1.03') {
+  // ═══════════════════════════════════════════════════════════════════════
+  // BEHAVIOR: Loss Aversion
+  // ═══════════════════════════════════════════════════════════════════════
+  if (page === 'loss_aversion') {
     var startBtn = document.getElementById('start-btn');
     var laterBtn = document.getElementById('later-btn');
     
     if (startBtn) {
       startBtn.addEventListener('click', function() {
         trackEvent('loss_aversion_convert', { converted: true });
-        navigateTo('1.02');
+        navigateTo('debt_check');
       });
     }
     
     if (laterBtn) {
       laterBtn.addEventListener('click', function() {
         trackEvent('loss_aversion_convert', { converted: false });
-        navigateTo('1.0');
+        navigateTo('landing_main');
       });
     }
   }
   
-  // PAGE 1.04
-  if (page === '1.04') {
+  // ═══════════════════════════════════════════════════════════════════════
+  // BEHAVIOR: Debt Payoff
+  // ═══════════════════════════════════════════════════════════════════════
+  if (page === 'debt_payoff') {
     var gotitBtn = document.getElementById('gotit-btn');
     
     if (gotitBtn) {
       gotitBtn.addEventListener('click', function() {
         trackEvent('debt_redirect_acknowledge');
-        navigateTo('1.0');
+        navigateTo('landing_main');
       });
     }
   }
   
-  // PAGE 1.045
-  if (page === '1.045') {
+  // ═══════════════════════════════════════════════════════════════════════
+  // BEHAVIOR: Email Capture
+  // ═══════════════════════════════════════════════════════════════════════
+  if (page === 'email_capture') {
     var emailInput = document.getElementById('email-input');
     var sendBtn = document.getElementById('send-guide-btn');
     var skipBtn = document.getElementById('skip-email-btn');
@@ -1292,14 +1417,14 @@ function attachEventListeners() {
         
         console.log('📧 Email captured:', email);
         
-        navigateTo('1.05');
+        navigateTo('brokerage_setup');
       });
     }
     
     if (skipBtn) {
       skipBtn.addEventListener('click', function() {
         trackEvent('email_captured', { email_provided: false });
-        navigateTo('1.05');
+        navigateTo('brokerage_setup');
       });
     }
     
@@ -1309,9 +1434,11 @@ function attachEventListeners() {
       });
     }
   }
-  
-  // PAGE 1.05
-  if (page === '1.05') {
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // BEHAVIOR: Brokerage Setup
+  // ═══════════════════════════════════════════════════════════════════════
+  if (page === 'brokerage_setup') {
     var hasIncomeBtn = document.getElementById('has-income-btn');
     var noIncomeBtn = document.getElementById('no-income-btn');
     var accountResult = document.getElementById('account-type-result');
@@ -1350,8 +1477,8 @@ function attachEventListeners() {
       hasIncomeBtn.addEventListener('click', function() {
         AppState.accountType = 'roth_ira';
         
-        if (accountName) accountName.textContent = COPY.PAGE_1_05.ACCOUNT_ROTH_IRA_NAME;
-        if (accountExplanation) accountExplanation.textContent = COPY.PAGE_1_05.ACCOUNT_ROTH_IRA_EXPLANATION;
+        if (accountName) accountName.textContent = COPY.BROKERAGE_SETUP.ACCOUNT_ROTH_IRA_NAME;
+        if (accountExplanation) accountExplanation.textContent = COPY.BROKERAGE_SETUP.ACCOUNT_ROTH_IRA_EXPLANATION;
         
         trackEvent('account_type_selected', { account_type: 'roth_ira' });
         showNextSections();
@@ -1362,8 +1489,8 @@ function attachEventListeners() {
       noIncomeBtn.addEventListener('click', function() {
         AppState.accountType = 'taxable';
         
-        if (accountName) accountName.textContent = COPY.PAGE_1_05.ACCOUNT_TAXABLE_NAME;
-        if (accountExplanation) accountExplanation.textContent = COPY.PAGE_1_05.ACCOUNT_TAXABLE_EXPLANATION;
+        if (accountName) accountName.textContent = COPY.BROKERAGE_SETUP.ACCOUNT_TAXABLE_NAME;
+        if (accountExplanation) accountExplanation.textContent = COPY.BROKERAGE_SETUP.ACCOUNT_TAXABLE_EXPLANATION;
         
         trackEvent('account_type_selected', { account_type: 'taxable' });
         showNextSections();
@@ -1372,7 +1499,7 @@ function attachEventListeners() {
     
     if (backHomeBtn) {
       backHomeBtn.addEventListener('click', function() {
-        navigateTo('1.0');
+        navigateTo('landing_main');
       });
     }
     
@@ -1391,14 +1518,23 @@ function attachEventListeners() {
   }
 }
 
+
 // ============================================================================
-// INITIALIZE APP
+// ██╗███╗   ██╗██╗████████╗██╗ █████╗ ██╗     ██╗███████╗ █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
+// ██║████╗  ██║██║╚══██╔══╝██║██╔══██╗██║     ██║╚══███╔╝██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║
+// ██║██╔██╗ ██║██║   ██║   ██║███████║██║     ██║  ███╔╝ ███████║   ██║   ██║██║   ██║██╔██╗ ██║
+// ██║██║╚██╗██║██║   ██║   ██║██╔══██║██║     ██║ ███╔╝  ██╔══██║   ██║   ██║██║   ██║██║╚██╗██║
+// ██║██║ ╚████║██║   ██║   ██║██║  ██║███████╗██║███████╗██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
+// ╚═╝╚═╝  ╚═══╝╚═╝   ╚═╝   ╚═╝╚═╝  ╚═╝╚══════╝╚═╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+// 
+// APP INITIALIZATION
+// Starts the application on page load
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🚀 App initializing...');
-  console.log('📍 Current page:', AppState.currentPage);
-  console.log('📦 AppState:', AppState);
+  console.log('🚀 StartWith60 initializing...');
+  console.log('📍 Starting page:', AppState.currentPage);
+  console.log('📦 Initial state:', AppState);
   
   try {
     render();
