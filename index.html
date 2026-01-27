@@ -117,25 +117,24 @@ var COPY = {
   // LOSS AVERSION: The Hammer (Cost of Waiting)
   // ==========================================================================
 LOSS_AVERSION: {
-  HEADLINE: 'BEFORE YOU GO...',
+  HEADLINE: 'YOUR MONEY EXPLODES AT THE END',
   
-  DAILY_LABEL: 'Start today vs. tomorrow:',
-  DAILY_VALUE: '$[DAILY] difference',
+  INTRO: 'This is how fast your account grows in the final year:',
   
-  WEEKLY_LABEL: 'Start today vs. next week:',
-  WEEKLY_VALUE: '$[WEEKLY] difference',
+  BIG_NUMBER: '+$[YEARLY]',
   
-  MONTHLY_LABEL: 'Start today vs. next month:',
-  MONTHLY_VALUE: '$[MONTHLY] difference',
+  EXPLANATION_1: 'That\'s how much your money grows in just the LAST YEAR.',
   
-  YEARLY_LABEL: 'Start today vs. next year:',
-  YEARLY_VALUE: '$[YEARLY] difference',
+  EXPLANATION_2: 'If you wait one year to start? You miss that entire year of explosive growth.',
   
-  EXPLANATION_LINE_1: 'Your money grows exponentially at retirement.',
-  EXPLANATION_LINE_2: 'Every day you wait costs more.',
+  MONTH_TEXT: 'Wait one month? Miss $[MONTHLY] of growth.',
+  WEEK_TEXT: 'Wait one week? Miss $[WEEKLY] of growth.',
   
-  OFFER_TEXT: '10 minutes of your time = $[YEARLY].',
-  OFFER_QUESTION: 'Worth it?',
+  CLOSING_LINE_1: 'The end is where the magic happens.',
+  CLOSING_LINE_2: 'Start today to capture it all.',
+  
+  OFFER_TEXT: '$[YEARLY] for 10 minutes of work.',
+  OFFER_QUESTION: 'Deal?',
   
   BUTTON_START: 'LET\'S DO THIS',
   BUTTON_LATER: 'I\'ll think about it',
@@ -740,57 +739,51 @@ var PageTemplates = {
   var C = COPY.LOSS_AVERSION;
   var prevPage = 'results';
   
-  var daily = Calculator.dailyLoss(Number(AppState.age), Number(AppState.budget));
   var weekly = Calculator.weeklyLoss(Number(AppState.age), Number(AppState.budget));
   var monthly = Calculator.monthlyLoss(Number(AppState.age), Number(AppState.budget));
   var yearly = Calculator.yearlyLoss(Number(AppState.age), Number(AppState.budget));
   
-  var dailyValue = replacePlaceholders(C.DAILY_VALUE, { DAILY: daily.toLocaleString() });
-  var weeklyValue = replacePlaceholders(C.WEEKLY_VALUE, { WEEKLY: weekly.toLocaleString() });
-  var monthlyValue = replacePlaceholders(C.MONTHLY_VALUE, { MONTHLY: monthly.toLocaleString() });
-  var yearlyValue = replacePlaceholders(C.YEARLY_VALUE, { YEARLY: yearly.toLocaleString() });
-  
+  var bigNumber = replacePlaceholders(C.BIG_NUMBER, { YEARLY: yearly.toLocaleString() });
+  var monthText = replacePlaceholders(C.MONTH_TEXT, { MONTHLY: monthly.toLocaleString() });
+  var weekText = replacePlaceholders(C.WEEK_TEXT, { WEEKLY: weekly.toLocaleString() });
   var offerText = replacePlaceholders(C.OFFER_TEXT, { YEARLY: yearly.toLocaleString() });
   
   return '\
     <div class="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-4 flex items-center justify-center relative">\
       ' + getBackButton(prevPage, C.BACK_BUTTON) + '\
-      <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
-        <h1 class="text-3xl font-black text-center mb-8 text-slate-900">' + C.HEADLINE + '</h1>\
+      <div class="max-w-lg w-full bg-white rounded-2xl shadow-2xl p-8 md:p-10">\
         \
-        <div class="space-y-4 mb-8">\
-          <div class="flex justify-between items-baseline pb-3 border-b border-slate-200">\
-            <span class="text-slate-700 font-medium">' + C.DAILY_LABEL + '</span>\
-            <span class="text-xl font-bold text-red-600">' + dailyValue + '</span>\
-          </div>\
-          <div class="flex justify-between items-baseline pb-3 border-b border-slate-200">\
-            <span class="text-slate-700 font-medium">' + C.WEEKLY_LABEL + '</span>\
-            <span class="text-xl font-bold text-red-600">' + weeklyValue + '</span>\
-          </div>\
-          <div class="flex justify-between items-baseline pb-3 border-b border-slate-200">\
-            <span class="text-slate-700 font-medium">' + C.MONTHLY_LABEL + '</span>\
-            <span class="text-xl font-bold text-red-600">' + monthlyValue + '</span>\
-          </div>\
-          <div class="flex justify-between items-baseline pb-4 border-b-2 border-slate-300">\
-            <span class="text-slate-700 font-medium">' + C.YEARLY_LABEL + '</span>\
-            <span class="text-2xl font-black text-red-600">' + yearlyValue + '</span>\
-          </div>\
+        <h1 class="text-3xl md:text-4xl font-black text-center mb-6 text-slate-900">' + C.HEADLINE + '</h1>\
+        \
+        <p class="text-center text-slate-700 mb-6 text-lg">' + C.INTRO + '</p>\
+        \
+        <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl p-8 mb-6 text-center border-4 border-emerald-500">\
+          <p class="text-6xl md:text-7xl font-black text-emerald-600 mb-2">' + bigNumber + '</p>\
         </div>\
         \
-        <div class="bg-slate-50 rounded-lg p-6 mb-8 text-center">\
-          <p class="text-slate-900 font-bold mb-2">' + C.EXPLANATION_LINE_1 + '</p>\
-          <p class="text-slate-600">' + C.EXPLANATION_LINE_2 + '</p>\
+        <p class="text-center text-slate-900 font-bold text-lg mb-6">' + C.EXPLANATION_1 + '</p>\
+        \
+        <div class="bg-slate-50 rounded-xl p-6 mb-6 space-y-3">\
+          <p class="text-slate-900 font-semibold">' + C.EXPLANATION_2 + '</p>\
+          <p class="text-slate-700">' + monthText + '</p>\
+          <p class="text-slate-700">' + weekText + '</p>\
         </div>\
         \
         <div class="text-center mb-8">\
-          <p class="text-lg text-slate-900 font-bold mb-2">' + offerText + '</p>\
-          <p class="text-2xl font-black text-emerald-600">' + C.OFFER_QUESTION + '</p>\
+          <p class="text-slate-900 font-bold text-lg">' + C.CLOSING_LINE_1 + '</p>\
+          <p class="text-slate-700">' + C.CLOSING_LINE_2 + '</p>\
+        </div>\
+        \
+        <div class="border-t-2 border-slate-200 pt-8 mb-8">\
+          <p class="text-center text-xl font-bold text-slate-900 mb-2">' + offerText + '</p>\
+          <p class="text-center text-3xl font-black text-emerald-600">' + C.OFFER_QUESTION + '</p>\
         </div>\
         \
         <div class="space-y-3">\
-          <button id="start-btn" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-5 rounded-lg font-black text-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-xl">' + C.BUTTON_START + '</button>\
-          <button id="later-btn" class="w-full bg-slate-200 text-slate-600 py-3 rounded-lg font-semibold hover:bg-slate-300 transition-colors text-sm">' + C.BUTTON_LATER + '</button>\
+          <button id="start-btn" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-5 rounded-xl font-black text-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-xl transform hover:scale-105">' + C.BUTTON_START + '</button>\
+          <button id="later-btn" class="w-full text-slate-500 py-3 rounded-xl font-semibold hover:text-slate-700 transition-colors text-sm">' + C.BUTTON_LATER + '</button>\
         </div>\
+        \
       </div>\
     </div>';
 },
