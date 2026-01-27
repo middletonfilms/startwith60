@@ -116,24 +116,31 @@ var COPY = {
   // ==========================================================================
   // LOSS AVERSION: The Hammer (Cost of Waiting)
   // ==========================================================================
-  LOSS_AVERSION: {
-    HEADLINE: 'WAIT.',
-    SUBHEAD: 'Before you decide to "come back later"...',
-    LOSS_BOX_LABEL: 'EVERY DAY YOU WAIT:',
-    LOSS_DAILY: '$[DAILY]',
-    LOSS_MONTHLY: 'Every month: $[MONTHLY]',
-    LOSS_YEARLY: 'Every year: $[YEARLY]',
-    LOSS_FIVE_YEAR: 'Wait just 5 years: -$[FIVE_YEAR]',
-    VIZ_LABEL: 'If you wait ONE YEAR to start:',
-    VIZ_TEXT: 'That\'s 75% of what most Americans save in a YEAR - gone forever',
-    TESTIMONIAL: '"I waited 3 years to start. It cost me $42,000. Do not make my mistake. Start TODAY."',
-    TESTIMONIAL_ATTRIBUTION: '- Real user, started at age 35',
-    WARNING_PRIMARY: 'That is money you will NEVER get back.',
-    WARNING_SECONDARY: 'Time is the only resource you cannot buy more of.',
-    BUTTON_START: 'NO, LET\'S START NOW',
-    BUTTON_LATER: 'I will think about it',
-    BACK_BUTTON: 'Go back'
-  },
+LOSS_AVERSION: {
+  HEADLINE: 'BEFORE YOU GO...',
+  
+  DAILY_LABEL: 'Start today vs. tomorrow:',
+  DAILY_VALUE: '$[DAILY] difference',
+  
+  WEEKLY_LABEL: 'Start today vs. next week:',
+  WEEKLY_VALUE: '$[WEEKLY] difference',
+  
+  MONTHLY_LABEL: 'Start today vs. next month:',
+  MONTHLY_VALUE: '$[MONTHLY] difference',
+  
+  YEARLY_LABEL: 'Start today vs. next year:',
+  YEARLY_VALUE: '$[YEARLY] difference',
+  
+  EXPLANATION_LINE_1: 'Your money grows exponentially at retirement.',
+  EXPLANATION_LINE_2: 'Every day you wait costs more.',
+  
+  OFFER_TEXT: '10 minutes of your time = $[YEARLY].',
+  OFFER_QUESTION: 'Worth it?',
+  
+  BUTTON_START: 'LET\'S DO THIS',
+  BUTTON_LATER: 'I\'ll think about it',
+  BACK_BUTTON: 'Go back'
+},
   
   // ==========================================================================
   // DEBT PAYOFF: Redirect Page
@@ -382,9 +389,30 @@ var Calculator = {
   },
   
   dailyLoss: function(age, budget) {
-    var now = this.retirement(age, budget);
-    var later = this.retirement(age + 1, budget);
-    return Math.round((now - later) / 365);
+    var finalToday = this.retirement(age, budget);
+    var finalIfWaitYear = this.retirement(age + 1, budget);
+    var finalIfWaitYearThenGrow = finalIfWaitYear * Math.pow(1.104, 364/365);
+    return Math.round(finalToday - finalIfWaitYearThenGrow);
+  },
+  
+  weeklyLoss: function(age, budget) {
+    var finalToday = this.retirement(age, budget);
+    var finalIfWaitYear = this.retirement(age + 1, budget);
+    var finalIfWaitYearThenGrow = finalIfWaitYear * Math.pow(1.104, 51/52);
+    return Math.round(finalToday - finalIfWaitYearThenGrow);
+  },
+  
+  monthlyLoss: function(age, budget) {
+    var finalToday = this.retirement(age, budget);
+    var finalIfWaitYear = this.retirement(age + 1, budget);
+    var finalIfWaitYearThenGrow = finalIfWaitYear * Math.pow(1.104, 11/12);
+    return Math.round(finalToday - finalIfWaitYearThenGrow);
+  },
+  
+  yearlyLoss: function(age, budget) {
+    var finalToday = this.retirement(age, budget);
+    var finalIfWaitYear = this.retirement(age + 1, budget);
+    return Math.round(finalToday - finalIfWaitYear);
   },
   
   getDescription: function(amount) {
@@ -709,62 +737,64 @@ var PageTemplates = {
   // NAVIGATION: → debt_check OR landing_main
   // ═══════════════════════════════════════════════════════════════════════
   // ==========================================================================
-  'loss_aversion': function() {
-    var C = COPY.LOSS_AVERSION;
-    var prevPage = 'results';
-    
-    var daily = Calculator.dailyLoss(Number(AppState.age), Number(AppState.budget));
-    var monthly = daily * 30;
-    var yearly = daily * 365;
-    var fiveYear = yearly * 5;
-    
-    var lossDaily = replacePlaceholders(C.LOSS_DAILY, { DAILY: daily.toLocaleString() });
-    var lossMonthly = replacePlaceholders(C.LOSS_MONTHLY, { MONTHLY: monthly.toLocaleString() });
-    var lossYearly = replacePlaceholders(C.LOSS_YEARLY, { YEARLY: yearly.toLocaleString() });
-    var lossFiveYear = replacePlaceholders(C.LOSS_FIVE_YEAR, { FIVE_YEAR: fiveYear.toLocaleString() });
-    
-    return '\
-      <div class="min-h-screen bg-gradient-to-br from-red-900 to-red-700 p-4 flex items-center justify-center relative">\
-        ' + getBackButton(prevPage, C.BACK_BUTTON) + '\
-        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
-          <h1 class="text-6xl font-black text-center mb-2 text-red-600">' + C.HEADLINE + '</h1>\
-          <p class="text-center text-slate-600 mb-8">' + C.SUBHEAD + '</p>\
-          \
-          <div class="bg-red-50 border-4 border-red-200 rounded-xl p-6 mb-6">\
-            <p class="text-center text-lg font-bold text-slate-700 mb-4">' + C.LOSS_BOX_LABEL + '</p>\
-            <p class="text-center text-5xl font-black text-red-600 mb-6">' + lossDaily + '</p>\
-            <div class="space-y-2 text-center text-slate-600">\
-              <p>' + lossMonthly + '</p>\
-              <p>' + lossYearly + '</p>\
-              <p class="text-lg pt-3 mt-3 border-t border-red-200 font-bold">' + lossFiveYear + '</p>\
-            </div>\
+'loss_aversion': function() {
+  var C = COPY.LOSS_AVERSION;
+  var prevPage = 'results';
+  
+  var daily = Calculator.dailyLoss(Number(AppState.age), Number(AppState.budget));
+  var weekly = Calculator.weeklyLoss(Number(AppState.age), Number(AppState.budget));
+  var monthly = Calculator.monthlyLoss(Number(AppState.age), Number(AppState.budget));
+  var yearly = Calculator.yearlyLoss(Number(AppState.age), Number(AppState.budget));
+  
+  var dailyValue = replacePlaceholders(C.DAILY_VALUE, { DAILY: daily.toLocaleString() });
+  var weeklyValue = replacePlaceholders(C.WEEKLY_VALUE, { WEEKLY: weekly.toLocaleString() });
+  var monthlyValue = replacePlaceholders(C.MONTHLY_VALUE, { MONTHLY: monthly.toLocaleString() });
+  var yearlyValue = replacePlaceholders(C.YEARLY_VALUE, { YEARLY: yearly.toLocaleString() });
+  
+  var offerText = replacePlaceholders(C.OFFER_TEXT, { YEARLY: yearly.toLocaleString() });
+  
+  return '\
+    <div class="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-4 flex items-center justify-center relative">\
+      ' + getBackButton(prevPage, C.BACK_BUTTON) + '\
+      <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
+        <h1 class="text-3xl font-black text-center mb-8 text-slate-900">' + C.HEADLINE + '</h1>\
+        \
+        <div class="space-y-4 mb-8">\
+          <div class="flex justify-between items-baseline pb-3 border-b border-slate-200">\
+            <span class="text-slate-700 font-medium">' + C.DAILY_LABEL + '</span>\
+            <span class="text-xl font-bold text-red-600">' + dailyValue + '</span>\
           </div>\
-          \
-          <div class="bg-slate-100 rounded-lg p-4 mb-6">\
-            <p class="text-sm font-bold text-slate-700 mb-3">' + C.VIZ_LABEL + '</p>\
-            <div class="relative h-4 bg-red-200 rounded-full overflow-hidden mb-2">\
-              <div class="absolute h-full bg-red-600 rounded-full animate-pulse" style="width: 75%"></div>\
-            </div>\
-            <p class="text-xs text-slate-600 text-center">' + C.VIZ_TEXT + '</p>\
+          <div class="flex justify-between items-baseline pb-3 border-b border-slate-200">\
+            <span class="text-slate-700 font-medium">' + C.WEEKLY_LABEL + '</span>\
+            <span class="text-xl font-bold text-red-600">' + weeklyValue + '</span>\
           </div>\
-          \
-          <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">\
-            <p class="text-sm text-slate-700 italic">' + C.TESTIMONIAL + '</p>\
-            <p class="text-xs text-slate-500 mt-2">' + C.TESTIMONIAL_ATTRIBUTION + '</p>\
+          <div class="flex justify-between items-baseline pb-3 border-b border-slate-200">\
+            <span class="text-slate-700 font-medium">' + C.MONTHLY_LABEL + '</span>\
+            <span class="text-xl font-bold text-red-600">' + monthlyValue + '</span>\
           </div>\
-          \
-          <div class="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4 mb-6">\
-            <p class="text-center font-bold text-slate-900">' + C.WARNING_PRIMARY + '</p>\
-            <p class="text-center text-sm text-slate-600 mt-2">' + C.WARNING_SECONDARY + '</p>\
-          </div>\
-          \
-          <div class="space-y-3">\
-            <button id="start-btn" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-5 rounded-lg font-black text-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-xl">' + C.BUTTON_START + '</button>\
-            <button id="later-btn" class="w-full bg-slate-200 text-slate-600 py-3 rounded-lg font-semibold hover:bg-slate-300 transition-colors text-sm">' + C.BUTTON_LATER + '</button>\
+          <div class="flex justify-between items-baseline pb-4 border-b-2 border-slate-300">\
+            <span class="text-slate-700 font-medium">' + C.YEARLY_LABEL + '</span>\
+            <span class="text-2xl font-black text-red-600">' + yearlyValue + '</span>\
           </div>\
         </div>\
-      </div>';
-  },
+        \
+        <div class="bg-slate-50 rounded-lg p-6 mb-8 text-center">\
+          <p class="text-slate-900 font-bold mb-2">' + C.EXPLANATION_LINE_1 + '</p>\
+          <p class="text-slate-600">' + C.EXPLANATION_LINE_2 + '</p>\
+        </div>\
+        \
+        <div class="text-center mb-8">\
+          <p class="text-lg text-slate-900 font-bold mb-2">' + offerText + '</p>\
+          <p class="text-2xl font-black text-emerald-600">' + C.OFFER_QUESTION + '</p>\
+        </div>\
+        \
+        <div class="space-y-3">\
+          <button id="start-btn" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-5 rounded-lg font-black text-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-xl">' + C.BUTTON_START + '</button>\
+          <button id="later-btn" class="w-full bg-slate-200 text-slate-600 py-3 rounded-lg font-semibold hover:bg-slate-300 transition-colors text-sm">' + C.BUTTON_LATER + '</button>\
+        </div>\
+      </div>\
+    </div>';
+},
   
   // ==========================================================================
   // ═══════════════════════════════════════════════════════════════════════
