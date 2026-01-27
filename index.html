@@ -39,9 +39,9 @@ var COPY = {
   PAGE_1_0: {
     HEADLINE: 'U STILL BROKE<br>AT 65?',
     SUBHEAD_LINE_1: 'Most people are.',
-    SUBHEAD_LINE_2: 'You do not have to be.',
-    LABEL_AGE: 'YOUR AGE',
-    LABEL_BUDGET: 'PER MONTH',
+    SUBHEAD_LINE_2: 'You don\'t have to be.',
+    LABEL_AGE: 'How old are you?',
+    LABEL_BUDGET: 'How much can you set aside per month?',
     PLACEHOLDER_AGE: 'AGE',
     PLACEHOLDER_BUDGET: '60',
     BUTTON_CTA: 'SHOW ME THE MATH',
@@ -69,7 +69,7 @@ var COPY = {
   // ==========================================================================
   PAGE_1_01: {
     EYEBROW: 'YOUR $[BUDGET]/MONTH BECOMES', // [BUDGET] will be replaced
-    YEARS_TEXT: 'You are [AGE]. That is [YEARS] years of compound growth.', // [AGE] and [YEARS] replaced
+    YEARS_TEXT: 'You are [AGE]. If you retire at [RETIREAGE], that is [YEARS] years of compound growth.', // [AGE] and [YEARS] replaced
     
     // Benefits list varies by goal
     BENEFITS_LABEL: 'That means:',
@@ -77,22 +77,20 @@ var COPY = {
     // RETIREMENT GOAL benefits
     RETIREMENT_BENEFIT_1: 'Never asking your kids for money',
     RETIREMENT_BENEFIT_2: 'Retiring when YOU want to',
-    RETIREMENT_BENEFIT_3: 'Financial security for life',
-    RETIREMENT_BENEFIT_4: '$[INCOME]/year forever', // [INCOME] replaced
-    RETIREMENT_BENEFIT_4_SUFFIX: '(without touching your money)',
+    RETIREMENT_BENEFIT_3: 'Age [RETIREAGE]: $[AMOUNT] in your account. Take out $[INCOME]/year. Forever. The account never empties.'
     
     // FAMILY GOAL benefits
     FAMILY_BENEFIT_1: 'Your kids never struggle like you did',
-    FAMILY_BENEFIT_2: 'Generational wealth starts with YOU',
-    FAMILY_BENEFIT_3: '$[INCOME]/year for your family', // [INCOME] replaced
-    FAMILY_BENEFIT_4: 'If untouched 20 more years: $[FUTURE]', // [FUTURE] replaced
+    FAMILY_BENEFIT_2: 'College. Wedding. First house. All covered.',
+    FAMILY_BENEFIT_3: 'They collect $[INCOME]/year. Forever. Without even shrinking the $[AMOUNT] in the account.'
+  
     
     DISCLAIMER_TITLE: 'Based on S&P 500 historical average',
     DISCLAIMER_TEXT: '10.4% annual return (1926-2024). Past performance does not guarantee future results. Market values fluctuate.',
     
-    CLOSING_TEXT: 'This money works for you while you sleep. Every single day. For decades.',
+    CLOSING_TEXT: 'This money makes MORE money. Every day. While you do nothing.',
     
-    BUTTON_WANT: 'THIS IS WHAT I WANT',
+    BUTTON_WANT: 'LET\'S GET THIS DONE',
     BUTTON_WAIT: 'Show me what happens if I wait',
     BUTTON_BACK: 'Try different numbers',
     
@@ -509,7 +507,6 @@ var Pages = {
           \
           <button id="submit-btn" class="w-full py-5 rounded-xl font-black text-xl shadow-xl transition-all ' + buttonClass + '">' + C.BUTTON_CTA + '</button>\
           \
-          <p class="text-center text-sm text-slate-500 mt-4">' + C.FOOTER_TEXT + '</p>\
         </div>\
       </div>';
   },
