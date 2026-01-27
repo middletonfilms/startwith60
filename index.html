@@ -579,23 +579,15 @@ var Pages = {
         <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.RETIREMENT_BENEFIT_2 + '</span></p>\
         <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + benefit3 + '</span></p>';
     } else {
-      var benefit3 = replacePlaceholders(C.FAMILY_BENEFIT_3, { 
-        INCOME: income.toLocaleString(),
-        AMOUNT: amount.toLocaleString()
-      });
-      benefitsList = '\
-        <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.RETIREMENT_BENEFIT_1 + '</span></p>\
-        <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.RETIREMENT_BENEFIT_2 + '</span></p>\
-        <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.RETIREMENT_BENEFIT_3 + '</span></p>\
-    } else {
-      var benefit3 = replacePlaceholders(C.FAMILY_BENEFIT_3, { INCOME: income.toLocaleString() });
-      var benefit4 = replacePlaceholders(C.FAMILY_BENEFIT_4, { FUTURE: future20.toLocaleString() });
-      benefitsList = '\
-        <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + C.FAMILY_BENEFIT_1 + '</span></p>\
-        <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + C.FAMILY_BENEFIT_2 + '</span></p>\
-        <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span class="font-bold">' + benefit3 + '</span></p>\
-        <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + benefit4 + '</span></p>';
-    }
+  var benefit3 = replacePlaceholders(C.FAMILY_BENEFIT_3, { 
+    INCOME: income.toLocaleString(),
+    AMOUNT: amount.toLocaleString()
+  });
+  benefitsList = '\
+    <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + C.FAMILY_BENEFIT_1 + '</span></p>\
+    <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + C.FAMILY_BENEFIT_2 + '</span></p>\
+    <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + benefit3 + '</span></p>';
+}
     
     return '\
       <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 flex items-center justify-center relative">\
