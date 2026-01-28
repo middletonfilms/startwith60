@@ -838,7 +838,7 @@ var PageTemplates = {
         <p class="text-center text-slate-700 mb-6 text-lg">' + C.INTRO + '</p>\
         \
         <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-2xl p-8 mb-6 text-center border-4 border-red-500">\
-          <p class="text-5xl sm:text-6xl md:text-7xl font-black text-red-600 mb-2 break-words">' + bigNumber + '</p>\
+          <p class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-red-600 mb-2 break-words leading-tight">' + bigNumber + '</p>\
         </div>\
         \
         <p class="text-center text-slate-900 font-bold text-lg mb-6">' + C.EXPLANATION_1 + '</p>\
@@ -1292,7 +1292,7 @@ function attachEventListeners() {
     var submitBtn = document.getElementById('submit-btn');
     
     function updateButtonState() {
-      var canSubmit = AppState.age && AppState.budget && AppState.age >= 18 && AppState.age <= 64 && AppState.budget > 0;
+      var canSubmit = AppState.age && AppState.budget && AppState.age >= 0 && AppState.age <= 64 && AppState.budget > 0;
       if (submitBtn) {
         submitBtn.className = 'w-full py-5 rounded-xl font-black text-xl shadow-xl transition-all ' + 
           (canSubmit 
@@ -1317,7 +1317,7 @@ function attachEventListeners() {
     
     if (submitBtn) {
       submitBtn.addEventListener('click', function() {
-        if (AppState.age && AppState.budget && AppState.age >= 18 && AppState.age <= 64 && AppState.budget > 0) {
+        if (AppState.age && AppState.budget && AppState.age >= 0 && AppState.age <= 64 && AppState.budget > 0) {
           trackEvent('input_complete', {
             age: AppState.age,
             budget: AppState.budget
