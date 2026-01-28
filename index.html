@@ -1,8 +1,7 @@
 // TOP LEVEL INSTRUCTIONS FOR ANY HUMANS OR AI WORKING ON THIS PROJECT. 
-
 // THE MISSION: Interrupt poor people before they get scammed or lose out due to inaction. Show them the actual path to wealth. Make it so simple they can't say no. Nobody else finds it profitable to teach them, guide them, demystify for them—- so we will.
 
-//COPY PRINCIPLES:
+// COPY PRINCIPLES:
 // 1. Visceral over educational - "$500K" not "compound interest grows exponentially"
 // 2. Urgency over inspiration - "You're losing $47/day" not "imagine your future"
 // 3. Specificity over theory - "Open Fidelity, buy VOO, $60/month" not "consider your options"
@@ -10,8 +9,73 @@
 // 5. Zero jargon - If a high school dropout can't understand it in 3 seconds, rewrite it
 // 6. Assume distrust - They've been lied to before. Prove it with math, not promises
 // 7. Remove ALL friction - Every extra word, every extra click is another person who stays broke
-
 // THE GOAL: Get them from "I can't afford to invest" to clicking "Open Fidelity Account" in under 2 minutes.
+
+// ARCHITECTURE GUIDE:
+// - ALL COPY lives in the COPY object (search for "COPY MANAGEMENT" ASCII header)
+// - ALL page templates live in PageTemplates object (search for "TEMPLATES" ASCII header)
+// - Navigation flow is controlled by NavigationFlows object
+// - Use CMD+F on the giant ASCII headers to jump between sections
+// - Page IDs are semantic: 'landing_main', 'goal_selection', 'results', 'debt_check', 'loss_aversion', 'email_capture', 'brokerage_setup'
+
+// MATH/CALCULATOR NOTES:
+// - All financial calculations use S&P 500 historical average: 10.4% annual return (1.104)
+// - Monthly rate: Math.pow(1.104, 1/12) - 1
+// - Formula: FV = PMT × ((1+r)^n - 1) / r
+// - Loss calculations for "wait" page:
+//   * yearlyLoss = retirement(age) - retirement(age+1)
+//   * monthlyLoss = (budget) × 1.104^(years_to_65) [one month of contributions grown to retirement]
+//   * weeklyLoss = (budget × 7/30) × 1.104^(years_to_65)
+// - These show "opportunity cost" = missed contributions × their compound growth
+
+// INVESTMENT RECOMMENDATION LOGIC (not yet fully implemented):
+// Universal priorities (any time horizon):
+//   1. Emergency fund (3-6 months in HYSA)
+//   2. Pay off debt >7% APR
+//   3. 401(k) up to company match
+//   4. HSA (if eligible) - mention as advanced option
+// 
+// If time horizon ≥10 years:
+//   5. Pay off debt 5-7%
+//   6. Roth IRA (or Spousal IRA if not employed)
+//   7. 529 (if for education)
+//   8. Taxable brokerage
+//
+// If time horizon 5-10 years:
+//   5. Pay off debt >5%
+//   6. Conservative mix: 60% bonds / 40% stocks, CDs, or I Bonds
+//
+// If time horizon <5 years:
+//   5. Pay off debt >4%
+//   6. HYSA, CDs, or I Bonds ONLY (no stocks)
+
+// KEY DESIGN DECISIONS:
+// - Toggle on results page: retirement vs family legacy (same page, dynamic content)
+// - Loss aversion page uses RED for danger/urgency, GREEN for action
+// - Brokerage setup page: progressive reveal (click account type → sections appear sequentially)
+// - Mobile-first design, works on desktop/tablet
+// - All copy supports dynamic variable replacement via replacePlaceholders() function
+
+// REFACTOR HISTORY:
+// - Jan 2026: Converted from numeric IDs (1.0, 1.01) to semantic names ('landing_main', 'results')
+// - Jan 2026: Split PAGE_1_01 into RESULTS_RETIREMENT and RESULTS_FAMILY for goal-specific copy
+// - Jan 2026: Unified results pages with toggle instead of separate pages
+// - Jan 2026: Rewrote loss aversion page to focus on exponential growth at end (+$21,785 in final year)
+
+// FILE STRUCTURE NOTES:
+// - This is a SINGLE FILE APP (index.html) - everything is self-contained
+// - No external dependencies except Tailwind CDN and Google Analytics
+// - Copy is separated from templates for easy editing
+// - Templates use string concatenation (old-school but works in any browser)
+
+// COMMON TASKS:
+// - Edit copy: Find COPY object, edit the relevant section
+// - Add new page: Add to PageTemplates, update NavigationFlows, add event listeners
+// - Change navigation flow: Edit NavigationFlows.default.routes
+// - Update calculations: Edit Calculator object functions
+// - Change colors/styling: Update Tailwind classes in templates
+
+// CRITICAL: Always test the full flow after changes. Users drop off at ANY friction point.
 
 <!DOCTYPE html>
 <html lang="en">
