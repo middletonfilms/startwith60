@@ -3,116 +3,93 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title id="page-title">Post | StartWith60</title>
+<title>Blog | StartWith60</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body class="bg-slate-50">
 
 <div class="max-w-3xl mx-auto p-6">
   <!-- Header -->
   <div class="mb-8">
-    <a href="index.html" class="text-blue-600 hover:underline text-sm">← Back to Blog</a>
+    <a href="../index.html" class="text-blue-600 hover:underline text-sm">← Back to StartWith60</a>
+    <h1 class="text-4xl font-black mt-4 mb-2">The Blog</h1>
+    <p class="text-slate-600">Real talk about money, investing, and not staying broke.</p>
   </div>
 
-  <!-- Post Content -->
-  <article id="post-content" class="bg-white rounded-lg shadow-md p-8">
+  <!-- Post List -->
+  <div id="post-list" class="space-y-6">
     <div class="text-center py-12">
-      <div class="animate-pulse">Loading post...</div>
+      <div class="animate-pulse">Loading posts...</div>
     </div>
-  </article>
+  </div>
 </div>
 
 <script>
-// Get slug from URL
-const urlParams = new URLSearchParams(window.location.search);
-const slug = urlParams.get('slug');
-
-if (!slug) {
-  document.getElementById('post-content').innerHTML = '<p class="text-center text-red-600">Post not found.</p>';
-} else {
-  // Load the markdown file
-  fetch(`posts/${slug}.md`)
-    .then(response => {
-      if (!response.ok) throw new Error('Post not found');
-      return response.text();
-    })
-    .then(markdown => {
-      // Convert markdown to HTML
-      const html = marked.parse(markdown);
+// Fetch the list of files in the posts directory
+fetch('https://api.github.com/repos/middletonfilms/startwith60/contents/blog/posts')
+  .then(res => res.json())
+  .then(files => {
+    const mdFiles = files.filter(f => f.name.endsWith('.md'));
+    
+    // Fetch each post to get title and excerpt
+    const postPromises = mdFiles.map(file => {
+      const slug = file.name.replace('.md', '');
+      return fetch(file.download_url)
+        .then(res => res.text())
+        .then(content => {
+          // Extract title (first H1)
+          const titleMatch = content.match(/^#\s+(.+)$/m);
+          const title = titleMatch ? titleMatch[1] : slug;
+          
+          // Extract excerpt (first paragraph after title)
+          const lines = content.split('\n').filter(l => l.trim());
+          const excerptLine = lines.find(l => !l.startsWith('#') && l.length > 20);
+          const excerpt = excerptLine ? excerptLine.substring(0, 150) + '...' : '';
+          
+          // Get date from GitHub commit (or use file modified date)
+          const date = new Date(file.size).toISOString().split('T')[0]; // placeholder
+          
+          return { slug, title, excerpt, date };
+        });
+    });
+    
+    return Promise.all(postPromises);
+  })
+  .then(posts => {
+    // Sort by date (newest first)
+    posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    // Render posts
+    const postList = document.getElementById('post-list');
+    postList.innerHTML = posts.map(post => {
+      const date = new Date(post.date).toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
       
-      // Extract title from first H1 in markdown
-      const titleMatch = markdown.match(/^#\s+(.+)$/m);
-      const title = titleMatch ? titleMatch[1] : 'Post';
-      
-      // Update page title
-      document.getElementById('page-title').textContent = `${title} | StartWith60`;
-      
-      // Render post
-      document.getElementById('post-content').innerHTML = `
-        <div class="prose prose-lg max-w-none">
-          ${html}
+      return `
+        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+          <div class="text-sm text-slate-500 mb-2">${date}</div>
+          <h2 class="text-2xl font-bold mb-3">
+            <a href="post.html?slug=${post.slug}" class="text-slate-900 hover:text-blue-600">
+              ${post.title}
+            </a>
+          </h2>
+          <p class="text-slate-600 mb-4">${post.excerpt}</p>
+          <a href="post.html?slug=${post.slug}" class="text-blue-600 font-semibold hover:underline">
+            Read more →
+          </a>
         </div>
       `;
-    })
-    .catch(error => {
-      document.getElementById('post-content').innerHTML = `
-        <p class="text-center text-red-600">Post not found.</p>
-      `;
-    });
-}
+    }).join('');
+  })
+  .catch(error => {
+    document.getElementById('post-list').innerHTML = `
+      <p class="text-center text-red-600">Error loading posts. Make sure your repo is public.</p>
+    `;
+  });
 </script>
-
-<style>
-/* Blog post styling */
-.prose {
-  color: #334155;
-  line-height: 1.75;
-}
-.prose h1 {
-  font-size: 2.5rem;
-  font-weight: 900;
-  margin-bottom: 1rem;
-  color: #0f172a;
-}
-.prose h2 {
-  font-size: 1.75rem;
-  font-weight: 800;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  color: #1e293b;
-}
-.prose p {
-  margin-bottom: 1.5rem;
-}
-.prose ul {
-  list-style: disc;
-  margin-left: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-.prose li {
-  margin-bottom: 0.5rem;
-}
-.prose strong {
-  font-weight: 700;
-  color: #0f172a;
-}
-.prose table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 2rem 0;
-}
-.prose th,
-.prose td {
-  border: 1px solid #e2e8f0;
-  padding: 0.75rem;
-  text-align: left;
-}
-.prose th {
-  background: #f1f5f9;
-  font-weight: 700;
-}
-</style>
 
 </body>
 </html>
