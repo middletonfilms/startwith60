@@ -15,7 +15,7 @@ As a former Life Insurance Agent, I’ve worked with hundreds of families— lar
 
 I wish I had a time machine so I could go back just 40 years, shake these people, and tell them the same thing I’m about to tell you:
 
-[box(tip):There are funds you can put your money in— called index funds— that grow 10.4% every year on average. This is where the insurance company puts your money and everyone else’s, and it’s why they’re worth billions of dollars.]
+[box(thesis):There are funds you can put your money in— called index funds— that grow 10.4% every year on average. This is where the insurance company puts your money and everyone else’s, and it’s why they’re worth billions of dollars.]
 
 Now, 10.4% per year might sound boring to you. With regular stocks, the value can double in a year. Or the value can 10x in one day. But— to be candid— that’s not going to be your luck. Stocks are gambling. You wouldn’t bet your mortgage at the casino, and for good reason.
 
