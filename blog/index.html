@@ -24,7 +24,7 @@
   <!-- Header -->
   <header class="mb-16 text-center">
     <h1 class="text-5xl md:text-6xl font-black mb-6 leading-tight">
-      MONEY. IN PLAIN ENGLISH.
+      <span class="text-emerald-400">MONEY.</span><br>IN PLAIN ENGLISH.
     </h1>
     <p class="text-xl md:text-2xl text-slate-300 max-w-2xl mx-auto leading-relaxed mb-4">
       Compound interest. Retirement accounts. Market performance.
@@ -123,15 +123,16 @@ fetch('https://api.github.com/repos/middletonfilms/startwith60/contents/blog/pos
         ];
         const colorClass = colors[Math.floor(Math.random() * colors.length)];
         
-        // Calculate font size based on title length
-        let fontSize = 'text-4xl';
-        if (post.title.length > 60) fontSize = 'text-2xl';
-        else if (post.title.length > 40) fontSize = 'text-3xl';
-        else if (post.title.length < 20) fontSize = 'text-5xl';
+        // Calculate font size based on title length - MORE AGGRESSIVE
+        let fontSize = 'text-4xl md:text-6xl';
+        if (post.title.length > 80) fontSize = 'text-2xl md:text-3xl';
+        else if (post.title.length > 60) fontSize = 'text-3xl md:text-4xl';
+        else if (post.title.length > 40) fontSize = 'text-3xl md:text-5xl';
+        else if (post.title.length < 25) fontSize = 'text-5xl md:text-7xl';
         
         imageHTML = `
-          <div class="w-full h-64 bg-gradient-to-br ${colorClass} rounded-t-lg flex items-center justify-center px-6 py-8">
-            <h3 class="text-white ${fontSize} font-black text-center leading-tight break-words w-full">
+          <div class="w-full h-64 bg-gradient-to-br ${colorClass} rounded-t-lg flex items-center justify-center p-3 md:p-4">
+            <h3 class="text-white ${fontSize} font-black text-center leading-none break-words w-full" style="word-break: break-word; hyphens: auto; line-height: 1.1;">
               ${post.title}
             </h3>
           </div>
