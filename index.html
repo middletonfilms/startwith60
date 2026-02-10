@@ -3,177 +3,1683 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Money. In Plain English. | StartWith60</title>
-<meta name="description" content="Compound interest. Retirement accounts. Market performance. The knowledge rich people get from their parents — explained for everyone else.">
+<title>See How $60/Month Becomes Half A Million Dollars | StartWith60</title>
+<meta name="description" content="$60/month becomes half a million dollars by retirement. See your exact number in 30 seconds—no financial knowledge needed.">
+<meta property="og:title" content="See How $60/Month Becomes Half A Million Dollars">
+<meta property="og:description" content="$60/month becomes half a million dollars by retirement. See your exact number in 30 seconds—no financial knowledge needed.">
+<meta property="og:type" content="website">
 <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-900 text-white">
-
-<div class="max-w-4xl mx-auto px-4 py-8">
-  
-  <!-- Back Link -->
-  <div class="mb-12">
-    <a href="../index.html" class="text-blue-400 hover:text-blue-300 text-sm font-semibold flex items-center">
-      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-      </svg>
-      StartWith60
-    </a>
-  </div>
-
-  <!-- Header -->
-  <header class="mb-16 text-center">
-    <h1 class="text-5xl md:text-6xl font-black mb-6 leading-tight">
-      <span class="text-emerald-400">MONEY.</span><br>IN PLAIN ENGLISH.
-    </h1>
-    <p class="text-xl md:text-2xl text-slate-300 max-w-2xl mx-auto leading-relaxed mb-4">
-      Compound interest. Retirement accounts. Market performance.
-    </p>
-    <p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto">
-      The knowledge rich people get from their parents — explained for everyone else.
-    </p>
-  </header>
-
-  <!-- Post List -->
-  <div id="post-list" class="space-y-8">
-    <!-- Loading state -->
-    <div class="text-center py-12">
-      <div class="inline-block animate-pulse bg-slate-800 rounded-lg px-6 py-3">
-        <span class="text-slate-400">Loading posts...</span>
-      </div>
-    </div>
-  </div>
-
-</div>
-
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
 <script>
-// Fetch posts from GitHub
-fetch('https://api.github.com/repos/middletonfilms/startwith60/contents/blog/posts')
-  .then(res => res.json())
-  .then(files => {
-    const mdFiles = files.filter(f => f.name.endsWith('.md'));
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// 
+// TOP LEVEL INSTRUCTIONS FOR ANYONE WORKING ON THIS PROJECT. 
+// THE MISSION: Intercept low-income and disenfranchised people before they get scammed or lose out due to inaction. Show them the actual path to wealth. Make it so simple they can't say no. Nobody else finds it profitable to teach them, guide them, demystify for them—- so we will.
+
+// COPY PRINCIPLES:
+// 1. Visceral over educational - "$500K" not "compound interest grows exponentially"
+// 2. Urgency over inspiration - "You're losing $47/day" not "imagine your future"
+// 3. Specificity over theory - "Open Fidelity, buy VOO, $60/month" not "consider your options"
+// 4. Loss before gain - Hook with pain, close with hope
+// 5. Zero jargon - If a high school dropout can't understand it in 3 seconds, rewrite it
+// 6. Assume distrust - They've been lied to before. Prove it with math, not promises
+// 7. Remove ALL friction - Every extra word, every extra click is another person who stays broke
+// THE GOAL: Get them from "I can't afford to invest" to clicking "Open Fidelity Account" in under 2 minutes.
+
+// ARCHITECTURE GUIDE:
+// - ALL COPY lives in the COPY object (search for "COPY MANAGEMENT" ASCII header)
+// - ALL page templates live in PageTemplates object (search for "TEMPLATES" ASCII header)
+// - Navigation flow is controlled by NavigationFlows object
+// - Use CMD+F on the giant ASCII headers to jump between sections
+// - Page IDs are semantic: 'landing_main', 'goal_selection', 'results', 'debt_check', 'loss_aversion', 'email_capture', 'brokerage_setup'
+
+// MATH/CALCULATOR NOTES:
+// - All financial calculations use S&P 500 historical average: 10.4% annual return (1.104)
+// - Monthly rate: Math.pow(1.104, 1/12) - 1
+// - Formula: FV = PMT × ((1+r)^n - 1) / r
+// - Loss calculations for "wait" page:
+//   * yearlyLoss = retirement(age) - retirement(age+1)
+//   * monthlyLoss = (budget) × 1.104^(years_to_65) [one month of contributions grown to retirement]
+//   * weeklyLoss = (budget × 7/30) × 1.104^(years_to_65)
+// - These show "opportunity cost" = missed contributions × their compound growth
+
+// INVESTMENT RECOMMENDATION LOGIC (not yet fully implemented):
+// Universal priorities (any time horizon):
+//   1. Emergency fund (3-6 months in HYSA)
+//   2. Pay off debt >7% APR
+//   3. 401(k) up to company match
+//   4. HSA (if eligible) - mention as advanced option
+// 
+// If time horizon ≥10 years:
+//   5. Pay off debt 5-7%
+//   6. Roth IRA (or Spousal IRA if not employed)
+//   7. 529 (if for education)
+//   8. Taxable brokerage
+//
+// If time horizon 5-10 years:
+//   5. Pay off debt >5%
+//   6. Conservative mix: 60% bonds / 40% stocks, CDs, or I Bonds
+//
+// If time horizon <5 years:
+//   5. Pay off debt >4%
+//   6. HYSA, CDs, or I Bonds ONLY (no stocks)
+
+// KEY DESIGN DECISIONS:
+// - Toggle on results page: retirement vs family legacy (same page, dynamic content)
+// - Loss aversion page uses RED for danger/urgency, GREEN for action
+// - Brokerage setup page: progressive reveal (click account type → sections appear sequentially)
+// - Mobile-first design, works on desktop/tablet
+// - All copy supports dynamic variable replacement via replacePlaceholders() function
+
+// REFACTOR HISTORY:
+// - Jan 2026: Converted from numeric IDs (1.0, 1.01) to semantic names ('landing_main', 'results')
+// - Jan 2026: Split PAGE_1_01 into RESULTS_RETIREMENT and RESULTS_FAMILY for goal-specific copy
+// - Jan 2026: Unified results pages with toggle instead of separate pages
+// - Jan 2026: Rewrote loss aversion page to focus on exponential growth at end (+$21,785 in final year)
+
+// FILE STRUCTURE NOTES:
+// - This is a SINGLE FILE APP (index.html) - everything is self-contained
+// - No external dependencies except Tailwind CDN and Google Analytics
+// - Copy is separated from templates for easy editing
+// - Templates use string concatenation (old-school but works in any browser)
+
+// COMMON TASKS:
+// - Edit copy: Find COPY object, edit the relevant section
+// - Add new page: Add to PageTemplates, update NavigationFlows, add event listeners
+// - Change navigation flow: Edit NavigationFlows.default.routes
+// - Update calculations: Edit Calculator object functions
+// - Change colors/styling: Update Tailwind classes in templates
+
+// CRITICAL: Always test the full flow after changes. Users drop off at ANY friction point.
+  
+//============================================================================
+// ██████╗ ██████╗ ██████╗ ██╗   ██╗
+// ██╔════╝██╔═══██╗██╔══██╗╚██╗ ██╔╝
+// ██║     ██║   ██║██████╔╝ ╚████╔╝ 
+// ██║     ██║   ██║██╔═══╝   ╚██╔╝  
+// ╚██████╗╚██████╔╝██║        ██║   
+//  ╚═════╝ ╚═════╝ ╚═╝        ╚═╝   
+// 
+// COPY MANAGEMENT - ALL TEXT LIVES HERE
+// Edit copy here to change any text on any page
+// ============================================================================
+
+var COPY = {
+  
+  // ==========================================================================
+  // LANDING: Main Entry Point (Age/Budget Input)
+  // ==========================================================================
+  LANDING_MAIN: {
+    HEADLINE: 'STILL BROKE<br>AT 65?',
+    SUBHEAD_LINE_1: 'Most people are.',
+    SUBHEAD_LINE_2: 'You don\'t have to be.',
+    LABEL_AGE: 'How old are you?',
+    LABEL_BUDGET: 'How much can you set aside per month?',
+    PLACEHOLDER_AGE: 'AGE',
+    PLACEHOLDER_BUDGET: '60',
+    BUTTON_CTA: 'SHOW ME THE MATH',
+    ERROR_AGE: 'Age 18-64 only',
+    ERROR_BUDGET: 'Must be > $0'
+  },
+  
+  // ==========================================================================
+  // GOAL SELECTION: Retirement vs Family Legacy
+  // ==========================================================================
+  GOAL_SELECTION: {
+    HEADLINE: 'WHAT MATTERS MOST?',
+    SUBHEAD: 'Choose your primary goal:',
+    BUTTON_RETIREMENT: 'MY RETIREMENT',
+    BUTTON_RETIREMENT_SUB: 'Living comfortably when I stop working',
+    BUTTON_FAMILY: 'FAMILY LEGACY',
+    BUTTON_FAMILY_SUB: 'Leaving wealth for my loved ones',
+    BACK_BUTTON: 'Back'
+  },
+  
+  // ==========================================================================
+  // RESULTS: The Big Reveal (Retirement Goal)
+  // ==========================================================================
+  RESULTS_RETIREMENT: {
+    EYEBROW: 'YOUR $[BUDGET]/MONTH BECOMES',
+    YEARS_TEXT: 'You are [AGE]. If you retire at [RETIREAGE], that is [YEARS] years of compound growth.',
+    BENEFITS_LABEL: 'That means:',
+    BENEFIT_1: 'Never asking your kids for money',
+    BENEFIT_2: 'Retiring when YOU want to',
+    BENEFIT_3: 'Age [RETIREAGE]: Take out $[INCOME]/year. Forever. The $[AMOUNT] in your account never even shrinks.',
+    DISCLAIMER_TITLE: 'Based on S&P 500 historical average',
+    DISCLAIMER_TEXT: '10.4% annual return (1926-2024). Past performance does not guarantee future results. Market values fluctuate.',
+    CLOSING_TEXT: 'This money makes MORE money. Every day. While you do nothing.',
+    BUTTON_WANT: 'WHAT DO I NEED TO DO?',
+    BUTTON_WAIT: 'Show me what happens if I wait',
+    BUTTON_BACK: 'Try different numbers',
+    BACK_BUTTON: 'Back'
+  },
+  
+  // ==========================================================================
+  // RESULTS: The Big Reveal (Family Legacy Goal)
+  // ==========================================================================
+  RESULTS_FAMILY: {
+    EYEBROW: 'YOUR $[BUDGET]/MONTH BECOMES',
+    YEARS_TEXT: 'You are [AGE]. If you leave this to your family at [DEATHAGE], that is [YEARS] years of compound growth.',
+    BENEFITS_LABEL: 'That means:',
+    BENEFIT_1: 'College. Wedding. First house. All covered.',
+    BENEFIT_2: 'They collect $[INCOME]/year. Forever. Without even shrinking the $[AMOUNT] in the account.',
+    DISCLAIMER_TITLE: 'Based on S&P 500 historical average',
+    DISCLAIMER_TEXT: '10.4% annual return (1926-2024). Past performance does not guarantee future results. Market values fluctuate.',
+    CLOSING_TEXT: 'This money makes MORE money. Every day. While you do nothing.',
+    BUTTON_WANT: 'WHAT DO I NEED TO DO?',
+    BUTTON_WAIT: 'Show me what happens if I wait',
+    BUTTON_BACK: 'Try different numbers',
+    BACK_BUTTON: 'Back'
+  },
+
+  // ==========================================================================
+  // DEBT CHECK: Quick Yes/No Question
+  // ==========================================================================
+  DEBT_CHECK: {
+    HEADLINE: 'QUICK QUESTION',
+    QUESTION: 'Do you have credit card debt or high-interest loans?',
+    BUTTON_YES: 'YES, I have debt',
+    BUTTON_NO: 'NO debt',
+    WHY_LABEL: 'Why we ask:',
+    WHY_TEXT: 'High-interest debt (typically 15-25% APR) costs more than stock market returns. Paying it off first is mathematically optimal and protects you from losing money.',
+    BACK_BUTTON: 'Back'
+  },
+  
+  // ==========================================================================
+  // LOSS AVERSION: The Hammer (Cost of Waiting)
+  // ==========================================================================
+LOSS_AVERSION: {
+  HEADLINE: 'YOUR MONEY EXPLODES AT THE END',
+  
+  INTRO: 'This is how fast your account grows in the final year:',
+  
+  BIG_NUMBER: '+$[YEARLY]',
+  
+  EXPLANATION_1: 'That\'s how much your money grows in just the LAST YEAR.',
+  
+  EXPLANATION_2: 'If you wait one year to start? You miss that entire year of explosive growth.',
+  
+  MONTH_TEXT: 'Wait one month? Miss $[MONTHLY] of growth.',
+  WEEK_TEXT: 'Wait one week? Miss $[WEEKLY] of growth.',
+  
+  CLOSING_LINE_1: 'The end is where the magic happens.',
+  CLOSING_LINE_2: 'Start today to capture it all.',
+  
+  OFFER_TEXT: '$[YEARLY] for 10 minutes of work.',
+  OFFER_QUESTION: 'Deal?',
+  
+  BUTTON_START: 'WHAT WOULD I NEED TO DO?',
+  BUTTON_LATER: 'I\'ll think about it',
+  BACK_BUTTON: 'Go back'
+},
+  
+  // ==========================================================================
+  // DEBT PAYOFF: Redirect Page
+  // ==========================================================================
+  DEBT_PAYOFF: {
+    HEADLINE: 'PAY THAT OFF FIRST',
+    PARA_1: 'Credit card debt at 20% interest costs you more than the stock market will make you.',
+    PARA_2: 'Take your $[BUDGET]/month and attack that debt.',
+    PARA_3: 'Once it is gone, come back here. Then that $[BUDGET] can start building wealth instead of paying interest.',
+    MATH_BOX_LINE_1: 'Paying off a 20% loan = guaranteed 20% return',
+    MATH_BOX_LINE_2: 'S&P 500 averages 10%. Your debt costs 20%. Math favors debt payoff.',
+    STRATEGY_LABEL: 'Smart strategy:',
+    STRATEGY_STEP_1: '1. Pay off high-interest debt first',
+    STRATEGY_STEP_2: '2. Then invest that same payment amount',
+    STRATEGY_STEP_3: '3. Build wealth without the debt burden',
+    DISCLAIMER_LABEL: 'This is general guidance, not personal advice',
+    DISCLAIMER_TEXT: 'Everyone\'s financial situation is different. Consider consulting a financial advisor for personalized recommendations.',
+    BUTTON_CTA: 'Got it. I will be back.',
+    BACK_BUTTON: 'Back'
+  },
+  
+  // ==========================================================================
+  // EMAIL CAPTURE: Optional Step-by-Step Guide
+  // ==========================================================================
+  EMAIL_CAPTURE: {
+    HEADLINE: 'ONE MORE THING',
+    SUBHEAD: 'Get your step-by-step setup guide via email',
+    BENEFITS_LABEL: 'We will send you:',
+    BENEFIT_1: 'Your personalized plan ($[BUDGET]/month)',
+    BENEFIT_2: 'Account opening checklist',
+    BENEFIT_3: 'Screenshots of each step',
+    BENEFIT_4: 'What to do if you get stuck',
+    PLACEHOLDER_EMAIL: 'your@email.com',
+    ERROR_EMAIL: 'Please enter a valid email',
+    BUTTON_SEND: 'SEND ME THE GUIDE',
+    BUTTON_SKIP: 'Skip (I will figure it out myself)',
+    PRIVACY_TEXT: 'We hate spam. Zero marketing emails. Unsubscribe anytime.',
+    BACK_BUTTON: 'Back'
+  },
+  
+  // ==========================================================================
+  // BROKERAGE SETUP: Final Instructions Page
+  // ==========================================================================
+  BROKERAGE_SETUP: {
+    HEADLINE: 'LET\'S GET YOU SET UP',
+    PLAN_SUMMARY_LABEL: 'Your Plan: $[BUDGET]/month',
+    PLAN_SUMMARY_DETAIL: 'Age [AGE] → [GOAL]',
     
-    // Fetch each post
-    const postPromises = mdFiles.map(file => {
-      const slug = file.name.replace('.md', '');
-      return fetch(file.download_url)
-        .then(res => res.text())
-        .then(content => {
-          // Extract title (first H1)
-          const titleMatch = content.match(/^#\s+(.+)$/m);
-          const title = titleMatch ? titleMatch[1] : slug;
-          
-          // Extract hook (look for bold text or first real paragraph)
-          const lines = content.split('\n').filter(l => l.trim());
-          
-          // Try to find a compelling hook
-          let hook = '';
-          for (let line of lines) {
-            // Skip title, skip short lines, skip disclaimers
-            if (line.startsWith('#')) continue;
-            if (line.length < 50) continue;
-            if (line.toLowerCase().includes('quick note:')) continue;
-            if (line.toLowerCase().includes('disclaimer')) continue;
-            
-            // Found a good hook
-            hook = line.replace(/\*\*/g, '').substring(0, 200);
-            if (hook.length === 200) hook += '...';
-            break;
-          }
-          
-          // Fallback if no hook found
-          if (!hook) {
-            const excerptLine = lines.find(l => !l.startsWith('#') && l.length > 20);
-            hook = excerptLine ? excerptLine.substring(0, 150) + '...' : '';
-          }
-          
-          // Check if post has image reference
-          const imageMatch = content.match(/!\[.*?\]\((.*?)\)/);
-          const image = imageMatch ? imageMatch[1] : null;
-          
-          return { slug, title, hook, image };
-        });
+    STEP_1_TITLE: 'CHOOSE YOUR ACCOUNT TYPE',
+    STEP_1_QUESTION: 'Do you have earned income this year?',
+    STEP_1_EXPLANATION: 'Earned income = wages from a job, self-employment income, freelance work',
+    STEP_1_BUTTON_YES: 'YES',
+    STEP_1_BUTTON_NO: 'NO',
+    STEP_1_RESULT_PREFIX: '✓ Perfect! You will use a',
+    ACCOUNT_ROTH_IRA_NAME: 'Roth IRA',
+    ACCOUNT_ROTH_IRA_EXPLANATION: 'Tax-free growth forever. This is the best account type for building wealth. You already paid taxes on your income, so your investments grow tax-free and withdrawals in retirement are tax-free too.',
+    ACCOUNT_TAXABLE_NAME: 'Taxable Brokerage Account',
+    ACCOUNT_TAXABLE_EXPLANATION: 'No income = no IRA eligibility. But taxable brokerage accounts still work great! You can access your money anytime, and if you hold for 1+ year, you get lower long-term capital gains tax rates.',
+    
+    STEP_2_TITLE: 'OPEN YOUR ACCOUNT',
+    STEP_2_INTRO: 'Choose one of these trusted brokerages:',
+    FIDELITY_NAME: 'FIDELITY',
+    FIDELITY_BADGE: 'RECOMMENDED',
+    FIDELITY_TAGLINE: 'Easiest for beginners. Best mobile app. Excellent customer service.',
+    FIDELITY_BENEFIT_1: 'Zero fees, zero account minimums',
+    FIDELITY_BENEFIT_2: '24/7 customer service',
+    FIDELITY_BENEFIT_3: 'Can buy fractional shares (important for small monthly amounts)',
+    FIDELITY_CTA: 'Open Fidelity Account →',
+    OTHER_OPTIONS_LABEL: 'See other options (Schwab, Vanguard)',
+    SCHWAB_NAME: 'Charles Schwab',
+    SCHWAB_TAGLINE: 'Great all-around choice. Physical branches nationwide if you prefer in-person help.',
+    SCHWAB_CTA: 'Open Schwab Account →',
+    VANGUARD_NAME: 'Vanguard',
+    VANGUARD_TAGLINE: 'Lowest fees in the industry. Invented index funds. Slightly less user-friendly interface.',
+    VANGUARD_CTA: 'Open Vanguard Account →',
+    STEP_2_TIME_NOTE: '⏱️ Account opening takes 10-15 minutes',
+    STEP_2_REQUIREMENTS: 'You will need: Social Security Number, driver\'s license, bank account info for transfers.',
+    
+    STEP_3_TITLE: 'WHAT TO BUY',
+    STEP_3_INTRO: 'Buy ONE of these index funds:',
+    FUND_VOO_TICKER: 'VOO',
+    FUND_VOO_NAME: 'Vanguard S&P 500 ETF',
+    FUND_VOO_BADGE: 'RECOMMENDED',
+    FUND_VTI_TICKER: 'VTI',
+    FUND_VTI_NAME: 'Vanguard Total Stock Market',
+    FUND_VT_TICKER: 'VT',
+    FUND_VT_NAME: 'Vanguard Total World Stock',
+    STEP_3_EXPLANATION_LABEL: 'What are these?',
+    STEP_3_EXPLANATION_TEXT: 'These are NOT individual stocks. They are index funds that own hundreds of companies. When you buy VOO, you instantly own tiny pieces of Apple, Microsoft, Amazon, and 497 others. Instant diversification.',
+    STEP_3_COST_LABEL: 'Cost per share:',
+    STEP_3_COST_TEXT: 'Around $500-600 (but you can buy fractional shares, so your $[BUDGET]/month works perfectly)',
+    
+    STEP_4_TITLE: 'SET IT AND FORGET IT',
+    STEP_4_WARNING_EMOJI: '⚡',
+    STEP_4_WARNING_LABEL: 'CRITICAL STEP',
+    STEP_4_WARNING_TEXT: 'Set up automatic investing so you never have to think about this again. This is what makes it work.',
+    STEP_4_INSTRUCTION_1: 'In your brokerage app, find "Automatic Investment" or "Auto-Invest"',
+    STEP_4_INSTRUCTION_2: 'Choose your fund: VOO, VTI, or VT',
+    STEP_4_INSTRUCTION_3: 'Set amount: $[BUDGET] per month',
+    STEP_4_INSTRUCTION_4: 'Set date: The day after your paycheck hits',
+    STEP_4_INSTRUCTION_5: 'Turn it ON',
+    STEP_4_SUCCESS_LABEL: 'That\'s it!',
+    STEP_4_SUCCESS_TEXT: 'Your $[BUDGET] will automatically buy more shares every month. The compound interest machine runs on autopilot. You never have to think about it again.',
+    
+    TIMELINE_TITLE: 'WHAT TO EXPECT',
+    TIMELINE_MONTH_1: 'You will have ~$[BUDGET] worth of shares',
+    TIMELINE_YEAR_1: '~$[AMOUNT] (your $[CONTRIBUTED] grew ~10%)',
+    TIMELINE_YEAR_5: '~$[AMOUNT]',
+    TIMELINE_YEAR_10: 'Your money has DOUBLED (compound interest goes vertical)',
+    TIMELINE_NOTE: 'The market will go up and down. Some months you will be down. Keep buying. Market drops are SALES - your money buys more shares when prices are low. That is when you make the most money long-term.',
+    
+    FAQ_TITLE: 'COMMON QUESTIONS',
+    FAQ_Q1: 'What if I can only do $40 this month?',
+    FAQ_A1: 'That\'s completely fine. Do what you can. The key is consistency, not perfection. Even $20/month builds real wealth over time.',
+    FAQ_Q2: 'Can I invest MORE if I have extra money?',
+    FAQ_A2: 'Yes! Absolutely. You can increase your auto-invest amount anytime, or make one-time purchases when you have extra cash. The more you invest, the faster it grows.',
+    FAQ_Q3: 'What if the market crashes?',
+    FAQ_A3: 'Keep buying. Market crashes are SALES. Your $[BUDGET] buys MORE shares when prices drop. People who kept investing through 2008-2009 made the most money. Crashes are opportunities, not disasters.',
+    FAQ_Q4: 'When can I access this money?',
+    FAQ_A4: 'Roth IRA: Your contributions anytime (tax and penalty free), earnings at age 59½. Brokerage account: Anytime (but you may owe capital gains tax).',
+    FAQ_Q5: 'Do I need to do my taxes differently?',
+    FAQ_A5: 'Roth IRA: No changes. Traditional IRA: You get a tax deduction. Brokerage: You will receive tax forms for investment income (usually minimal in early years).',
+    FAQ_Q6: 'Should I pick individual stocks instead?',
+    FAQ_A6: 'No. 90% of professional stock pickers lose to index funds over 15 years. Index funds are boring, but boring wins. Stick with VOO/VTI/VT and let compound interest do the work.',
+    
+    LEGAL_DISCLAIMER: 'Important: This tool provides educational information only, not personalized financial advice. All calculations use S&P 500 historical average returns (10.4% annually, 1926-2024). Past performance does not guarantee future results. Investments carry risk including possible loss of principal. Consider consulting a financial advisor for personalized recommendations.',
+    BUTTON_BACK_HOME: 'Start over with different numbers'
+  },
+  
+  // ==========================================================================
+  // UI STATES: Loading and Error Messages
+  // ==========================================================================
+  LOADING: {
+    TITLE: 'Calculating your future...',
+    SUBTITLE: 'This changes everything.'
+  },
+  
+  ERROR: {
+    TITLE: 'Oops! Something went wrong',
+    MESSAGE: 'We encountered an error. Please refresh the page to try again.',
+    BUTTON: 'Refresh Page'
+  }
+};
+
+  // ============================================================================
+// ███╗   ██╗ █████╗ ██╗   ██╗██╗ ██████╗  █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
+// ████╗  ██║██╔══██╗██║   ██║██║██╔════╝ ██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║
+// ██╔██╗ ██║███████║██║   ██║██║██║  ███╗███████║   ██║   ██║██║   ██║██╔██╗ ██║
+// ██║╚██╗██║██╔══██║╚██╗ ██╔╝██║██║   ██║██╔══██║   ██║   ██║██║   ██║██║╚██╗██║
+// ██║ ╚████║██║  ██║ ╚████╔╝ ██║╚██████╔╝██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
+// ╚═╝  ╚═══╝╚═╝  ╚═╝  ╚═══╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+// 
+// NAVIGATION SYSTEM
+// Controls page flow and routing logic
+// ============================================================================
+
+var NavigationFlows = {
+  current: 'default',
+  
+  default: {
+    start: 'landing_main',
+    
+    routes: {
+      'landing_main': 'goal_selection',
+      
+      'goal_selection': 'results',
+      
+      'results': 'debt_check',
+      
+      'debt_check': function(state) {
+        return state.hasDebt ? 'debt_payoff' : 'email_capture';
+      },
+      
+      'loss_aversion': 'debt_check',
+      
+      'debt_payoff': 'landing_main',
+      
+      'email_capture': 'brokerage_setup',
+      
+      'brokerage_setup': 'landing_main'
+    }
+  }
+};
+
+
+// ============================================================================
+// ███████╗████████╗ █████╗ ████████╗███████╗
+// ██╔════╝╚══██╔══╝██╔══██╗╚══██╔══╝██╔════╝
+// ███████╗   ██║   ███████║   ██║   █████╗  
+// ╚════██║   ██║   ██╔══██║   ██║   ██╔══╝  
+// ███████║   ██║   ██║  ██║   ██║   ███████╗
+// ╚══════╝   ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚══════╝
+// 
+// APPLICATION STATE
+// Stores user data and current page
+// ============================================================================
+
+var AppState = {
+  currentPage: 'landing_main',
+  age: '',
+  budget: '',
+  retireage: 65,
+  deathage: 80,
+  goal: 'retirement',
+  hasDebt: false,
+  email: '',
+  accountType: 'roth_ira'
+};
+
+
+// ============================================================================
+//  ██████╗ █████╗ ██╗      ██████╗██╗   ██╗██╗      █████╗ ████████╗ ██████╗ ██████╗ 
+// ██╔════╝██╔══██╗██║     ██╔════╝██║   ██║██║     ██╔══██╗╚══██╔══╝██╔═══██╗██╔══██╗
+// ██║     ███████║██║     ██║     ██║   ██║██║     ███████║   ██║   ██║   ██║██████╔╝
+// ██║     ██╔══██║██║     ██║     ██║   ██║██║     ██╔══██║   ██║   ██║   ██║██╔══██╗
+// ╚██████╗██║  ██║███████╗╚██████╗╚██████╔╝███████╗██║  ██║   ██║   ╚██████╔╝██║  ██║
+//  ╚═════╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝
+// 
+// CALCULATOR FUNCTIONS
+// Financial calculations and formatting
+// ============================================================================
+
+var Calculator = {
+  retirement: function(age, budget) {
+    var years = 65 - age;
+    var months = years * 12;
+    var rate = Math.pow(1.104, 1/12) - 1;
+    var result = budget * ((Math.pow(1 + rate, months) - 1) / rate);
+    return Math.round(result);
+  },
+  
+  death: function(age, budget) {
+    var years = 80 - age;
+    var months = years * 12;
+    var rate = Math.pow(1.104, 1/12) - 1;
+    var result = budget * ((Math.pow(1 + rate, months) - 1) / rate);
+    return Math.round(result);
+  },
+  
+  income: function(principal) {
+    return Math.round(principal * 0.1284);
+  },
+  
+  future20Years: function(principal) {
+    return Math.round(principal * Math.pow(1.104, 20));
+  },
+  
+  dailyLoss: function(age, budget) {
+    var years = 65 - age;
+    var growthFactor = Math.pow(1.104, years);
+    var dailyContribution = budget / 30;
+    return Math.round(dailyContribution * growthFactor);
+  },
+  
+  weeklyLoss: function(age, budget) {
+    var years = 65 - age;
+    var growthFactor = Math.pow(1.104, years);
+    var weeklyContribution = (budget * 7) / 30;
+    return Math.round(weeklyContribution * growthFactor);
+  },
+  
+  monthlyLoss: function(age, budget) {
+    var years = 65 - age;
+    var growthFactor = Math.pow(1.104, years);
+    return Math.round(budget * growthFactor);
+  },
+  
+  yearlyLoss: function(age, budget) {
+    var finalToday = this.retirement(age, budget);
+    var finalIfWait1Year = this.retirement(age + 1, budget);
+    return Math.round(finalToday - finalIfWait1Year);
+  },
+  
+  getDescription: function(amount) {
+    if (amount < 100000) return { header: 'Over $' + Math.floor(amount/1000) + 'K', showNumber: true };
+    if (amount < 180000) return { header: 'Over $100,000', showNumber: true };
+    if (amount < 220000) return { header: 'Nearly $200,000', showNumber: true };
+    if (amount < 250000) return { header: 'Almost a quarter million dollars', showNumber: true };
+    if (amount < 295000) return { header: 'Over a quarter million dollars', showNumber: true };
+    if (amount < 333333) return { header: 'Nearly a third of a million dollars', showNumber: true };
+    if (amount < 380000) return { header: 'Over a third of a million dollars', showNumber: true };
+    if (amount < 480000) return { header: 'Nearly half a million dollars', showNumber: true };
+    if (amount < 520000) return { header: 'HALF A MILLION DOLLARS', showNumber: true };
+    if (amount < 580000) return { header: 'Over half a million dollars', showNumber: true };
+    if (amount < 666666) return { header: 'Nearly two-thirds of a million dollars', showNumber: true };
+    if (amount < 720000) return { header: 'Over two-thirds of a million dollars', showNumber: true };
+    if (amount < 750000) return { header: 'Nearly three-quarters of a million dollars', showNumber: true };
+    if (amount < 825000) return { header: 'Three-quarters of a million dollars', showNumber: true };
+    if (amount < 900000) return { header: 'Over three-quarters of a million dollars', showNumber: true };
+    if (amount < 980000) return { header: 'Nearly a million dollars', showNumber: true };
+    if (amount < 1080000) return { header: 'OVER ONE MILLION DOLLARS', showNumber: true };
+    return { header: (amount/1000000).toFixed(1) + ' MILLION DOLLARS', showNumber: true };
+  }
+};
+
+
+// ============================================================================
+// ██╗   ██╗████████╗██╗██╗     ██╗████████╗██╗███████╗███████╗
+// ██║   ██║╚══██╔══╝██║██║     ██║╚══██╔══╝██║██╔════╝██╔════╝
+// ██║   ██║   ██║   ██║██║     ██║   ██║   ██║█████╗  ███████╗
+// ██║   ██║   ██║   ██║██║     ██║   ██║   ██║██╔══╝  ╚════██║
+// ╚██████╔╝   ██║   ██║███████╗██║   ██║   ██║███████╗███████║
+//  ╚═════╝    ╚═╝   ╚═╝╚══════╝╚═╝   ╚═╝   ╚═╝╚══════╝╚══════╝
+// 
+// UTILITY FUNCTIONS
+// Helper functions used across templates
+// ============================================================================
+
+function trackEvent(eventName, properties) {
+  properties = properties || {};
+  if (typeof gtag !== 'undefined') {
+    gtag('event', eventName, properties);
+  }
+  console.log('📊 Event:', eventName, properties);
+}
+
+function navigateTo(page) {
+  var previousPage = AppState.currentPage;
+  AppState.currentPage = page;
+  render();
+  window.scrollTo(0, 0);
+  
+  trackEvent('page_view', {
+    page_id: page,
+    from_page: previousPage,
+    user_age: AppState.age,
+    user_budget: AppState.budget,
+    user_goal: AppState.goal
+  });
+}
+
+function showLoading() {
+  var overlay = document.createElement('div');
+  overlay.id = 'loading-overlay';
+  overlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+  overlay.innerHTML = '\
+    <div class="bg-white rounded-2xl p-8 shadow-2xl">\
+      <div class="animate-pulse text-center">\
+        <div class="text-2xl font-black text-slate-900 mb-2">' + COPY.LOADING.TITLE + '</div>\
+        <div class="text-slate-600">' + COPY.LOADING.SUBTITLE + '</div>\
+      </div>\
+    </div>';
+  document.body.appendChild(overlay);
+}
+
+function hideLoading() {
+  var overlay = document.getElementById('loading-overlay');
+  if (overlay) overlay.remove();
+}
+
+function getBackButton(targetPage, labelOverride) {
+  var label = labelOverride || 'Back';
+  return '<button onclick="navigateTo(\'' + targetPage + '\')" class="absolute top-4 left-4 text-slate-600 hover:text-slate-900 flex items-center text-sm font-semibold transition-colors"><svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>' + label + '</button>';
+}
+
+function replacePlaceholders(text, replacements) {
+  var result = text;
+  for (var key in replacements) {
+    result = result.replace(new RegExp('\\[' + key + '\\]', 'g'), replacements[key]);
+  }
+  return result;
+}
+
+  // ============================================================================
+// ████████╗███████╗███╗   ███╗██████╗ ██╗      █████╗ ████████╗███████╗███████╗
+// ╚══██╔══╝██╔════╝████╗ ████║██╔══██╗██║     ██╔══██╗╚══██╔══╝██╔════╝██╔════╝
+//    ██║   █████╗  ██╔████╔██║██████╔╝██║     ███████║   ██║   █████╗  ███████╗
+//    ██║   ██╔══╝  ██║╚██╔╝██║██╔═══╝ ██║     ██╔══██║   ██║   ██╔══╝  ╚════██║
+//    ██║   ███████╗██║ ╚═╝ ██║██║     ███████╗██║  ██║   ██║   ███████╗███████║
+//    ╚═╝   ╚══════╝╚═╝     ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚══════╝
+// 
+// PAGE TEMPLATES
+// HTML generation for each page type
+// ============================================================================
+
+var PageTemplates = {
+  
+  // ==========================================================================
+  // ═══════════════════════════════════════════════════════════════════════
+  // TEMPLATE: Landing Page (Main Entry)
+  // COPY SOURCE: COPY.LANDING_MAIN
+  // NAVIGATION: → goal_selection
+  // ═══════════════════════════════════════════════════════════════════════
+  // ==========================================================================
+  'landing_main': function() {
+    var C = COPY.LANDING_MAIN;
+    
+    var canSubmit = AppState.age && AppState.budget && AppState.age >= 0 && AppState.age <= 64 && AppState.budget > 0;
+    var buttonClass = canSubmit 
+      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white cursor-pointer hover:from-blue-700 hover:to-blue-800 transform hover:scale-105' 
+      : 'bg-slate-300 text-slate-500 cursor-not-allowed';
+    
+    var ageError = AppState.age && (AppState.age < 0 || AppState.age > 64);
+    var budgetError = AppState.budget && AppState.budget <= 0;
+    
+    return '\
+      <div class="min-h-screen bg-gradient-to-br from-slate-900 to-slate-700 p-4 flex items-center justify-center">\
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
+          <h1 class="text-5xl md:text-6xl font-black text-center mb-3 text-slate-900 leading-tight">' + C.HEADLINE + '</h1>\
+          <p class="text-center text-xl text-slate-600 mb-8">' + C.SUBHEAD_LINE_1 + '<br><span class="font-bold text-slate-900">' + C.SUBHEAD_LINE_2 + '</span></p>\
+          \
+          <div class="grid grid-cols-2 gap-4 mb-6">\
+            <div>\
+              <label class="block text-xs font-bold text-slate-700 mb-2 text-center h-8 flex items-center justify-center">' + C.LABEL_AGE + '</label>\
+              <input type="number" id="age-input" placeholder="' + C.PLACEHOLDER_AGE + '" min="0" max="64" value="' + AppState.age + '" class="w-full h-28 md:h-24 px-4 border-3 ' + (ageError ? 'border-red-500' : 'border-slate-400') + ' rounded-xl focus:border-blue-500 focus:outline-none text-4xl font-black text-center bg-slate-50 placeholder-slate-300">\
+              <p id="age-error" class="text-xs text-red-600 mt-1 text-center ' + (ageError ? '' : 'invisible') + '">' + C.ERROR_AGE + '</p>\
+            </div>\
+            <div>\
+              <label class="block text-xs font-bold text-slate-700 mb-2 text-center h-8 flex items-center justify-center">' + C.LABEL_BUDGET + '</label>\
+              <div class="relative">\
+                <span class="absolute left-3 top-8 md:top-7 text-3xl text-slate-400 font-black">$</span>\
+                <input type="number" id="budget-input" placeholder="' + C.PLACEHOLDER_BUDGET + '" min="1" value="' + AppState.budget + '" class="w-full h-28 md:h-24 pl-10 pr-3 border-3 ' + (budgetError ? 'border-red-500' : 'border-slate-400') + ' rounded-xl focus:border-blue-500 focus:outline-none text-4xl font-black text-center bg-slate-50 placeholder-slate-300">\
+              </div>\
+              <p id="budget-error" class="text-xs text-red-600 mt-1 text-center ' + (budgetError ? '' : 'invisible') + '">' + C.ERROR_BUDGET + '</p>\
+            </div>\
+          </div>\
+          \
+          <button id="submit-btn" class="w-full py-5 rounded-xl font-black text-xl shadow-xl transition-all ' + buttonClass + '">' + C.BUTTON_CTA + '</button>\
+        </div>\
+      </div>';
+  },
+  
+  // ==========================================================================
+  // ═══════════════════════════════════════════════════════════════════════
+  // TEMPLATE: Goal Selection
+  // COPY SOURCE: COPY.GOAL_SELECTION
+  // NAVIGATION: → results_retirement OR results_family
+  // ═══════════════════════════════════════════════════════════════════════
+  // ==========================================================================
+  'goal_selection': function() {
+    var C = COPY.GOAL_SELECTION;
+    
+    return '\
+      <div class="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 p-4 flex items-center justify-center relative">\
+        ' + getBackButton('landing_main', C.BACK_BUTTON) + '\
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
+          <h1 class="text-4xl font-black text-center mb-6 text-slate-900">' + C.HEADLINE + '</h1>\
+          <p class="text-center text-lg text-slate-700 mb-8">' + C.SUBHEAD + '</p>\
+          \
+          <div class="space-y-4">\
+            <button id="retirement-btn" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 text-white py-6 rounded-xl font-black text-xl hover:from-indigo-700 hover:to-indigo-800 transition-all shadow-lg transform hover:scale-105">\
+              <div class="text-2xl mb-1">' + C.BUTTON_RETIREMENT + '</div>\
+              <div class="text-sm font-normal opacity-90">' + C.BUTTON_RETIREMENT_SUB + '</div>\
+            </button>\
+            \
+            <button id="family-btn" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-6 rounded-xl font-black text-xl hover:from-purple-700 hover:to-purple-800 transition-all shadow-lg transform hover:scale-105">\
+              <div class="text-2xl mb-1">' + C.BUTTON_FAMILY + '</div>\
+              <div class="text-sm font-normal opacity-90">' + C.BUTTON_FAMILY_SUB + '</div>\
+            </button>\
+          </div>\
+        </div>\
+      </div>';
+  },
+  
+ // ==========================================================================
+  // ═══════════════════════════════════════════════════════════════════════
+  // TEMPLATE: Results Page (Unified with Toggle)
+  // COPY SOURCE: COPY.RESULTS_RETIREMENT + COPY.RESULTS_FAMILY
+  // NAVIGATION: → debt_check OR loss_aversion
+  // ═══════════════════════════════════════════════════════════════════════
+  // ==========================================================================
+  'results': function() {
+    var isRetirement = AppState.goal === 'retirement';
+    var C = isRetirement ? COPY.RESULTS_RETIREMENT : COPY.RESULTS_FAMILY;
+    
+    var years = isRetirement 
+      ? (AppState.retireage - Number(AppState.age))
+      : (AppState.deathage - Number(AppState.age));
+    
+    var amount = isRetirement 
+      ? Calculator.retirement(Number(AppState.age), Number(AppState.budget))
+      : Calculator.death(Number(AppState.age), Number(AppState.budget));
+    
+    var income = Calculator.income(amount);
+    var desc = Calculator.getDescription(amount);
+    
+    var eyebrow = replacePlaceholders(C.EYEBROW, { BUDGET: AppState.budget });
+    var yearsText = replacePlaceholders(C.YEARS_TEXT, { 
+      AGE: AppState.age, 
+      YEARS: years,
+      RETIREAGE: AppState.retireage,
+      DEATHAGE: AppState.deathage
     });
     
-    return Promise.all(postPromises);
-  })
-  .then(posts => {
-    // Render posts
-    const postList = document.getElementById('post-list');
-    
-    if (posts.length === 0) {
-      postList.innerHTML = '<p class="text-center text-slate-400">No posts yet. Check back soon.</p>';
-      return;
+    // Build benefits based on goal
+    var benefitsList = '';
+    if (isRetirement) {
+      var benefit3 = replacePlaceholders(C.BENEFIT_3, { 
+        RETIREAGE: AppState.retireage,
+        AMOUNT: amount.toLocaleString(),
+        INCOME: income.toLocaleString() 
+      });
+      benefitsList = '\
+        <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.BENEFIT_1 + '</span></p>\
+        <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + C.BENEFIT_2 + '</span></p>\
+        <p class="flex items-start"><span class="mr-2 text-emerald-600">→</span><span>' + benefit3 + '</span></p>';
+    } else {
+      var benefit2 = replacePlaceholders(C.BENEFIT_2, { 
+        INCOME: income.toLocaleString(),
+        AMOUNT: amount.toLocaleString()
+      });
+      benefitsList = '\
+        <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + C.BENEFIT_1 + '</span></p>\
+        <p class="flex items-start"><span class="mr-2 text-purple-600">→</span><span>' + benefit2 + '</span></p>';
     }
     
-    postList.innerHTML = posts.map(post => {
-      // Determine image or gradient fallback
-      let imageHTML = '';
-      if (post.image) {
-        // Real image
-        imageHTML = `<img src="${post.image}" alt="${post.title}" class="w-full h-64 object-cover rounded-t-lg">`;
-      } else {
-        // Gradient placeholder with FULL title, edge-to-edge
-        const colors = [
-          'from-red-500 to-red-700',
-          'from-blue-500 to-blue-700',
-          'from-green-500 to-green-700',
-          'from-purple-500 to-purple-700',
-          'from-orange-500 to-orange-700'
-        ];
-        const colorClass = colors[Math.floor(Math.random() * colors.length)];
-        
-        // Calculate font size based on title length - MORE AGGRESSIVE
-        let fontSize = 'text-4xl md:text-6xl';
-        if (post.title.length > 80) fontSize = 'text-2xl md:text-3xl';
-        else if (post.title.length > 60) fontSize = 'text-3xl md:text-4xl';
-        else if (post.title.length > 40) fontSize = 'text-3xl md:text-5xl';
-        else if (post.title.length < 25) fontSize = 'text-5xl md:text-7xl';
-        
-        imageHTML = `
-          <div class="w-full h-64 bg-gradient-to-br ${colorClass} rounded-t-lg flex items-center justify-center p-3 md:p-4">
-            <h3 class="text-white ${fontSize} font-black text-center leading-none break-words w-full" style="word-break: break-word; hyphens: auto; line-height: 1.1;">
-              ${post.title}
-            </h3>
-          </div>
-        `;
+    var accentColor = isRetirement ? 'indigo' : 'purple';
+    
+    return '\
+          <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 flex items-center justify-center relative">\
+            ' + getBackButton('goal_selection', C.BACK_BUTTON) + '\
+            <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
+              \
+              <!-- Toggle Switch -->\
+              <div class="mb-6 flex items-center justify-center">\
+                <div class="relative inline-flex items-center bg-slate-200 rounded-full p-1 shadow-inner">\
+                  <button id="toggle-retirement" class="relative z-10 px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-200 ' + (isRetirement ? 'text-white' : 'text-slate-600 hover:text-slate-800') + '" style="min-width: 140px">\
+                    💰 Retirement\
+                  </button>\
+                  <button id="toggle-family" class="relative z-10 px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-200 ' + (!isRetirement ? 'text-white' : 'text-slate-600 hover:text-slate-800') + '" style="min-width: 140px">\
+                    👨‍👩‍👧 Family\
+                  </button>\
+                  <div id="toggle-slider" class="absolute rounded-full transition-all duration-300 ease-in-out shadow-md" style="top: 4px; left: 4px; width: 140px; height: calc(100% - 8px); transform: translateX(' + (isRetirement ? '0px' : '144px') + '); background: linear-gradient(to right, ' + (isRetirement ? '#4f46e5, #4338ca' : '#9333ea, #7e22ce') + ')"></div>\
+                </div>\
+              </div>\
+              \
+              <!-- Results Content -->\
+              <div id="results-content">\
+                <div class="text-center mb-6">\
+                  <p class="text-slate-600 text-sm mb-3 uppercase tracking-wide">' + eyebrow + '</p>\
+                  <h1 class="text-4xl md:text-5xl font-black mb-3 leading-tight" style="color: ' + (isRetirement ? '#4f46e5' : '#9333ea') + '">' + desc.header + '</h1>\
+                  ' + (desc.showNumber ? '<p class="text-3xl font-bold text-slate-700 mb-3">$' + amount.toLocaleString() + '</p>' : '') + '\
+                  <p class="text-slate-500 text-sm">' + yearsText + '</p>\
+                </div>\
+                \
+                <div class="bg-emerald-50 rounded-xl p-6 mb-6 space-y-3">\
+                  <p class="text-lg font-bold text-slate-900">' + C.BENEFITS_LABEL + '</p>\
+                  <div class="space-y-2 text-slate-700">' + benefitsList + '</div>\
+                </div>\
+                \
+                <p class="text-center text-slate-700 mb-6 text-lg leading-relaxed">' + C.CLOSING_TEXT + '</p>\
+              </div>\
+              \
+              <div class="space-y-3 mb-6">\
+                <button id="want-btn" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-4 rounded-lg font-black text-lg hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg">' + C.BUTTON_WANT + '</button>\
+                <button id="wait-btn" class="w-full bg-slate-200 text-slate-600 py-3 rounded-lg font-semibold hover:bg-slate-300 transition-colors text-sm">' + C.BUTTON_WAIT + '</button>\
+                <button id="back-btn" class="w-full text-slate-500 underline text-sm hover:text-slate-700">' + C.BUTTON_BACK + '</button>\
+              </div>\
+              \
+              <div class="bg-blue-50 border-l-4 border-blue-400 p-4 text-xs text-slate-600">\
+                <p class="font-semibold text-blue-900 mb-1">' + C.DISCLAIMER_TITLE + '</p>\
+                <p>' + C.DISCLAIMER_TEXT + '</p>\
+              </div>\
+            </div>\
+          </div>';
+      },
+
+  // ==========================================================================
+  // ═══════════════════════════════════════════════════════════════════════
+  // TEMPLATE: Debt Check
+  // COPY SOURCE: COPY.DEBT_CHECK
+  // NAVIGATION: → debt_payoff OR email_capture
+  // ═══════════════════════════════════════════════════════════════════════
+  // ==========================================================================
+  'debt_check': function() {
+    var C = COPY.DEBT_CHECK;
+    var prevPage = 'results';
+    
+    return '\
+      <div class="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 p-4 flex items-center justify-center relative">\
+        ' + getBackButton(prevPage, C.BACK_BUTTON) + '\
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
+          <h1 class="text-3xl font-black text-center mb-6 text-slate-900">' + C.HEADLINE + '</h1>\
+          <p class="text-xl text-center text-slate-700 mb-8">' + C.QUESTION + '</p>\
+          \
+          <div class="space-y-3 mb-6">\
+            <button id="yes-debt" class="w-full bg-red-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-red-700 transition-colors shadow-lg">' + C.BUTTON_YES + '</button>\
+            <button id="no-debt" class="w-full bg-emerald-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-emerald-700 transition-colors shadow-lg">' + C.BUTTON_NO + '</button>\
+          </div>\
+          \
+          <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 text-xs text-slate-600">\
+            <p class="font-semibold text-slate-700 mb-1">' + C.WHY_LABEL + '</p>\
+            <p>' + C.WHY_TEXT + '</p>\
+          </div>\
+        </div>\
+      </div>';
+  },
+  
+  // ==========================================================================
+  // ═══════════════════════════════════════════════════════════════════════
+  // TEMPLATE: Loss Aversion (The Hammer)
+  // COPY SOURCE: COPY.LOSS_AVERSION
+  // NAVIGATION: → debt_check OR landing_main
+  // ═══════════════════════════════════════════════════════════════════════
+  // ==========================================================================
+'loss_aversion': function() {
+  var C = COPY.LOSS_AVERSION;
+  var prevPage = 'results';
+  
+  var weekly = Calculator.weeklyLoss(Number(AppState.age), Number(AppState.budget));
+  var monthly = Calculator.monthlyLoss(Number(AppState.age), Number(AppState.budget));
+  var yearly = Calculator.yearlyLoss(Number(AppState.age), Number(AppState.budget));
+  
+  var bigNumber = replacePlaceholders(C.BIG_NUMBER, { YEARLY: yearly.toLocaleString() });
+  var monthText = replacePlaceholders(C.MONTH_TEXT, { MONTHLY: monthly.toLocaleString() });
+  var weekText = replacePlaceholders(C.WEEK_TEXT, { WEEKLY: weekly.toLocaleString() });
+  var offerText = replacePlaceholders(C.OFFER_TEXT, { YEARLY: yearly.toLocaleString() });
+  
+  return '\
+    <div class="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-4 flex items-center justify-center relative">\
+      ' + getBackButton(prevPage, C.BACK_BUTTON) + '\
+      <div class="max-w-lg w-full bg-white rounded-2xl shadow-2xl p-8 md:p-10">\
+        \
+        <h1 class="text-3xl md:text-4xl font-black text-center mb-6 text-red-600">' + C.HEADLINE + '</h1>\
+        \
+        <p class="text-center text-slate-700 mb-6 text-lg">' + C.INTRO + '</p>\
+        \
+        <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-2xl p-8 mb-6 text-center border-4 border-red-500">\
+          <p class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-red-600 mb-2 break-words leading-tight">' + bigNumber + '</p>\
+        </div>\
+        \
+        <p class="text-center text-slate-900 font-bold text-lg mb-6">' + C.EXPLANATION_1 + '</p>\
+        \
+        <div class="bg-slate-50 rounded-xl p-6 mb-6 space-y-3">\
+          <p class="text-slate-900 font-semibold">' + C.EXPLANATION_2 + '</p>\
+          <p class="text-slate-700">Wait one month? Miss <span class="font-bold text-red-600">$' + monthly.toLocaleString() + '</span> of growth.</p>\
+          <p class="text-slate-700">Wait one week? Miss <span class="font-bold text-red-600">$' + weekly.toLocaleString() + '</span> of growth.</p>\
+        </div>\
+        \
+        <div class="text-center mb-8">\
+          <p class="text-slate-900 font-bold text-lg">' + C.CLOSING_LINE_1 + '</p>\
+          <p class="text-slate-700">' + C.CLOSING_LINE_2 + '</p>\
+        </div>\
+        \
+        <div class="border-t-2 border-slate-200 pt-8 mb-8">\
+          <p class="text-center text-xl font-bold text-slate-900 mb-2">' + offerText + '</p>\
+          <p class="text-center text-3xl font-black text-emerald-600">' + C.OFFER_QUESTION + '</p>\
+        </div>\
+        \
+        <div class="space-y-3">\
+          <button id="start-btn" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-5 rounded-xl font-black text-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-xl transform hover:scale-105">' + C.BUTTON_START + '</button>\
+          <button id="later-btn" class="w-full text-slate-500 py-3 rounded-xl font-semibold hover:text-slate-700 transition-colors text-sm">' + C.BUTTON_LATER + '</button>\
+        </div>\
+        \
+      </div>\
+    </div>';
+},
+  
+  // ==========================================================================
+  // ═══════════════════════════════════════════════════════════════════════
+  // TEMPLATE: Debt Payoff (Redirect Page)
+  // COPY SOURCE: COPY.DEBT_PAYOFF
+  // NAVIGATION: → landing_main
+  // ═══════════════════════════════════════════════════════════════════════
+  // ==========================================================================
+  'debt_payoff': function() {
+    var C = COPY.DEBT_PAYOFF;
+    
+    var para2 = replacePlaceholders(C.PARA_2, { BUDGET: AppState.budget });
+    var para3 = replacePlaceholders(C.PARA_3, { BUDGET: AppState.budget });
+    
+    return '\
+      <div class="min-h-screen bg-gradient-to-br from-amber-50 to-amber-100 p-4 flex items-center justify-center relative">\
+        ' + getBackButton('debt_check', C.BACK_BUTTON) + '\
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
+          <h1 class="text-4xl font-black text-center mb-6 text-amber-900">' + C.HEADLINE + '</h1>\
+          \
+          <div class="space-y-4 text-lg text-slate-700 mb-6">\
+            <p>' + C.PARA_1 + '</p>\
+            <p class="font-bold text-slate-900">' + para2 + '</p>\
+            <p>' + para3 + '</p>\
+          </div>\
+          \
+          <div class="bg-amber-50 border-2 border-amber-300 rounded-lg p-4 mb-4">\
+            <p class="text-center font-bold text-slate-900 mb-2">' + C.MATH_BOX_LINE_1 + '</p>\
+            <p class="text-center text-sm text-slate-600">' + C.MATH_BOX_LINE_2 + '</p>\
+          </div>\
+          \
+          <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">\
+            <p class="text-sm text-slate-700 mb-2"><span class="font-bold">' + C.STRATEGY_LABEL + '</span></p>\
+            <p class="text-sm text-slate-600">' + C.STRATEGY_STEP_1 + '<br>' + C.STRATEGY_STEP_2 + '<br>' + C.STRATEGY_STEP_3 + '</p>\
+          </div>\
+          \
+          <div class="bg-slate-50 border border-slate-200 rounded p-3 mb-6 text-xs text-slate-600">\
+            <p class="font-semibold text-slate-700 mb-1">' + C.DISCLAIMER_LABEL + '</p>\
+            <p>' + C.DISCLAIMER_TEXT + '</p>\
+          </div>\
+          \
+          <button id="gotit-btn" class="w-full bg-slate-700 text-white py-4 rounded-lg font-bold text-lg hover:bg-slate-800 transition-colors shadow-lg">' + C.BUTTON_CTA + '</button>\
+        </div>\
+      </div>';
+  },
+  
+  // ==========================================================================
+  // ═══════════════════════════════════════════════════════════════════════
+  // TEMPLATE: Email Capture
+  // COPY SOURCE: COPY.EMAIL_CAPTURE
+  // NAVIGATION: → brokerage_setup
+  // ═══════════════════════════════════════════════════════════════════════
+  // ==========================================================================
+  'email_capture': function() {
+    var C = COPY.EMAIL_CAPTURE;
+    
+    var benefit1 = replacePlaceholders(C.BENEFIT_1, { BUDGET: AppState.budget });
+    
+    return '\
+      <div class="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-4 flex items-center justify-center relative">\
+        ' + getBackButton('debt_check', C.BACK_BUTTON) + '\
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">\
+          <h1 class="text-3xl font-black text-center mb-4 text-slate-900">' + C.HEADLINE + '</h1>\
+          <p class="text-center text-lg text-slate-700 mb-6">' + C.SUBHEAD + '</p>\
+          \
+          <div class="bg-blue-50 rounded-lg p-6 mb-6">\
+            <p class="text-sm font-bold text-slate-700 mb-3">' + C.BENEFITS_LABEL + '</p>\
+            <ul class="space-y-2 text-sm text-slate-700">\
+              <li class="flex items-start"><span class="mr-2 text-blue-600">✓</span>' + benefit1 + '</li>\
+              <li class="flex items-start"><span class="mr-2 text-blue-600">✓</span>' + C.BENEFIT_2 + '</li>\
+              <li class="flex items-start"><span class="mr-2 text-blue-600">✓</span>' + C.BENEFIT_3 + '</li>\
+              <li class="flex items-start"><span class="mr-2 text-blue-600">✓</span>' + C.BENEFIT_4 + '</li>\
+            </ul>\
+          </div>\
+          \
+          <input type="email" id="email-input" placeholder="' + C.PLACEHOLDER_EMAIL + '" class="w-full px-4 py-4 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg mb-4" required>\
+          <p id="email-error" class="text-xs text-red-600 mb-4 hidden">' + C.ERROR_EMAIL + '</p>\
+          \
+          <button id="send-guide-btn" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-lg font-black text-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg mb-3">' + C.BUTTON_SEND + '</button>\
+          \
+          <button id="skip-email-btn" class="w-full text-slate-500 underline text-sm hover:text-slate-700">' + C.BUTTON_SKIP + '</button>\
+          \
+          <p class="text-xs text-slate-400 text-center mt-4">' + C.PRIVACY_TEXT + '</p>\
+        </div>\
+      </div>';
+  },
+
+  // ==========================================================================
+  // ═══════════════════════════════════════════════════════════════════════
+  // TEMPLATE: Brokerage Setup (Final Instructions)
+  // COPY SOURCE: COPY.BROKERAGE_SETUP
+  // NAVIGATION: → landing_main (end of flow)
+  // ═══════════════════════════════════════════════════════════════════════
+  // ==========================================================================
+  'brokerage_setup': function() {
+    var C = COPY.BROKERAGE_SETUP;
+    
+    var isRetirement = AppState.goal === 'retirement';
+    var goalText = isRetirement ? 'Retirement Security' : 'Family Legacy';
+    
+    var planLabel = replacePlaceholders(C.PLAN_SUMMARY_LABEL, { BUDGET: AppState.budget });
+    var planDetail = replacePlaceholders(C.PLAN_SUMMARY_DETAIL, { AGE: AppState.age, GOAL: goalText });
+    
+    var step3CostText = replacePlaceholders(C.STEP_3_COST_TEXT, { BUDGET: AppState.budget });
+    var step4Instruction3 = replacePlaceholders(C.STEP_4_INSTRUCTION_3, { BUDGET: AppState.budget });
+    var step4SuccessText = replacePlaceholders(C.STEP_4_SUCCESS_TEXT, { BUDGET: AppState.budget });
+    
+    var timelineMonth1 = replacePlaceholders(C.TIMELINE_MONTH_1, { BUDGET: AppState.budget });
+    var year1Amount = Math.round(AppState.budget * 12 * 1.104).toLocaleString();
+    var year1Contributed = (AppState.budget * 12).toLocaleString();
+    var timelineYear1 = replacePlaceholders(C.TIMELINE_YEAR_1, { AMOUNT: year1Amount, CONTRIBUTED: year1Contributed });
+    var year5Amount = Math.round(Calculator.retirement(AppState.age, AppState.budget) * (5 / (65 - AppState.age))).toLocaleString();
+    var timelineYear5 = replacePlaceholders(C.TIMELINE_YEAR_5, { AMOUNT: year5Amount });
+    
+    var faqA3 = replacePlaceholders(C.FAQ_A3, { BUDGET: AppState.budget });
+    
+    return '\
+      <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 py-12">\
+        <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-2xl p-8">\
+          \
+          <div class="text-center mb-8">\
+            <h1 class="text-4xl font-black text-emerald-900 mb-3">' + C.HEADLINE + '</h1>\
+            <div class="bg-emerald-50 rounded-lg p-4">\
+              <p class="text-xl font-bold text-slate-900">' + planLabel + '</p>\
+              <p class="text-sm text-slate-600">' + planDetail + '</p>\
+            </div>\
+          </div>\
+          \
+          <!-- STEP 1 -->\
+          <div class="mb-8 pb-8 border-b border-slate-200">\
+            <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center">\
+              <span class="bg-emerald-600 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 text-lg flex-shrink-0">1</span>\
+              <span>' + C.STEP_1_TITLE + '</span>\
+            </h2>\
+            \
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">\
+              <p class="font-semibold text-blue-900 mb-2">' + C.STEP_1_QUESTION + '</p>\
+              <p class="text-sm text-slate-600">' + C.STEP_1_EXPLANATION + '</p>\
+            </div>\
+            \
+            <div class="grid grid-cols-2 gap-3 mb-4">\
+              <button id="has-income-btn" class="bg-emerald-600 text-white py-4 px-6 rounded-lg font-bold hover:bg-emerald-700 transition-colors">' + C.STEP_1_BUTTON_YES + '</button>\
+              <button id="no-income-btn" class="bg-slate-300 text-slate-700 py-4 px-6 rounded-lg font-bold hover:bg-slate-400 transition-colors">' + C.STEP_1_BUTTON_NO + '</button>\
+            </div>\
+            \
+            <div id="account-type-result" class="bg-emerald-50 border-2 border-emerald-500 rounded-lg p-6 hidden">\
+              <p class="font-bold text-emerald-900 text-lg mb-2">' + C.STEP_1_RESULT_PREFIX + ' <span id="account-name"></span></p>\
+              <p class="text-sm text-slate-600" id="account-explanation"></p>\
+            </div>\
+          </div>\
+          \
+          <!-- STEP 2 -->\
+          <div id="brokerage-section" class="mb-8 pb-8 border-b border-slate-200 hidden">\
+            <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center">\
+              <span class="bg-emerald-600 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 text-lg flex-shrink-0">2</span>\
+              <span>' + C.STEP_2_TITLE + '</span>\
+            </h2>\
+            \
+            <p class="text-slate-700 mb-4">' + C.STEP_2_INTRO + '</p>\
+            \
+            <div class="space-y-4">\
+              <div class="bg-white border-2 border-emerald-500 rounded-lg p-6">\
+                <div class="flex justify-between items-start mb-3">\
+                  <h3 class="text-2xl font-black text-slate-900">' + C.FIDELITY_NAME + '</h3>\
+                  <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full">' + C.FIDELITY_BADGE + '</span>\
+                </div>\
+                <p class="text-sm text-slate-600 mb-3">' + C.FIDELITY_TAGLINE + '</p>\
+                <ul class="space-y-2 text-sm text-slate-700 mb-4">\
+                  <li class="flex items-start"><span class="text-emerald-600 mr-2">✓</span><span>' + C.FIDELITY_BENEFIT_1 + '</span></li>\
+                  <li class="flex items-start"><span class="text-emerald-600 mr-2">✓</span><span>' + C.FIDELITY_BENEFIT_2 + '</span></li>\
+                  <li class="flex items-start"><span class="text-emerald-600 mr-2">✓</span><span>' + C.FIDELITY_BENEFIT_3 + '</span></li>\
+                </ul>\
+                <a href="https://www.fidelity.com/open-account/overview" target="_blank" rel="noopener" class="block bg-emerald-600 text-white text-center py-3 rounded-lg font-bold hover:bg-emerald-700 transition-colors">' + C.FIDELITY_CTA + '</a>\
+              </div>\
+              \
+              <details class="bg-slate-50 rounded-lg p-4">\
+                <summary class="font-bold text-slate-700 cursor-pointer hover:text-slate-900">' + C.OTHER_OPTIONS_LABEL + '</summary>\
+                <div class="mt-4 space-y-3">\
+                  <div class="bg-white border border-slate-300 rounded p-4">\
+                    <h4 class="font-bold text-slate-900 mb-2">' + C.SCHWAB_NAME + '</h4>\
+                    <p class="text-sm text-slate-600 mb-3">' + C.SCHWAB_TAGLINE + '</p>\
+                    <a href="https://www.schwab.com" target="_blank" rel="noopener" class="text-blue-600 underline text-sm hover:text-blue-800">' + C.SCHWAB_CTA + '</a>\
+                  </div>\
+                  <div class="bg-white border border-slate-300 rounded p-4">\
+                    <h4 class="font-bold text-slate-900 mb-2">' + C.VANGUARD_NAME + '</h4>\
+                    <p class="text-sm text-slate-600 mb-3">' + C.VANGUARD_TAGLINE + '</p>\
+                    <a href="https://investor.vanguard.com" target="_blank" rel="noopener" class="text-blue-600 underline text-sm hover:text-blue-800">' + C.VANGUARD_CTA + '</a>\
+                  </div>\
+                </div>\
+              </details>\
+            </div>\
+            \
+            <div class="mt-4 bg-yellow-50 border-l-4 border-yellow-400 p-4 text-sm text-slate-700">\
+              <p class="font-semibold mb-1">' + C.STEP_2_TIME_NOTE + '</p>\
+              <p>' + C.STEP_2_REQUIREMENTS + '</p>\
+            </div>\
+          </div>\
+          \
+          <!-- STEP 3 -->\
+          <div id="fund-section" class="mb-8 pb-8 border-b border-slate-200 hidden">\
+            <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center">\
+              <span class="bg-emerald-600 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 text-lg flex-shrink-0">3</span>\
+              <span>' + C.STEP_3_TITLE + '</span>\
+            </h2>\
+            \
+            <div class="bg-emerald-50 rounded-lg p-6">\
+              <p class="font-bold text-slate-900 mb-4">' + C.STEP_3_INTRO + '</p>\
+              \
+              <div class="space-y-3 mb-4">\
+                <div class="bg-white rounded-lg p-4 border-2 border-emerald-500">\
+                  <div class="flex justify-between items-center">\
+                    <div>\
+                      <p class="font-mono font-bold text-2xl text-emerald-600">' + C.FUND_VOO_TICKER + '</p>\
+                      <p class="text-sm text-slate-600">' + C.FUND_VOO_NAME + '</p>\
+                    </div>\
+                    <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-1 rounded">' + C.FUND_VOO_BADGE + '</span>\
+                  </div>\
+                </div>\
+                \
+                <div class="bg-white rounded-lg p-4">\
+                  <p class="font-mono font-bold text-xl text-slate-700">' + C.FUND_VTI_TICKER + '</p>\
+                  <p class="text-sm text-slate-600">' + C.FUND_VTI_NAME + '</p>\
+                </div>\
+                \
+                <div class="bg-white rounded-lg p-4">\
+                  <p class="font-mono font-bold text-xl text-slate-700">' + C.FUND_VT_TICKER + '</p>\
+                  <p class="text-sm text-slate-600">' + C.FUND_VT_NAME + '</p>\
+                </div>\
+              </div>\
+              \
+              <div class="bg-blue-50 border-l-4 border-blue-400 p-3 text-sm">\
+                <p class="font-semibold text-blue-900 mb-1">' + C.STEP_3_EXPLANATION_LABEL + '</p>\
+                <p class="text-slate-700">' + C.STEP_3_EXPLANATION_TEXT + '</p>\
+              </div>\
+            </div>\
+            \
+            <div class="mt-4 bg-slate-50 rounded p-4 text-sm text-slate-600">\
+              <p class="font-semibold text-slate-700 mb-2">' + C.STEP_3_COST_LABEL + '</p>\
+              <p>' + step3CostText + '</p>\
+            </div>\
+          </div>\
+          \
+          <!-- STEP 4 -->\
+          <div id="autoinvest-section" class="mb-8 pb-8 border-b border-slate-200 hidden">\
+            <h2 class="text-2xl font-black text-slate-900 mb-4 flex items-center">\
+              <span class="bg-emerald-600 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 text-lg flex-shrink-0">4</span>\
+              <span>' + C.STEP_4_TITLE + '</span>\
+            </h2>\
+            \
+            <div class="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-6 mb-4">\
+              <p class="font-bold text-yellow-900 mb-3 flex items-center"><span class="text-2xl mr-2">' + C.STEP_4_WARNING_EMOJI + '</span> ' + C.STEP_4_WARNING_LABEL + '</p>\
+              <p class="text-slate-700 mb-4">' + C.STEP_4_WARNING_TEXT + '</p>\
+              \
+              <ol class="space-y-3 text-slate-700">\
+                <li class="flex items-start">\
+                  <span class="font-bold mr-2 flex-shrink-0">1.</span>\
+                  <span>' + C.STEP_4_INSTRUCTION_1 + '</span>\
+                </li>\
+                <li class="flex items-start">\
+                  <span class="font-bold mr-2 flex-shrink-0">2.</span>\
+                  <span>' + C.STEP_4_INSTRUCTION_2 + '</span>\
+                </li>\
+                <li class="flex items-start">\
+                  <span class="font-bold mr-2 flex-shrink-0">3.</span>\
+                  <span>' + step4Instruction3 + '</span>\
+                </li>\
+                <li class="flex items-start">\
+                  <span class="font-bold mr-2 flex-shrink-0">4.</span>\
+                  <span>' + C.STEP_4_INSTRUCTION_4 + '</span>\
+                </li>\
+                <li class="flex items-start">\
+                  <span class="font-bold mr-2 flex-shrink-0">5.</span>\
+                  <span>' + C.STEP_4_INSTRUCTION_5 + '</span>\
+                </li>\
+              </ol>\
+            </div>\
+            \
+            <div class="bg-emerald-50 rounded p-4">\
+              <p class="font-bold text-emerald-900 mb-2">' + C.STEP_4_SUCCESS_LABEL + '</p>\
+              <p class="text-sm text-slate-700">' + step4SuccessText + '</p>\
+            </div>\
+          </div>\
+          \
+          <!-- TIMELINE -->\
+          <div id="timeline-section" class="mb-8 hidden">\
+            <h2 class="text-2xl font-black text-slate-900 mb-4">' + C.TIMELINE_TITLE + '</h2>\
+            \
+            <div class="space-y-3 text-slate-700">\
+              <div class="flex items-start">\
+                <span class="font-bold mr-3 text-emerald-600 flex-shrink-0">Month 1:</span>\
+                <span>' + timelineMonth1 + '</span>\
+              </div>\
+              <div class="flex items-start">\
+                <span class="font-bold mr-3 text-emerald-600 flex-shrink-0">Year 1:</span>\
+                <span>' + timelineYear1 + '</span>\
+              </div>\
+              <div class="flex items-start">\
+                <span class="font-bold mr-3 text-emerald-600 flex-shrink-0">Year 5:</span>\
+                <span>' + timelineYear5 + '</span>\
+              </div>\
+              <div class="flex items-start">\
+                <span class="font-bold mr-3 text-emerald-600 flex-shrink-0">Year 10:</span>\
+                <span>' + C.TIMELINE_YEAR_10 + '</span>\
+              </div>\
+            </div>\
+            \
+            <div class="mt-4 bg-blue-50 rounded p-4 text-sm text-slate-600">\
+              <p>' + C.TIMELINE_NOTE + '</p>\
+            </div>\
+          </div>\
+          \
+          <!-- FAQ -->\
+          <div class="border-t border-slate-200 pt-6">\
+            <h3 class="font-black text-xl text-slate-900 mb-4">' + C.FAQ_TITLE + '</h3>\
+            \
+            <div class="space-y-3">\
+              <details class="bg-slate-50 rounded-lg p-4">\
+                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">' + C.FAQ_Q1 + '</summary>\
+                <p class="mt-2 text-sm text-slate-600">' + C.FAQ_A1 + '</p>\
+              </details>\
+              \
+              <details class="bg-slate-50 rounded-lg p-4">\
+                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">' + C.FAQ_Q2 + '</summary>\
+                <p class="mt-2 text-sm text-slate-600">' + C.FAQ_A2 + '</p>\
+              </details>\
+              \
+              <details class="bg-slate-50 rounded-lg p-4">\
+                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">' + C.FAQ_Q3 + '</summary>\
+                <p class="mt-2 text-sm text-slate-600">' + faqA3 + '</p>\
+              </details>\
+              \
+              <details class="bg-slate-50 rounded-lg p-4">\
+                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">' + C.FAQ_Q4 + '</summary>\
+                <p class="mt-2 text-sm text-slate-600">' + C.FAQ_A4 + '</p>\
+              </details>\
+              \
+              <details class="bg-slate-50 rounded-lg p-4">\
+                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">' + C.FAQ_Q5 + '</summary>\
+                <p class="mt-2 text-sm text-slate-600">' + C.FAQ_A5 + '</p>\
+              </details>\
+              \
+              <details class="bg-slate-50 rounded-lg p-4">\
+                <summary class="font-semibold text-slate-800 cursor-pointer hover:text-slate-900">' + C.FAQ_Q6 + '</summary>\
+                <p class="mt-2 text-sm text-slate-600">' + C.FAQ_A6 + '</p>\
+              </details>\
+            </div>\
+          </div>\
+          \
+          <!-- LEGAL -->\
+          <div class="border-t border-slate-200 pt-6 mt-6">\
+            <p class="text-xs text-slate-500 text-center leading-relaxed">' + C.LEGAL_DISCLAIMER + '</p>\
+          </div>\
+          \
+          <button id="back-home-btn" class="w-full mt-6 text-slate-500 underline text-sm hover:text-slate-700">' + C.BUTTON_BACK_HOME + '</button>\
+        </div>\
+      </div>';
+  }
+};
+
+  // ============================================================================
+// ██████╗ ███████╗███╗   ██╗██████╗ ███████╗██████╗ ██╗███╗   ██╗ ██████╗ 
+// ██╔══██╗██╔════╝████╗  ██║██╔══██╗██╔════╝██╔══██╗██║████╗  ██║██╔════╝ 
+// ██████╔╝█████╗  ██╔██╗ ██║██║  ██║█████╗  ██████╔╝██║██╔██╗ ██║██║  ███╗
+// ██╔══██╗██╔══╝  ██║╚██╗██║██║  ██║██╔══╝  ██╔══██╗██║██║╚██╗██║██║   ██║
+// ██║  ██║███████╗██║ ╚████║██████╔╝███████╗██║  ██║██║██║ ╚████║╚██████╔╝
+// ╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
+// 
+// RENDERING ENGINE
+// Renders current page template
+// ============================================================================
+
+function render() {
+  var container = document.getElementById('app');
+  if (!container) return;
+  
+  try {
+    var template = PageTemplates[AppState.currentPage];
+    if (template) {
+      container.innerHTML = template();
+      attachEventListeners();
+    } else {
+      throw new Error('Page template not found: ' + AppState.currentPage);
+    }
+  } catch (error) {
+    console.error('❌ Render error:', error);
+    container.innerHTML = '\
+      <div class="min-h-screen flex items-center justify-center bg-red-50 p-4">\
+        <div class="max-w-md bg-white rounded-lg p-8 shadow-xl">\
+          <h1 class="text-2xl font-bold text-red-600 mb-4">' + COPY.ERROR.TITLE + '</h1>\
+          <p class="text-slate-700 mb-4">' + COPY.ERROR.MESSAGE + '</p>\
+          <button onclick="location.reload()" class="w-full bg-red-600 text-white px-6 py-3 rounded font-bold hover:bg-red-700">' + COPY.ERROR.BUTTON + '</button>\
+        </div>\
+      </div>';
+  }
+}
+
+
+// ============================================================================
+// ██████╗ ███████╗██╗  ██╗ █████╗ ██╗   ██╗██╗ ██████╗ ██████╗ 
+// ██╔══██╗██╔════╝██║  ██║██╔══██╗██║   ██║██║██╔═══██╗██╔══██╗
+// ██████╔╝█████╗  ███████║███████║██║   ██║██║██║   ██║██████╔╝
+// ██╔══██╗██╔══╝  ██╔══██║██╔══██║╚██╗ ██╔╝██║██║   ██║██╔══██╗
+// ██████╔╝███████╗██║  ██║██║  ██║ ╚████╔╝ ██║╚██████╔╝██║  ██║
+// ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝
+// 
+// EVENT LISTENERS
+// Button clicks and user interactions for each page
+// ============================================================================
+
+function attachEventListeners() {
+  var page = AppState.currentPage;
+  
+  console.log('🔌 Attaching listeners for page:', page);
+  
+  try {
+  
+  // ═══════════════════════════════════════════════════════════════════════
+  // BEHAVIOR: Landing Page (Main)
+  // ═══════════════════════════════════════════════════════════════════════
+  if (page === 'landing_main') {
+    var ageInput = document.getElementById('age-input');
+    var budgetInput = document.getElementById('budget-input');
+    var submitBtn = document.getElementById('submit-btn');
+    
+    function updateButtonState() {
+      var canSubmit = AppState.age && AppState.budget && AppState.age >= 0 && AppState.age <= 64 && AppState.budget > 0;
+      if (submitBtn) {
+        submitBtn.className = 'w-full py-5 rounded-xl font-black text-xl shadow-xl transition-all ' + 
+          (canSubmit 
+            ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white cursor-pointer hover:from-blue-700 hover:to-blue-800 transform hover:scale-105' 
+            : 'bg-slate-300 text-slate-500 cursor-not-allowed');
+      }
+    }
+    
+    if (ageInput) {
+      ageInput.addEventListener('input', function(e) {
+        AppState.age = e.target.value;
+        updateButtonState();
+      });
+    }
+    
+    if (budgetInput) {
+      budgetInput.addEventListener('input', function(e) {
+        AppState.budget = e.target.value;
+        updateButtonState();
+      });
+    }
+    
+    if (submitBtn) {
+      submitBtn.addEventListener('click', function() {
+        if (AppState.age && AppState.budget && AppState.age >= 0 && AppState.age <= 64 && AppState.budget > 0) {
+          trackEvent('input_complete', {
+            age: AppState.age,
+            budget: AppState.budget
+          });
+          
+          showLoading();
+          setTimeout(function() {
+            hideLoading();
+            navigateTo('goal_selection');
+          }, 1000);
+        }
+      });
+    }
+  }
+  
+// ═══════════════════════════════════════════════════════════════════════
+  // BEHAVIOR: Goal Selection
+  // ═══════════════════════════════════════════════════════════════════════
+  if (page === 'goal_selection') {
+    var retBtn = document.getElementById('retirement-btn');
+    var famBtn = document.getElementById('family-btn');
+    
+    if (retBtn) {
+      retBtn.addEventListener('click', function() {
+        AppState.goal = 'retirement';
+        trackEvent('goal_selected', { goal: 'retirement' });
+        navigateTo('results');  // ← FIXED!
+      });
+    }
+    
+    if (famBtn) {
+      famBtn.addEventListener('click', function() {
+        AppState.goal = 'family';
+        trackEvent('goal_selected', { goal: 'family' });
+        navigateTo('results');  // ← FIXED!
+      });
+    }
+  }
+  
+  // ═══════════════════════════════════════════════════════════════════════
+  // BEHAVIOR: Results Pages (Retirement & Family)
+  // ═══════════════════════════════════════════════════════════════════════
+ // ═══════════════════════════════════════════════════════════════════════
+  // BEHAVIOR: Results Page (Unified)
+  // ═══════════════════════════════════════════════════════════════════════
+  if (page === 'results') {
+    var wantBtn = document.getElementById('want-btn');
+    var waitBtn = document.getElementById('wait-btn');
+    var backBtn = document.getElementById('back-btn');
+    var toggleRetirement = document.getElementById('toggle-retirement');
+    var toggleFamily = document.getElementById('toggle-family');
+    var resultsContent = document.getElementById('results-content');
+    var toggleSlider = document.getElementById('toggle-slider');
+    
+    var amount = AppState.goal === 'retirement' 
+      ? Calculator.retirement(Number(AppState.age), Number(AppState.budget))
+      : Calculator.death(Number(AppState.age), Number(AppState.budget));
+    
+    // Toggle switch behavior
+    function switchGoal(newGoal) {
+      if (AppState.goal === newGoal) return; // Already on this goal
+      
+      var oldGoal = AppState.goal;
+      AppState.goal = newGoal;
+      
+      trackEvent('goal_toggled', { 
+        from: oldGoal,
+        to: newGoal
+      });
+      
+      // Slide out animation
+      if (resultsContent) {
+        resultsContent.style.transform = oldGoal === 'retirement' ? 'translateX(-100%)' : 'translateX(100%)';
+        resultsContent.style.opacity = '0';
+        resultsContent.style.transition = 'transform 0.3s ease-in-out, opacity 0.3s ease-in-out';
       }
       
-      return `
-        <a href="post.html?slug=${post.slug}" class="block group">
-          <article class="bg-slate-800 rounded-lg overflow-hidden hover:bg-slate-750 transition-all hover:scale-[1.02] shadow-xl">
-            ${imageHTML}
-            
-            <div class="p-6 md:p-8">
-              <h2 class="text-2xl md:text-3xl font-black mb-4 leading-tight group-hover:text-blue-400 transition-colors">
-                ${post.title}
-              </h2>
-              
-              <p class="text-slate-300 text-lg mb-6 leading-relaxed">
-                ${post.hook}
-              </p>
-              
-              <div class="flex items-center justify-between">
-                <span class="text-blue-400 font-bold text-lg group-hover:text-blue-300 transition-colors">
-                  Read this →
-                </span>
-                <span class="text-slate-500 text-sm">(5 min)</span>
-              </div>
-            </div>
-          </article>
-        </a>
-      `;
-    }).join('');
-  })
-  .catch(error => {
-    console.error('Error loading posts:', error);
-    document.getElementById('post-list').innerHTML = `
-      <div class="bg-red-900 border border-red-700 rounded-lg p-6 text-center">
-        <p class="text-red-200 mb-2 font-bold">Error loading posts</p>
-        <p class="text-red-300 text-sm">Make sure your GitHub repo is public or check the console for details.</p>
-      </div>
-    `;
-  });
+      // Move slider
+      if (toggleSlider) {
+        toggleSlider.style.transform = newGoal === 'retirement' ? 'translateX(0%)' : 'translateX(100%)';
+      }
+      
+      // After animation, re-render
+      setTimeout(function() {
+        render();
+        
+        // Slide in animation
+        var newContent = document.getElementById('results-content');
+        if (newContent) {
+          newContent.style.transform = newGoal === 'retirement' ? 'translateX(100%)' : 'translateX(-100%)';
+          newContent.style.opacity = '0';
+          
+          setTimeout(function() {
+            newContent.style.transform = 'translateX(0)';
+            newContent.style.opacity = '1';
+          }, 10);
+        }
+      }, 300);
+    }
+    
+    if (toggleRetirement) {
+      toggleRetirement.addEventListener('click', function() {
+        switchGoal('retirement');
+      });
+    }
+    
+    if (toggleFamily) {
+      toggleFamily.addEventListener('click', function() {
+        switchGoal('family');
+      });
+    }
+    
+    if (wantBtn) {
+      wantBtn.addEventListener('click', function() {
+        trackEvent('cta_want', { 
+          amount: amount,
+          goal: AppState.goal
+        });
+        navigateTo('debt_check');
+      });
+    }
+    
+    if (waitBtn) {
+      waitBtn.addEventListener('click', function() {
+        trackEvent('cta_wait', { 
+          amount: amount,
+          goal: AppState.goal
+        });
+        navigateTo('loss_aversion');
+      });
+    }
+    
+    if (backBtn) {
+      backBtn.addEventListener('click', function() {
+        navigateTo('landing_main');
+      });
+    }
+  }
+  
+  // ═══════════════════════════════════════════════════════════════════════
+  // BEHAVIOR: Debt Check
+  // ═══════════════════════════════════════════════════════════════════════
+  if (page === 'debt_check') {
+    var yesBtn = document.getElementById('yes-debt');
+    var noBtn = document.getElementById('no-debt');
+    
+    if (yesBtn) {
+      yesBtn.addEventListener('click', function() {
+        AppState.hasDebt = true;
+        trackEvent('debt_check', { has_debt: true });
+        navigateTo('debt_payoff');
+      });
+    }
+    
+    if (noBtn) {
+      noBtn.addEventListener('click', function() {
+        AppState.hasDebt = false;
+        trackEvent('debt_check', { has_debt: false });
+        navigateTo('email_capture');
+      });
+    }
+  }
+  
+  // ═══════════════════════════════════════════════════════════════════════
+  // BEHAVIOR: Loss Aversion
+  // ═══════════════════════════════════════════════════════════════════════
+  if (page === 'loss_aversion') {
+    var startBtn = document.getElementById('start-btn');
+    var laterBtn = document.getElementById('later-btn');
+    
+    if (startBtn) {
+      startBtn.addEventListener('click', function() {
+        trackEvent('loss_aversion_convert', { converted: true });
+        navigateTo('debt_check');
+      });
+    }
+    
+    if (laterBtn) {
+      laterBtn.addEventListener('click', function() {
+        trackEvent('loss_aversion_convert', { converted: false });
+        navigateTo('landing_main');
+      });
+    }
+  }
+  
+  // ═══════════════════════════════════════════════════════════════════════
+  // BEHAVIOR: Debt Payoff
+  // ═══════════════════════════════════════════════════════════════════════
+  if (page === 'debt_payoff') {
+    var gotitBtn = document.getElementById('gotit-btn');
+    
+    if (gotitBtn) {
+      gotitBtn.addEventListener('click', function() {
+        trackEvent('debt_redirect_acknowledge');
+        navigateTo('landing_main');
+      });
+    }
+  }
+  
+  // ═══════════════════════════════════════════════════════════════════════
+  // BEHAVIOR: Email Capture
+  // ═══════════════════════════════════════════════════════════════════════
+  if (page === 'email_capture') {
+    var emailInput = document.getElementById('email-input');
+    var sendBtn = document.getElementById('send-guide-btn');
+    var skipBtn = document.getElementById('skip-email-btn');
+    var emailError = document.getElementById('email-error');
+    
+    function validateEmail(email) {
+      var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
+    
+    if (sendBtn) {
+      sendBtn.addEventListener('click', function() {
+        var email = emailInput ? emailInput.value : '';
+        
+        if (!validateEmail(email)) {
+          if (emailError) emailError.classList.remove('hidden');
+          return;
+        }
+        
+        AppState.email = email;
+        
+        // TODO: Send email to your backend/email service
+        // Example: fetch('/api/subscribe', { method: 'POST', body: JSON.stringify({ email, age: AppState.age, budget: AppState.budget }) })
+        
+        trackEvent('email_captured', { 
+          email_provided: true,
+          age: AppState.age,
+          budget: AppState.budget,
+          goal: AppState.goal
+        });
+        
+        console.log('📧 Email captured:', email);
+        
+        navigateTo('brokerage_setup');
+      });
+    }
+    
+    if (skipBtn) {
+      skipBtn.addEventListener('click', function() {
+        trackEvent('email_captured', { email_provided: false });
+        navigateTo('brokerage_setup');
+      });
+    }
+    
+    if (emailInput) {
+      emailInput.addEventListener('input', function() {
+        if (emailError) emailError.classList.add('hidden');
+      });
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // BEHAVIOR: Brokerage Setup
+  // ═══════════════════════════════════════════════════════════════════════
+  if (page === 'brokerage_setup') {
+    var hasIncomeBtn = document.getElementById('has-income-btn');
+    var noIncomeBtn = document.getElementById('no-income-btn');
+    var accountResult = document.getElementById('account-type-result');
+    var accountName = document.getElementById('account-name');
+    var accountExplanation = document.getElementById('account-explanation');
+    var brokerageSection = document.getElementById('brokerage-section');
+    var fundSection = document.getElementById('fund-section');
+    var autoinvestSection = document.getElementById('autoinvest-section');
+    var timelineSection = document.getElementById('timeline-section');
+    var backHomeBtn = document.getElementById('back-home-btn');
+    
+    function showNextSections() {
+      if (accountResult) accountResult.classList.remove('hidden');
+      
+      setTimeout(function() {
+        if (brokerageSection) {
+          brokerageSection.classList.remove('hidden');
+          brokerageSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 500);
+      
+      setTimeout(function() {
+        if (fundSection) fundSection.classList.remove('hidden');
+      }, 1500);
+      
+      setTimeout(function() {
+        if (autoinvestSection) autoinvestSection.classList.remove('hidden');
+      }, 2500);
+      
+      setTimeout(function() {
+        if (timelineSection) timelineSection.classList.remove('hidden');
+      }, 3500);
+    }
+    
+    if (hasIncomeBtn) {
+      hasIncomeBtn.addEventListener('click', function() {
+        AppState.accountType = 'roth_ira';
+        
+        if (accountName) accountName.textContent = COPY.BROKERAGE_SETUP.ACCOUNT_ROTH_IRA_NAME;
+        if (accountExplanation) accountExplanation.textContent = COPY.BROKERAGE_SETUP.ACCOUNT_ROTH_IRA_EXPLANATION;
+        
+        trackEvent('account_type_selected', { account_type: 'roth_ira' });
+        showNextSections();
+      });
+    }
+    
+    if (noIncomeBtn) {
+      noIncomeBtn.addEventListener('click', function() {
+        AppState.accountType = 'taxable';
+        
+        if (accountName) accountName.textContent = COPY.BROKERAGE_SETUP.ACCOUNT_TAXABLE_NAME;
+        if (accountExplanation) accountExplanation.textContent = COPY.BROKERAGE_SETUP.ACCOUNT_TAXABLE_EXPLANATION;
+        
+        trackEvent('account_type_selected', { account_type: 'taxable' });
+        showNextSections();
+      });
+    }
+    
+    if (backHomeBtn) {
+      backHomeBtn.addEventListener('click', function() {
+        navigateTo('landing_main');
+      });
+    }
+    
+    trackEvent('setup_page_reached', {
+      age: AppState.age,
+      budget: AppState.budget,
+      goal: AppState.goal,
+      has_debt: AppState.hasDebt,
+      email_provided: AppState.email ? true : false
+    });
+  }
+  
+  } catch (error) {
+    console.error('❌ Error in attachEventListeners for page ' + page + ':', error);
+    console.error('Stack:', error.stack);
+  }
+}
+
+
+// ============================================================================
+// ██╗███╗   ██╗██╗████████╗██╗ █████╗ ██╗     ██╗███████╗ █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
+// ██║████╗  ██║██║╚══██╔══╝██║██╔══██╗██║     ██║╚══███╔╝██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║
+// ██║██╔██╗ ██║██║   ██║   ██║███████║██║     ██║  ███╔╝ ███████║   ██║   ██║██║   ██║██╔██╗ ██║
+// ██║██║╚██╗██║██║   ██║   ██║██╔══██║██║     ██║ ███╔╝  ██╔══██║   ██║   ██║██║   ██║██║╚██╗██║
+// ██║██║ ╚████║██║   ██║   ██║██║  ██║███████╗██║███████╗██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
+// ╚═╝╚═╝  ╚═══╝╚═╝   ╚═╝   ╚═╝╚═╝  ╚═╝╚══════╝╚═╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+// 
+// APP INITIALIZATION
+// Starts the application on page load
+// ============================================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🚀 StartWith60 initializing...');
+  console.log('📍 Starting page:', AppState.currentPage);
+  console.log('📦 Initial state:', AppState);
+  
+  try {
+    render();
+    console.log('✅ Initial render successful');
+  } catch (error) {
+    console.error('❌ Initial render failed:', error);
+  }
+});
 </script>
 
 </body>
