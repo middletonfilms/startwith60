@@ -78,8 +78,8 @@ function parseCustomSyntax(markdown) {
   // [highlight:text] -> yellow highlighted text
   markdown = markdown.replace(/\[highlight:(.*?)\]/g, '<span class="auto-highlight">$1</span>');
   
-  // [box(type):text] -> boxes (disclaimer/stat/quote/tip/warning)
-  markdown = markdown.replace(/\[box\((disclaimer|stat|quote|tip|warning)\):(.*?)\]/g, 
+  // [box(type):text] -> boxes (disclaimer/stat/quote/tip/warning/thesis)
+  markdown = markdown.replace(/\[box\((disclaimer|stat|quote|tip|warning|thesis)\):(.*?)\]/g, 
     '<div class="$1-box">$2</div>');
   
   // [button:text] -> full block button
@@ -90,8 +90,13 @@ function parseCustomSyntax(markdown) {
   markdown = markdown.replace(/\[button\(inline\):(.*?)\]/g, 
     '<span class="inline-cta"><a href="#">$1</a></span>');
   
-  // [image:url] or [image:url,caption] -> image (centered)
+  // [image:url] or [image:url,caption] or [image:] (placeholder)
   markdown = markdown.replace(/\[image:(.*?)\]/g, function(match, content) {
+    if (!content || content.trim() === '') {
+      // Empty URL = show placeholder
+      return '<div class="image-placeholder">[Image placeholder - add URL]</div>';
+    }
+    
     const parts = content.split(',');
     const url = parts[0].trim();
     const caption = parts[1] ? parts[1].trim() : '';
@@ -103,8 +108,12 @@ function parseCustomSyntax(markdown) {
     }
   });
   
-  // [image(left):url] or [image(left):url,caption] -> left-aligned image
+  // [image(left):url] or [image(left):url,caption] or [image(left):] (placeholder)
   markdown = markdown.replace(/\[image\(left\):(.*?)\]/g, function(match, content) {
+    if (!content || content.trim() === '') {
+      return '<div class="image-placeholder-left">[Image placeholder]</div>';
+    }
+    
     const parts = content.split(',');
     const url = parts[0].trim();
     const caption = parts[1] ? parts[1].trim() : '';
@@ -116,8 +125,12 @@ function parseCustomSyntax(markdown) {
     }
   });
   
-  // [image(right):url] or [image(right):url,caption] -> right-aligned image
+  // [image(right):url] or [image(right):url,caption] or [image(right):] (placeholder)
   markdown = markdown.replace(/\[image\(right\):(.*?)\]/g, function(match, content) {
+    if (!content || content.trim() === '') {
+      return '<div class="image-placeholder-right">[Image placeholder]</div>';
+    }
+    
     const parts = content.split(',');
     const url = parts[0].trim();
     const caption = parts[1] ? parts[1].trim() : '';
@@ -149,14 +162,14 @@ function applyTableColors() {
   tables.forEach(table => {
     const rows = table.querySelectorAll('tr');
     
-    // Process header row for [col(color,priority)] markers
+    // Process header row for [col(color,priority)] markers (CASE INSENSITIVE)
     const headerRow = rows[0];
     if (headerRow) {
       const headers = headerRow.querySelectorAll('th');
       headers.forEach((header, colIndex) => {
-        const colMatch = header.textContent.match(/\[col\((red|green|blue|yellow|purple|orange|white),(\d+)\)\]/);
+        const colMatch = header.textContent.match(/\[col\((red|green|blue|yellow|purple|orange|white),(\d+)\)\]/i);
         if (colMatch) {
-          const color = colMatch[1];
+          const color = colMatch[1].toLowerCase();
           const priority = parseInt(colMatch[2]);
           
           // Remove marker from header text
@@ -165,7 +178,7 @@ function applyTableColors() {
           // Apply color to entire column
           rows.forEach(row => {
             const cell = row.querySelectorAll('th, td')[colIndex];
-            if (cell && !cell.dataset.colorPriority || parseInt(cell.dataset.colorPriority) < priority) {
+            if (cell && (!cell.dataset.colorPriority || parseInt(cell.dataset.colorPriority) < priority)) {
               cell.classList.add(`col-${color}`);
               cell.dataset.colorPriority = priority;
             }
@@ -174,13 +187,13 @@ function applyTableColors() {
       });
     }
     
-    // Process each row for [row(color,priority)] markers
+    // Process each row for [row(color,priority)] markers (CASE INSENSITIVE)
     rows.forEach(row => {
       const firstCell = row.querySelector('th, td');
       if (firstCell) {
-        const rowMatch = firstCell.textContent.match(/\[row\((red|green|blue|yellow|purple|orange|white),(\d+)\)\]/);
+        const rowMatch = firstCell.textContent.match(/\[row\((red|green|blue|yellow|purple|orange|white),(\d+)\)\]/i);
         if (rowMatch) {
-          const color = rowMatch[1];
+          const color = rowMatch[1].toLowerCase();
           const priority = parseInt(rowMatch[2]);
           
           // Remove marker from cell text
@@ -622,6 +635,33 @@ function enhanceSectionHeaders() {
   border-radius: 0 0 0.5rem 0.5rem;
 }
 
+.image-placeholder,
+.image-placeholder-left,
+.image-placeholder-right {
+  background: #334155;
+  border: 2px dashed #64748b;
+  padding: 3rem;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  border-radius: 0.5rem;
+  margin: 2rem 0;
+}
+
+.image-placeholder-left {
+  float: left;
+  width: 40%;
+  padding: 2rem;
+  margin: 0 1.5rem 1rem 0;
+}
+
+.image-placeholder-right {
+  float: right;
+  width: 40%;
+  padding: 2rem;
+  margin: 0 0 1rem 1.5rem;
+}
+
 /* ========================================
    HORIZONTAL RULES
    ======================================== */
@@ -636,15 +676,33 @@ function enhanceSectionHeaders() {
    CUSTOM BOXES
    ======================================== */
 
+/* Disclaimer - tighter padding and margins */
 .disclaimer-box {
   background: #0f172a;
   border: 1px solid #334155;
   border-left: 4px solid #64748b;
-  padding: 1.25rem 1.5rem;
-  margin: 2rem 0;
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
   border-radius: 0.5rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #94a3b8;
+  line-height: 1.5;
+}
+
+.disclaimer-box p {
+  margin: 0;
+}
+
+/* Thesis - the key concept box */
+.thesis-box {
+  border: 4px double #10b981;
+  background: #0f172a;
+  padding: 2rem;
+  margin: 2.5rem 0;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  line-height: 1.7;
 }
 
 .stat-box {
@@ -695,17 +753,24 @@ function enhanceSectionHeaders() {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
+/* Closing section - reduced padding, bigger H2 */
 .closing-section {
   background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
   border-top: 3px solid #10b981;
-  padding: 2.5rem 2rem;
+  padding: 1.5rem 2rem 2.5rem;
   margin: 3rem -2.5rem -2.5rem;
   border-radius: 0 0 0.5rem 0.5rem;
 }
 
+.closing-section h2 {
+  font-size: 2.25rem;
+  color: #10b981;
+  margin-top: 0;
+}
+
 .cta-button {
   text-align: center;
-  margin: 2.5rem 0;
+  margin: 1rem 0;
 }
 
 .cta-button a {
@@ -753,7 +818,9 @@ function enhanceSectionHeaders() {
   .auto-image-left,
   .auto-image-right,
   .image-container-left,
-  .image-container-right {
+  .image-container-right,
+  .image-placeholder-left,
+  .image-placeholder-right {
     float: none;
     width: 100%;
     margin: 1rem 0;
@@ -761,7 +828,11 @@ function enhanceSectionHeaders() {
   
   .closing-section {
     margin: 3rem -1.5rem -1.5rem;
-    padding: 2rem 1.5rem;
+    padding: 1.5rem 1.5rem 2rem;
+  }
+  
+  .closing-section h2 {
+    font-size: 1.75rem;
   }
 }
 </style>
