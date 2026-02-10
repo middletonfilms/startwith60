@@ -48,10 +48,10 @@ if (!slug) {
       document.getElementById('page-title').textContent = `${title} | StartWith60`;
       document.getElementById('post-content').innerHTML = `<div class="prose prose-invert prose-lg max-w-none">${html}</div>`;
       
-      // Post-process: Add comparison table styling
-      enhanceComparisonTables();
+      // Apply table column colors
+      applyTableColors();
       
-      // Post-process: Convert ALL CAPS text in quotes to section headers if they're not already H2/H3
+      // Section header detection (quoted ALL CAPS)
       enhanceSectionHeaders();
     })
     .catch(error => {
@@ -60,28 +60,36 @@ if (!slug) {
     });
 }
 
-// Smart enhancement: detect comparison tables and style them
-function enhanceComparisonTables() {
-  const tables = document.querySelectorAll('table');
+// Apply custom colors to table columns based on data-colors attribute
+function applyTableColors() {
+  const tables = document.querySelectorAll('table[data-colors]');
   tables.forEach(table => {
-    const headers = Array.from(table.querySelectorAll('th')).map(th => th.textContent.toLowerCase());
+    const colorsAttr = table.getAttribute('data-colors');
+    if (!colorsAttr) return;
     
-    // If table has "insurance" or "whole life" vs "index" columns, it's a comparison
-    const isComparison = headers.some(h => h.includes('insurance') || h.includes('whole life')) && 
-                         headers.some(h => h.includes('index'));
+    // Parse: "2,red,4,green,7,blue" -> [[2,'red'], [4,'green'], [7,'blue']]
+    const pairs = colorsAttr.split(',').map(s => s.trim());
+    const colorMap = {};
     
-    if (isComparison) {
-      table.classList.add('comparison-table');
-      
-      // Highlight "they keep" row in red
-      const rows = table.querySelectorAll('tr');
-      rows.forEach(row => {
-        const firstCell = row.querySelector('td, th');
-        if (firstCell && firstCell.textContent.toLowerCase().includes('keep')) {
-          row.classList.add('keep-row');
+    for (let i = 0; i < pairs.length; i += 2) {
+      const colNum = parseInt(pairs[i]);
+      const color = pairs[i + 1];
+      if (colNum && color) {
+        colorMap[colNum] = color;
+      }
+    }
+    
+    // Apply colors to cells in specified columns
+    const rows = table.querySelectorAll('tr');
+    rows.forEach(row => {
+      const cells = row.querySelectorAll('th, td');
+      cells.forEach((cell, index) => {
+        const colNum = index + 1; // 1-indexed
+        if (colorMap[colNum]) {
+          cell.classList.add(`col-${colorMap[colNum]}`);
         }
       });
-    }
+    });
   });
 }
 
@@ -89,7 +97,6 @@ function enhanceComparisonTables() {
 function enhanceSectionHeaders() {
   const paragraphs = document.querySelectorAll('p');
   paragraphs.forEach(p => {
-    // Check if paragraph is just quoted ALL CAPS text (section header pattern)
     const text = p.textContent.trim();
     if (text.startsWith('"') && text.endsWith('"') && text === text.toUpperCase() && text.length < 60) {
       p.classList.add('section-header-quote');
@@ -109,7 +116,7 @@ function enhanceSectionHeaders() {
 }
 
 /* ========================================
-   HEADERS - Smart hierarchy
+   HEADERS
    ======================================== */
 
 .prose-invert h1 {
@@ -141,7 +148,6 @@ function enhanceSectionHeaders() {
   line-height: 1.3;
 }
 
-/* Section headers that appear as quoted all-caps text */
 .section-header-quote {
   font-size: 1.5rem;
   font-weight: 800;
@@ -161,7 +167,6 @@ function enhanceSectionHeaders() {
   line-height: 1.8;
 }
 
-/* Add extra spacing after key sections */
 .prose-invert h2 + p,
 .prose-invert h3 + p {
   margin-top: 1rem;
@@ -181,7 +186,6 @@ function enhanceSectionHeaders() {
   color: #cbd5e1;
 }
 
-/* Bold + italic = pull quote treatment */
 .prose-invert strong em,
 .prose-invert em strong {
   display: block;
@@ -197,7 +201,7 @@ function enhanceSectionHeaders() {
 }
 
 /* ========================================
-   LINKS - High visibility CTAs
+   LINKS & CTAs
    ======================================== */
 
 .prose-invert a {
@@ -211,7 +215,7 @@ function enhanceSectionHeaders() {
   color: #93c5fd;
 }
 
-/* ALL CAPS LINKS = CTA BUTTONS */
+/* Block CTA buttons (links with guide/calculator/start) */
 .prose-invert a[href*="GUIDE"],
 .prose-invert a[href*="guide"],
 .prose-invert a[href*="calculator"],
@@ -238,8 +242,27 @@ function enhanceSectionHeaders() {
   background: linear-gradient(135deg, #059669 0%, #047857 100%);
 }
 
+/* Inline CTA buttons */
+.inline-cta a {
+  display: inline;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.375rem;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.95em;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.inline-cta a:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
 /* ========================================
-   LISTS - Better spacing
+   LISTS
    ======================================== */
 
 .prose-invert ul {
@@ -264,7 +287,6 @@ function enhanceSectionHeaders() {
   font-size: 1.2rem;
 }
 
-/* If list items contain dollar amounts or numbers, make them pop */
 .prose-invert li {
   font-size: 1.1rem;
 }
@@ -281,7 +303,7 @@ function enhanceSectionHeaders() {
 }
 
 /* ========================================
-   TABLES - Comparison styling
+   TABLES - With custom column colors
    ======================================== */
 
 .prose-invert table {
@@ -315,43 +337,27 @@ function enhanceSectionHeaders() {
   font-size: 1.05rem;
 }
 
-/* Comparison table enhancements */
-.comparison-table th:last-child {
-  background: linear-gradient(135deg, #065f46 0%, #047857 100%);
-  color: #fff;
-}
-
-.comparison-table td:last-child {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+/* Column color classes */
+.prose-invert .col-red {
+  background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+  color: #fecaca;
   font-weight: 700;
-  color: #10b981;
 }
 
-/* "They keep" row gets red highlight */
-.comparison-table .keep-row td:nth-child(2) {
-  color: #ef4444;
-  font-weight: 900;
-  font-size: 1.2rem;
+.prose-invert .col-green {
+  background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+  color: #d1fae5;
+  font-weight: 700;
 }
 
-.comparison-table .keep-row td:last-child {
-  color: #10b981;
-  font-weight: 900;
-  font-size: 1.2rem;
-}
-
-/* Table caption */
-.prose-invert table + p em {
-  display: block;
-  text-align: center;
-  font-size: 0.95rem;
-  color: #94a3b8;
-  margin-top: -1.5rem;
-  margin-bottom: 2rem;
+.prose-invert .col-blue {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  color: #dbeafe;
+  font-weight: 700;
 }
 
 /* ========================================
-   BLOCKQUOTES - Disclaimer & callouts
+   BLOCKQUOTES
    ======================================== */
 
 .prose-invert blockquote {
@@ -374,7 +380,7 @@ function enhanceSectionHeaders() {
 }
 
 /* ========================================
-   CODE - Inline & blocks
+   CODE
    ======================================== */
 
 .prose-invert code {
@@ -413,6 +419,44 @@ function enhanceSectionHeaders() {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
+/* Image placeholders */
+.image-placeholder {
+  background: #334155;
+  border: 2px dashed #64748b;
+  padding: 3rem;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  border-radius: 0.5rem;
+  margin: 2rem 0;
+}
+
+.image-placeholder-left {
+  background: #334155;
+  border: 2px dashed #64748b;
+  padding: 2rem;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  border-radius: 0.5rem;
+  float: left;
+  width: 40%;
+  margin: 0 1.5rem 1rem 0;
+}
+
+.image-placeholder-right {
+  background: #334155;
+  border: 2px dashed #64748b;
+  padding: 2rem;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  border-radius: 0.5rem;
+  float: right;
+  width: 40%;
+  margin: 0 0 1rem 1.5rem;
+}
+
 /* ========================================
    HORIZONTAL RULES
    ======================================== */
@@ -424,8 +468,33 @@ function enhanceSectionHeaders() {
 }
 
 /* ========================================
-   CUSTOM COMPONENTS (paste these in markdown as HTML)
+   CUSTOM COMPONENTS
    ======================================== */
+
+/* Disclaimer box */
+.disclaimer-box {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-left: 4px solid #64748b;
+  padding: 1.25rem 1.5rem;
+  margin: 2rem 0;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.disclaimer-box p {
+  margin: 0;
+}
+
+/* Closing section */
+.closing-section {
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  border-top: 3px solid #10b981;
+  padding: 2.5rem 2rem;
+  margin: 3rem -2.5rem -2.5rem;
+  border-radius: 0 0 0.5rem 0.5rem;
+}
 
 /* Big stat callout */
 .stat-box {
@@ -441,7 +510,7 @@ function enhanceSectionHeaders() {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
 }
 
-/* CTA button */
+/* CTA button (standalone) */
 .cta-button {
   text-align: center;
   margin: 2.5rem 0;
@@ -525,6 +594,18 @@ function enhanceSectionHeaders() {
   .cta-button a { 
     padding: 1rem 1.5rem; 
     font-size: 1rem; 
+  }
+  
+  .image-placeholder-left,
+  .image-placeholder-right {
+    float: none;
+    width: 100%;
+    margin: 1rem 0;
+  }
+  
+  .closing-section {
+    margin: 3rem -1.5rem -1.5rem;
+    padding: 2rem 1.5rem;
   }
 }
 </style>
