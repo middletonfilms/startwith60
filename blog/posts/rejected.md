@@ -57,7 +57,7 @@ The S&P500 goes up and down, but since it was created in 1913, it has averaged a
 
 You have. Every time someone mentions their "401(k)" or "retirement account"—that's an index fund. The difference? Most people get access through their employer. You have to set it up yourself.
 
-[box(stat)It's not hidden. It's just not marketed to you.]
+[box(stat):It's not hidden. It's just not marketed to you.]
 
 Why? Because nobody makes commission when you invest directly. Insurance agents work on comission. Financial advisors charge 1% per year to manage your money.
 
