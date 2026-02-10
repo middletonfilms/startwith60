@@ -2,14 +2,12 @@
 
 ## Don’t worry. You’ve still got options. (Really good ones.)
 
-> *This website is a personal project. I am not affiliated with any bank, and I do not profit off your investment choices.*
+[box(disclaimer):This website is a personal project. I am not affiliated with any bank, and I do not profit off your investment choices.]
 
 I’ll cut to the chase. This is the insurance company’s loss, not yours.  
 You were about to give them— what, $100 every month? Over 40 years, that'd be $48,000.
 
-<div class="tip-box">
-They were going to invest that, turn it into over $600K, then hand you back $30-60K and pocket the rest.
-</div>
+They were going to invest that, turn it into over $600K, then hand you back $30-60K and pocket the rest.]
 
 I have a better pitch for you. Keep that full $600,000 for yourself.
 
@@ -17,7 +15,7 @@ As a former Life Insurance Agent, I’ve worked with hundreds of families— lar
 
 I wish I had a time machine so I could go back just 40 years, shake these people, and tell them the same thing I’m about to tell you:
 
-<div class="stat-box">There are funds you can put your money in— called index funds— that grow 10.4% every year on average. This is where the insurance company puts your money and everyone else’s, and it’s why they’re worth billions of dollars. </div>
+[box(tip):There are funds you can put your money in— called index funds— that grow 10.4% every year on average. This is where the insurance company puts your money and everyone else’s, and it’s why they’re worth billions of dollars.]
 
 Now, 10.4% per year might sound boring to you. With regular stocks, the value can double in a year. Or the value can 10x in one day. But— to be candid— that’s not going to be your luck. Stocks are gambling. You wouldn’t bet your mortgage at the casino, and for good reason.
 
@@ -31,7 +29,7 @@ People who put $100 a month into an index fund average:
 And If you can set aside $200/month or more… now we’re looking at millions. For your retirement, for your family’s inheritance… whatever you want. 
 
 LET'S COMPARE:
-|| Whole Life Insurance | Index Fund |
+|| Whole Life Insurance [col(red)] | Index Fund [col(green)] |
 |--|------|---|
 |$100/month becomes |	$654,000 (over 40 years) | $654,000 (over 40 years) |
 | You get back |$60,000 (generously) | $654,000 |
@@ -44,9 +42,7 @@ Same money. Different outcome.
 
 When you put $100 into an index fund, you instantly own tiny pieces of hundreds of companies. This is the most famous index: the S&P500. It consists of the top 500 companies in America, proportional to their size. 
 
-<div class="image-placeholder">
-  [Image: S&P 500 pie chart showing company distribution]
-</div>
+[image:]
 
 Notice something? Apple's 7%. Microsoft's 6%. Google's 4%.
 
@@ -67,6 +63,7 @@ Insurance agents work on comission. Financial advisors charge 1% per year to man
 An index fund? Zero commission. Zero management fees. Nobody profits off you—except you.
 That's why you've never had someone pitch this to you in a living room.
 
+[closing]
 
 ### GETTING IT DONE
  
