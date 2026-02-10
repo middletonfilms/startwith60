@@ -44,7 +44,9 @@ Same money. Different outcome.
 
 When you put $100 into an index fund, you instantly own tiny pieces of hundreds of companies. This is the most famous index: the S&P500. It consists of the top 500 companies in America, proportional to their size. 
 
-[PHOTO]
+<div class="image-placeholder">
+  [Image: S&P 500 pie chart showing company distribution]
+</div>
 
 Notice something? Apple's 7%. Microsoft's 6%. Google's 4%.
 
