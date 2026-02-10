@@ -69,14 +69,17 @@ fetch('https://api.github.com/repos/middletonfilms/startwith60/contents/blog/pos
           // Try to find a compelling hook
           let hook = '';
           for (let line of lines) {
-            // Skip title, skip short lines, skip disclaimers
+            // Skip title, skip short lines, skip disclaimers, skip HTML blocks
             if (line.startsWith('#')) continue;
             if (line.length < 50) continue;
             if (line.toLowerCase().includes('quick note:')) continue;
             if (line.toLowerCase().includes('disclaimer')) continue;
+            if (line.includes('class="disclaimer-box"')) continue;
+            if (line.includes('<div') && !hook) continue; // Skip opening div tags at start
+            if (line.includes('</div>') && !hook) continue; // Skip closing div tags at start
             
             // Found a good hook
-            hook = line.replace(/\*\*/g, '').substring(0, 200);
+            hook = line.replace(/\*\*/g, '').replace(/\*/g, '').substring(0, 200);
             if (hook.length === 200) hook += '...';
             break;
           }
