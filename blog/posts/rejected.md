@@ -8,7 +8,7 @@ You were about to give them— what, $100 every month? Over 40 years, that'd be 
 
 They were going to invest that, turn it into over $600K, then hand you back $30-60K and pocket the rest.]
 
-I have a better pitch for you. **[color(red):Keep that full $600,000 for yourself.)]**
+I have a better pitch for you. **[color(red):Keep that full $600,000 for yourself.]**
 
 As a former Life Insurance Agent, I’ve worked with hundreds of families— largely low to no income. I’ve worked with so many 60+ year olds who didn’t have $100 in their checking account. I’ve worked with too many 80 year olds who were desperate for just $5,000 of coverage because they had no money in savings, and the company forced me to decline them. 
 
