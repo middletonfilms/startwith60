@@ -29,11 +29,11 @@ People who put $100 a month into an index fund average:
 And If you can set aside $200/month or more… now we’re looking at millions. For your retirement, for your family’s inheritance… whatever you want. 
 
 LET'S COMPARE:
-| Whole Life Insurance | Index Fund |
-|------|---|
+|--| Whole Life Insurance | Index Fund |
+|--|------|---|
 |$100/month becomes |	$654,000 (over 40 years) | $654,000 (over 40 years) |
 | You get back |$60,000 (generously) | $654,000 |
-| They keep	$594,000 |$0|
+| They keep |	$594,000 |$0|
 
 Same money. Different outcome.
 
