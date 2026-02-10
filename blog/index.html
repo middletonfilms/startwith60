@@ -3,35 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blog | StartWith60</title>
+<title>Stop Getting Scammed | StartWith60</title>
+<meta name="description" content="Real talk about money, investing, and not staying broke. No BS, no jargon, just the truth about building wealth.">
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-50">
+<body class="bg-slate-900 text-white">
 
-<div class="max-w-3xl mx-auto p-6">
-  <!-- Header -->
-  <div class="mb-8">
-    <a href="../index.html" class="text-blue-600 hover:underline text-sm">← Back to StartWith60</a>
-    <h1 class="text-4xl font-black mt-4 mb-2">The Blog</h1>
-    <p class="text-slate-600">Real talk about money, investing, and not staying broke.</p>
+<div class="max-w-4xl mx-auto px-4 py-8">
+  
+  <!-- Back Link -->
+  <div class="mb-12">
+    <a href="../index.html" class="text-blue-400 hover:text-blue-300 text-sm font-semibold flex items-center">
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+      StartWith60
+    </a>
   </div>
+
+  <!-- Header -->
+  <header class="mb-16 text-center">
+    <h1 class="text-5xl md:text-6xl font-black mb-6 leading-tight">
+      STOP GETTING<br>SCAMMED
+    </h1>
+    <p class="text-xl md:text-2xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
+      If insurance agents, "financial advisors," or your broke uncle are giving you money advice—read this first.
+    </p>
+  </header>
 
   <!-- Post List -->
-  <div id="post-list" class="space-y-6">
+  <div id="post-list" class="space-y-8">
+    <!-- Loading state -->
     <div class="text-center py-12">
-      <div class="animate-pulse">Loading posts...</div>
+      <div class="inline-block animate-pulse bg-slate-800 rounded-lg px-6 py-3">
+        <span class="text-slate-400">Loading posts...</span>
+      </div>
     </div>
   </div>
+
 </div>
 
 <script>
-// Fetch the list of files in the posts directory
+// Fetch posts from GitHub
 fetch('https://api.github.com/repos/middletonfilms/startwith60/contents/blog/posts')
   .then(res => res.json())
   .then(files => {
     const mdFiles = files.filter(f => f.name.endsWith('.md'));
     
-    // Fetch each post to get title and excerpt
+    // Fetch each post
     const postPromises = mdFiles.map(file => {
       const slug = file.name.replace('.md', '');
       return fetch(file.download_url)
@@ -41,52 +60,109 @@ fetch('https://api.github.com/repos/middletonfilms/startwith60/contents/blog/pos
           const titleMatch = content.match(/^#\s+(.+)$/m);
           const title = titleMatch ? titleMatch[1] : slug;
           
-          // Extract excerpt (first paragraph after title)
+          // Extract hook (look for bold text or first real paragraph)
           const lines = content.split('\n').filter(l => l.trim());
-          const excerptLine = lines.find(l => !l.startsWith('#') && l.length > 20);
-          const excerpt = excerptLine ? excerptLine.substring(0, 150) + '...' : '';
           
-          // Get date from GitHub commit (or use file modified date)
-          const date = new Date(file.size).toISOString().split('T')[0]; // placeholder
+          // Try to find a compelling hook
+          let hook = '';
+          for (let line of lines) {
+            // Skip title, skip short lines, skip disclaimers
+            if (line.startsWith('#')) continue;
+            if (line.length < 50) continue;
+            if (line.toLowerCase().includes('quick note:')) continue;
+            if (line.toLowerCase().includes('disclaimer')) continue;
+            
+            // Found a good hook
+            hook = line.replace(/\*\*/g, '').substring(0, 200);
+            if (hook.length === 200) hook += '...';
+            break;
+          }
           
-          return { slug, title, excerpt, date };
+          // Fallback if no hook found
+          if (!hook) {
+            const excerptLine = lines.find(l => !l.startsWith('#') && l.length > 20);
+            hook = excerptLine ? excerptLine.substring(0, 150) + '...' : '';
+          }
+          
+          // Check if post has image reference
+          const imageMatch = content.match(/!\[.*?\]\((.*?)\)/);
+          const image = imageMatch ? imageMatch[1] : null;
+          
+          return { slug, title, hook, image };
         });
     });
     
     return Promise.all(postPromises);
   })
   .then(posts => {
-    // Sort by date (newest first)
-    posts.sort((a, b) => new Date(b.date) - new Date(a.date));
-    
     // Render posts
     const postList = document.getElementById('post-list');
+    
+    if (posts.length === 0) {
+      postList.innerHTML = '<p class="text-center text-slate-400">No posts yet. Check back soon.</p>';
+      return;
+    }
+    
     postList.innerHTML = posts.map(post => {
-      const date = new Date(post.date).toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      });
+      // Determine image or gradient fallback
+      let imageHTML = '';
+      if (post.image) {
+        // Real image
+        imageHTML = `<img src="${post.image}" alt="${post.title}" class="w-full h-64 object-cover rounded-t-lg">`;
+      } else {
+        // Gradient placeholder with key number/text from title
+        const colors = [
+          'from-red-500 to-red-700',
+          'from-blue-500 to-blue-700',
+          'from-green-500 to-green-700',
+          'from-purple-500 to-purple-700',
+          'from-orange-500 to-orange-700'
+        ];
+        const colorClass = colors[Math.floor(Math.random() * colors.length)];
+        
+        // Extract a key phrase from title for the gradient
+        const keyPhrase = post.title.split(' ').slice(0, 3).join(' ');
+        
+        imageHTML = `
+          <div class="w-full h-64 bg-gradient-to-br ${colorClass} rounded-t-lg flex items-center justify-center p-6">
+            <span class="text-white text-3xl md:text-4xl font-black text-center leading-tight">${keyPhrase}</span>
+          </div>
+        `;
+      }
       
       return `
-        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-          <div class="text-sm text-slate-500 mb-2">${date}</div>
-          <h2 class="text-2xl font-bold mb-3">
-            <a href="post.html?slug=${post.slug}" class="text-slate-900 hover:text-blue-600">
-              ${post.title}
-            </a>
-          </h2>
-          <p class="text-slate-600 mb-4">${post.excerpt}</p>
-          <a href="post.html?slug=${post.slug}" class="text-blue-600 font-semibold hover:underline">
-            Read more →
-          </a>
-        </div>
+        <a href="post.html?slug=${post.slug}" class="block group">
+          <article class="bg-slate-800 rounded-lg overflow-hidden hover:bg-slate-750 transition-all hover:scale-[1.02] shadow-xl">
+            ${imageHTML}
+            
+            <div class="p-6 md:p-8">
+              <h2 class="text-2xl md:text-3xl font-black mb-4 leading-tight group-hover:text-blue-400 transition-colors">
+                ${post.title}
+              </h2>
+              
+              <p class="text-slate-300 text-lg mb-6 leading-relaxed">
+                ${post.hook}
+              </p>
+              
+              <div class="flex items-center justify-between">
+                <span class="text-blue-400 font-bold text-lg group-hover:text-blue-300 transition-colors">
+                  Read this →
+                </span>
+                <span class="text-slate-500 text-sm">(5 min)</span>
+              </div>
+            </div>
+          </article>
+        </a>
       `;
     }).join('');
   })
   .catch(error => {
+    console.error('Error loading posts:', error);
     document.getElementById('post-list').innerHTML = `
-      <p class="text-center text-red-600">Error loading posts. Make sure your repo is public.</p>
+      <div class="bg-red-900 border border-red-700 rounded-lg p-6 text-center">
+        <p class="text-red-200 mb-2 font-bold">Error loading posts</p>
+        <p class="text-red-300 text-sm">Make sure your GitHub repo is public or check the console for details.</p>
+      </div>
     `;
   });
 </script>
