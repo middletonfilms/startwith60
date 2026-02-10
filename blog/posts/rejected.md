@@ -9,7 +9,7 @@ You were about to give them— what, $100 every month? Over 40 years, that'd be 
 
 They were going to invest that, turn it into over $600K, then hand you back $30-60K and pocket the rest.]
 
-I have a better pitch for you. Keep that full $600,000 for yourself.
+[box(quote):I have a better pitch for you. Keep that full $600,000 for yourself.]
 
 As a former Life Insurance Agent, I’ve worked with hundreds of families— largely low to no income. I’ve worked with so many 60+ year olds who didn’t have $100 in their checking account. I’ve worked with too many 80 year olds who were desperate for just $5,000 of coverage because they had no money in savings, and the company forced me to decline them. 
 
@@ -55,12 +55,13 @@ The S&P500 goes up and down, but since it was created in 1913, it has averaged a
 
 ### “WHY HAVE I NEVER HEARD OF THIS BEFORE?”
 
-You have. Every time someone mentions their "401(k)" or "retirement account"—that's an index fund. 
-The difference? Most people get access through their employer. You have to set it up yourself.
-It's not hidden. It's just not marketed to you.
-Why? Because nobody makes commission when you invest directly.
-Insurance agents work on comission. Financial advisors charge 1% per year to manage your money.
-An index fund? Zero commission. Zero management fees. Nobody profits off you—except you.
+You have. Every time someone mentions their "401(k)" or "retirement account"—that's an index fund. The difference? Most people get access through their employer. You have to set it up yourself.
+
+[box(stat)It's not hidden. It's just not marketed to you.]
+
+Why? Because nobody makes commission when you invest directly. Insurance agents work on comission. Financial advisors charge 1% per year to manage your money.
+
+An index fund? Zero commission. Zero management fees. Nobody profits off you— except you.
 That's why you've never had someone pitch this to you in a living room.
 
 [closing]
@@ -69,21 +70,15 @@ That's why you've never had someone pitch this to you in a living room.
  
 Setting up an index fund will be much shorter, easier, and more profitable than your phone call with the life insurance agent. You don’t need a list of prescriptions or a medical exam, or to sift through tons of paperwork. 
 
-Get started now. Set a timer for 10 minutes and <div class="cta-button">
-  <a href="/your-link-here">FOLLOW THIS STEP-BY-STEP GUIDE →</a>
-</div>
+[center:Get started now. Set a timer for 10 minutes and]
+[button:FOLLOW THIS STEP-BY-STEP GUIDE →]
 
-<div class="pull-quote">
 I couldn't help my 80-year-old clients. They ran out of time.
 You haven't. 
-</div>
 
-<div class="warning-box">
-I literally do not care which brokerage you choose. Just choose one and start today. Here's why: if you're 35 and start today, you'll have $654K at 75. Start at 36 instead? You'll have $591K. That one year cost you $63,000. 
-</div>
+I literally do not care which brokerage you choose. Just choose one and start today. Here's why: if you're 35 and start today, you'll have $654K at 75. Start at 36 instead? You'll have $591K. 
+[box(warning):That one year cost you $63,000.] 
 
-To see exactly how much waiting costs YOU, <div class="cta-button">
-  <a href="/your-link-here">USE THIS CALCULATOR →</a>
-</div>**. 
+To see exactly how much waiting costs YOU, [button(inline):USE THIS CALCULATOR →]
 
 That rejection wasn’t bad news. It was the best thing that could've happened to you. You were going to pay them for the privilege of investing your money. Now you get to cut out the middle man.
