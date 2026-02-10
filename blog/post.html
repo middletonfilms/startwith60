@@ -10,7 +10,6 @@
 <body class="bg-slate-900 text-white">
 
 <div class="max-w-3xl mx-auto px-4 py-8">
-  <!-- Back Link -->
   <div class="mb-8">
     <a href="index.html" class="text-blue-400 hover:text-blue-300 text-sm font-semibold flex items-center">
       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -20,7 +19,6 @@
     </a>
   </div>
 
-  <!-- Post Content -->
   <article id="post-content" class="bg-slate-800 rounded-lg p-6 md:p-10">
     <div class="text-center py-12">
       <div class="animate-pulse text-slate-400">Loading post...</div>
@@ -41,6 +39,9 @@ if (!slug) {
       return response.text();
     })
     .then(markdown => {
+      // PARSE CUSTOM SYNTAX BEFORE MARKDOWN CONVERSION
+      markdown = parseCustomSyntax(markdown);
+      
       const html = marked.parse(markdown);
       const titleMatch = markdown.match(/^#\s+(.+)$/m);
       const title = titleMatch ? titleMatch[1] : 'Post';
@@ -48,52 +49,158 @@ if (!slug) {
       document.getElementById('page-title').textContent = `${title} | StartWith60`;
       document.getElementById('post-content').innerHTML = `<div class="prose prose-invert prose-lg max-w-none">${html}</div>`;
       
-      // Apply table column colors
+      // Apply table column/row colors
       applyTableColors();
       
-      // Section header detection (quoted ALL CAPS)
+      // Section header detection
       enhanceSectionHeaders();
     })
     .catch(error => {
-      document.getElementById('post-content').innerHTML = '<p class="text-center text-red-400">Post not found. Make sure the file exists in blog/posts/</p>';
+      document.getElementById('post-content').innerHTML = '<p class="text-center text-red-400">Post not found.</p>';
       console.error('Error loading post:', error);
     });
 }
 
-// Apply custom colors to table columns based on data-colors attribute
-function applyTableColors() {
-  const tables = document.querySelectorAll('table[data-colors]');
-  tables.forEach(table => {
-    const colorsAttr = table.getAttribute('data-colors');
-    if (!colorsAttr) return;
+/* ============================================================
+   CUSTOM SYNTAX PARSER
+   Edit this section to add/modify custom markdown shortcuts
+   ============================================================ */
+
+function parseCustomSyntax(markdown) {
+  
+  // [center:text] -> centered text
+  markdown = markdown.replace(/\[center:(.*?)\]/g, '<span class="auto-center">$1</span>');
+  
+  // [color(red):text] -> colored text (red/orange/yellow/green/blue/purple/white)
+  markdown = markdown.replace(/\[color\((red|orange|yellow|green|blue|purple|white)\):(.*?)\]/g, 
+    '<span class="auto-color-$1">$2</span>');
+  
+  // [highlight:text] -> yellow highlighted text
+  markdown = markdown.replace(/\[highlight:(.*?)\]/g, '<span class="auto-highlight">$1</span>');
+  
+  // [box(type):text] -> boxes (disclaimer/stat/quote/tip/warning)
+  markdown = markdown.replace(/\[box\((disclaimer|stat|quote|tip|warning)\):(.*?)\]/g, 
+    '<div class="$1-box">$2</div>');
+  
+  // [button:text] -> full block button
+  markdown = markdown.replace(/\[button:(.*?)\]/g, 
+    '<div class="cta-button"><a href="#">$1</a></div>');
+  
+  // [button(inline):text] -> inline button
+  markdown = markdown.replace(/\[button\(inline\):(.*?)\]/g, 
+    '<span class="inline-cta"><a href="#">$1</a></span>');
+  
+  // [image:url] or [image:url,caption] -> image (centered)
+  markdown = markdown.replace(/\[image:(.*?)\]/g, function(match, content) {
+    const parts = content.split(',');
+    const url = parts[0].trim();
+    const caption = parts[1] ? parts[1].trim() : '';
     
-    // Parse: "2,red,4,green,7,blue" -> [[2,'red'], [4,'green'], [7,'blue']]
-    const pairs = colorsAttr.split(',').map(s => s.trim());
-    const colorMap = {};
-    
-    for (let i = 0; i < pairs.length; i += 2) {
-      const colNum = parseInt(pairs[i]);
-      const color = pairs[i + 1];
-      if (colNum && color) {
-        colorMap[colNum] = color;
-      }
+    if (caption) {
+      return `<div class="image-container"><img src="${url}" class="auto-image"><div class="image-caption">${caption}</div></div>`;
+    } else {
+      return `<img src="${url}" class="auto-image">`;
     }
+  });
+  
+  // [image(left):url] or [image(left):url,caption] -> left-aligned image
+  markdown = markdown.replace(/\[image\(left\):(.*?)\]/g, function(match, content) {
+    const parts = content.split(',');
+    const url = parts[0].trim();
+    const caption = parts[1] ? parts[1].trim() : '';
     
-    // Apply colors to cells in specified columns
+    if (caption) {
+      return `<div class="image-container-left"><img src="${url}" class="auto-image-left"><div class="image-caption">${caption}</div></div>`;
+    } else {
+      return `<img src="${url}" class="auto-image-left">`;
+    }
+  });
+  
+  // [image(right):url] or [image(right):url,caption] -> right-aligned image
+  markdown = markdown.replace(/\[image\(right\):(.*?)\]/g, function(match, content) {
+    const parts = content.split(',');
+    const url = parts[0].trim();
+    const caption = parts[1] ? parts[1].trim() : '';
+    
+    if (caption) {
+      return `<div class="image-container-right"><img src="${url}" class="auto-image-right"><div class="image-caption">${caption}</div></div>`;
+    } else {
+      return `<img src="${url}" class="auto-image-right">`;
+    }
+  });
+  
+  // [closing] -> marks start of closing section
+  markdown = markdown.replace(/\[closing\]/g, '<div class="closing-section">');
+  
+  // Add closing div at end if [closing] was used
+  if (markdown.includes('<div class="closing-section">')) {
+    markdown += '</div>';
+  }
+  
+  return markdown;
+}
+
+/* ============================================================
+   END CUSTOM SYNTAX PARSER
+   ============================================================ */
+
+function applyTableColors() {
+  const tables = document.querySelectorAll('table');
+  tables.forEach(table => {
     const rows = table.querySelectorAll('tr');
-    rows.forEach(row => {
-      const cells = row.querySelectorAll('th, td');
-      cells.forEach((cell, index) => {
-        const colNum = index + 1; // 1-indexed
-        if (colorMap[colNum]) {
-          cell.classList.add(`col-${colorMap[colNum]}`);
+    
+    // Process header row for [col(color,priority)] markers
+    const headerRow = rows[0];
+    if (headerRow) {
+      const headers = headerRow.querySelectorAll('th');
+      headers.forEach((header, colIndex) => {
+        const colMatch = header.textContent.match(/\[col\((red|green|blue|yellow|purple|orange|white),(\d+)\)\]/);
+        if (colMatch) {
+          const color = colMatch[1];
+          const priority = parseInt(colMatch[2]);
+          
+          // Remove marker from header text
+          header.textContent = header.textContent.replace(colMatch[0], '').trim();
+          
+          // Apply color to entire column
+          rows.forEach(row => {
+            const cell = row.querySelectorAll('th, td')[colIndex];
+            if (cell && !cell.dataset.colorPriority || parseInt(cell.dataset.colorPriority) < priority) {
+              cell.classList.add(`col-${color}`);
+              cell.dataset.colorPriority = priority;
+            }
+          });
         }
       });
+    }
+    
+    // Process each row for [row(color,priority)] markers
+    rows.forEach(row => {
+      const firstCell = row.querySelector('th, td');
+      if (firstCell) {
+        const rowMatch = firstCell.textContent.match(/\[row\((red|green|blue|yellow|purple|orange|white),(\d+)\)\]/);
+        if (rowMatch) {
+          const color = rowMatch[1];
+          const priority = parseInt(rowMatch[2]);
+          
+          // Remove marker from cell text
+          firstCell.textContent = firstCell.textContent.replace(rowMatch[0], '').trim();
+          
+          // Apply color to entire row
+          const cells = row.querySelectorAll('th, td');
+          cells.forEach(cell => {
+            if (!cell.dataset.colorPriority || parseInt(cell.dataset.colorPriority) < priority) {
+              cell.classList.remove('col-red', 'col-green', 'col-blue', 'col-yellow', 'col-purple', 'col-orange', 'col-white');
+              cell.classList.add(`col-${color}`);
+              cell.dataset.colorPriority = priority;
+            }
+          });
+        }
+      }
     });
   });
 }
 
-// Smart enhancement: detect section headers in quotes
 function enhanceSectionHeaders() {
   const paragraphs = document.querySelectorAll('p');
   paragraphs.forEach(p => {
@@ -201,6 +308,31 @@ function enhanceSectionHeaders() {
 }
 
 /* ========================================
+   CUSTOM TEXT FORMATTING
+   ======================================== */
+
+.auto-center {
+  display: block;
+  text-align: center;
+}
+
+.auto-color-red { color: #ef4444; font-weight: 700; }
+.auto-color-orange { color: #f97316; font-weight: 700; }
+.auto-color-yellow { color: #fbbf24; font-weight: 700; }
+.auto-color-green { color: #10b981; font-weight: 700; }
+.auto-color-blue { color: #60a5fa; font-weight: 700; }
+.auto-color-purple { color: #a78bfa; font-weight: 700; }
+.auto-color-white { color: #fff; font-weight: 700; }
+
+.auto-highlight {
+  background: #fbbf24;
+  color: #0f172a;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-weight: 700;
+}
+
+/* ========================================
    LINKS & CTAs
    ======================================== */
 
@@ -215,7 +347,6 @@ function enhanceSectionHeaders() {
   color: #93c5fd;
 }
 
-/* Block CTA buttons (links with guide/calculator/start) */
 .prose-invert a[href*="GUIDE"],
 .prose-invert a[href*="guide"],
 .prose-invert a[href*="calculator"],
@@ -242,7 +373,6 @@ function enhanceSectionHeaders() {
   background: linear-gradient(135deg, #059669 0%, #047857 100%);
 }
 
-/* Inline CTA buttons */
 .inline-cta a {
   display: inline;
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
@@ -303,7 +433,7 @@ function enhanceSectionHeaders() {
 }
 
 /* ========================================
-   TABLES - With custom column colors
+   TABLES
    ======================================== */
 
 .prose-invert table {
@@ -337,7 +467,6 @@ function enhanceSectionHeaders() {
   font-size: 1.05rem;
 }
 
-/* Column color classes */
 .prose-invert .col-red {
   background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
   color: #fecaca;
@@ -353,6 +482,30 @@ function enhanceSectionHeaders() {
 .prose-invert .col-blue {
   background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
   color: #dbeafe;
+  font-weight: 700;
+}
+
+.prose-invert .col-yellow {
+  background: linear-gradient(135deg, #854d0e 0%, #a16207 100%);
+  color: #fef3c7;
+  font-weight: 700;
+}
+
+.prose-invert .col-purple {
+  background: linear-gradient(135deg, #581c87 0%, #6b21a8 100%);
+  color: #f3e8ff;
+  font-weight: 700;
+}
+
+.prose-invert .col-orange {
+  background: linear-gradient(135deg, #7c2d12 0%, #9a3412 100%);
+  color: #fed7aa;
+  font-weight: 700;
+}
+
+.prose-invert .col-white {
+  background: linear-gradient(135deg, #e5e7eb 0%, #f3f4f6 100%);
+  color: #1f2937;
   font-weight: 700;
 }
 
@@ -419,42 +572,54 @@ function enhanceSectionHeaders() {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
-/* Image placeholders */
-.image-placeholder {
-  background: #334155;
-  border: 2px dashed #64748b;
-  padding: 3rem;
-  text-align: center;
-  color: #94a3b8;
-  font-style: italic;
+.auto-image,
+.auto-image-left,
+.auto-image-right {
+  max-width: 100%;
+  height: auto;
   border-radius: 0.5rem;
-  margin: 2rem 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
-.image-placeholder-left {
-  background: #334155;
-  border: 2px dashed #64748b;
-  padding: 2rem;
-  text-align: center;
-  color: #94a3b8;
-  font-style: italic;
-  border-radius: 0.5rem;
+.auto-image-left {
   float: left;
   width: 40%;
   margin: 0 1.5rem 1rem 0;
 }
 
-.image-placeholder-right {
-  background: #334155;
-  border: 2px dashed #64748b;
-  padding: 2rem;
-  text-align: center;
-  color: #94a3b8;
-  font-style: italic;
-  border-radius: 0.5rem;
+.auto-image-right {
   float: right;
   width: 40%;
   margin: 0 0 1rem 1.5rem;
+}
+
+.image-container,
+.image-container-left,
+.image-container-right {
+  position: relative;
+  margin: 2.5rem 0;
+}
+
+.image-container-left {
+  float: left;
+  width: 40%;
+  margin: 0 1.5rem 1rem 0;
+}
+
+.image-container-right {
+  float: right;
+  width: 40%;
+  margin: 0 0 1rem 1.5rem;
+}
+
+.image-caption {
+  background: rgba(15, 23, 42, 0.95);
+  color: #cbd5e1;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+  font-style: italic;
+  border-radius: 0 0 0.5rem 0.5rem;
 }
 
 /* ========================================
@@ -468,10 +633,9 @@ function enhanceSectionHeaders() {
 }
 
 /* ========================================
-   CUSTOM COMPONENTS
+   CUSTOM BOXES
    ======================================== */
 
-/* Disclaimer box */
 .disclaimer-box {
   background: #0f172a;
   border: 1px solid #334155;
@@ -483,20 +647,6 @@ function enhanceSectionHeaders() {
   color: #94a3b8;
 }
 
-.disclaimer-box p {
-  margin: 0;
-}
-
-/* Closing section */
-.closing-section {
-  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-  border-top: 3px solid #10b981;
-  padding: 2.5rem 2rem;
-  margin: 3rem -2.5rem -2.5rem;
-  border-radius: 0 0 0.5rem 0.5rem;
-}
-
-/* Big stat callout */
 .stat-box {
   font-size: 3rem;
   font-weight: 900;
@@ -510,7 +660,49 @@ function enhanceSectionHeaders() {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
 }
 
-/* CTA button (standalone) */
+.quote-box {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: #10b981;
+  text-align: center;
+  padding: 2rem;
+  margin: 3rem 0;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-top: 3px solid #10b981;
+  border-bottom: 3px solid #10b981;
+  line-height: 1.4;
+}
+
+.warning-box {
+  background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+  border-left: 4px solid #ef4444;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  margin: 2rem 0;
+  font-weight: 700;
+  color: #fecaca;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.tip-box {
+  background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+  border-left: 4px solid #10b981;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  margin: 2rem 0;
+  font-weight: 600;
+  color: #d1fae5;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.closing-section {
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  border-top: 3px solid #10b981;
+  padding: 2.5rem 2rem;
+  margin: 3rem -2.5rem -2.5rem;
+  border-radius: 0 0 0.5rem 0.5rem;
+}
+
 .cta-button {
   text-align: center;
   margin: 2.5rem 0;
@@ -537,44 +729,6 @@ function enhanceSectionHeaders() {
   background: linear-gradient(135deg, #059669 0%, #047857 100%);
 }
 
-/* Warning box */
-.warning-box {
-  background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
-  border-left: 4px solid #ef4444;
-  padding: 1.5rem;
-  border-radius: 0.5rem;
-  margin: 2rem 0;
-  font-weight: 700;
-  color: #fecaca;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-}
-
-/* Success/tip box */
-.tip-box {
-  background: linear-gradient(135deg, #065f46 0%, #047857 100%);
-  border-left: 4px solid #10b981;
-  padding: 1.5rem;
-  border-radius: 0.5rem;
-  margin: 2rem 0;
-  font-weight: 600;
-  color: #d1fae5;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-}
-
-/* Pull quote */
-.pull-quote {
-  font-size: 1.75rem;
-  font-weight: 900;
-  color: #10b981;
-  text-align: center;
-  padding: 2rem;
-  margin: 3rem 0;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border-top: 3px solid #10b981;
-  border-bottom: 3px solid #10b981;
-  line-height: 1.4;
-}
-
 /* ========================================
    MOBILE RESPONSIVE
    ======================================== */
@@ -589,15 +743,17 @@ function enhanceSectionHeaders() {
   .prose-invert td { padding: 0.75rem 0.5rem; }
   
   .stat-box { font-size: 2rem; padding: 1.5rem; }
-  .pull-quote { font-size: 1.35rem; padding: 1.5rem; }
+  .quote-box { font-size: 1.35rem; padding: 1.5rem; }
   
   .cta-button a { 
     padding: 1rem 1.5rem; 
     font-size: 1rem; 
   }
   
-  .image-placeholder-left,
-  .image-placeholder-right {
+  .auto-image-left,
+  .auto-image-right,
+  .image-container-left,
+  .image-container-right {
     float: none;
     width: 100%;
     margin: 1rem 0;
