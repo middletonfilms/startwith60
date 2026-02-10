@@ -1,5 +1,5 @@
 # SO YOU'VE BEEN REJECTED FOR LIFE INSURANCE
-## Don’t worry. You’ve still got options. (Really good ones.)
+**Don’t worry. You’ve still got options. (Really good ones.)**
 
 [box(disclaimer):This website is a personal project. I am not affiliated with any bank, and I do not profit off your investment choices.]
 
