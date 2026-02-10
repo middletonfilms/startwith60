@@ -8,13 +8,13 @@ You were about to give them— what, $100 every month? Over 40 years, that'd be 
 
 They were going to invest that, turn it into over $600K, then hand you back $30-60K and pocket the rest.]
 
-[box(quote):I have a better pitch for you. Keep that full $600,000 for yourself.]
+I have a better pitch for you. **[color(red):Keep that full $600,000 for yourself.)]**
 
 As a former Life Insurance Agent, I’ve worked with hundreds of families— largely low to no income. I’ve worked with so many 60+ year olds who didn’t have $100 in their checking account. I’ve worked with too many 80 year olds who were desperate for just $5,000 of coverage because they had no money in savings, and the company forced me to decline them. 
 
 I wish I had a time machine so I could go back just 40 years, shake these people, and tell them the same thing I’m about to tell you:
 
-[box(thesis):There are funds you can put your money in— called index funds— that grow 10.4% every year on average. This is where the insurance company puts your money and everyone else’s, and it’s why they’re worth billions of dollars.]
+[box(thesis):[color(green):There are funds you can put your money in— called index funds— that grow 10.4% every year on average.] This is where the insurance company puts your money and everyone else’s, and it’s why they’re worth billions of dollars.]
 
 Now, 10.4% per year might sound boring to you. With regular stocks, the value can double in a year. Or the value can 10x in one day. But— to be candid— that’s not going to be your luck. Stocks are gambling. You wouldn’t bet your mortgage at the casino, and for good reason.
 
