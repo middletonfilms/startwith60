@@ -34,6 +34,7 @@ LET'S COMPARE:
 |$100/month becomes |	$654,000 (over 40 years) | $654,000 (over 40 years) |
 | You get back |$60,000 (generously) | $654,000 |
 | They keep	$594,000 |$0|
+
 Same money. Different outcome.
 
 
