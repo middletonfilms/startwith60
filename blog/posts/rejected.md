@@ -7,7 +7,9 @@
 I’ll cut to the chase. This is the insurance company’s loss, not yours.  
 You were about to give them— what, $100 every month? Over 40 years, that'd be $48,000.
 
+<div class="tip-box">
 They were going to invest that, turn it into over $600K, then hand you back $30-60K and pocket the rest.
+</div>
 
 I have a better pitch for you. Keep that full $600,000 for yourself.
 
@@ -15,7 +17,7 @@ As a former Life Insurance Agent, I’ve worked with hundreds of families— lar
 
 I wish I had a time machine so I could go back just 40 years, shake these people, and tell them the same thing I’m about to tell you:
 
-### There are funds you can put your money in— called index funds— that grow 10.4% every year on average. This is where the insurance company puts your money and everyone else’s, and it’s why they’re worth billions of dollars. 
+<div class="stat-box">There are funds you can put your money in— called index funds— that grow 10.4% every year on average. This is where the insurance company puts your money and everyone else’s, and it’s why they’re worth billions of dollars. </div>
 
 Now, 10.4% per year might sound boring to you. With regular stocks, the value can double in a year. Or the value can 10x in one day. But— to be candid— that’s not going to be your luck. Stocks are gambling. You wouldn’t bet your mortgage at the casino, and for good reason.
 
@@ -68,10 +70,21 @@ That's why you've never had someone pitch this to you in a living room.
  
 Setting up an index fund will be much shorter, easier, and more profitable than your phone call with the life insurance agent. You don’t need a list of prescriptions or a medical exam, or to sift through tons of paperwork. 
 
-Get started now. Set a timer for 10 minutes and **FOLLOW THIS STEP-BY-STEP GUIDE.** 
+Get started now. Set a timer for 10 minutes and <div class="cta-button">
+  <a href="/your-link-here">FOLLOW THIS STEP-BY-STEP GUIDE →</a>
+</div>
+
+<div class="pull-quote">
 I couldn't help my 80-year-old clients. They ran out of time.
 You haven't. 
+</div>
 
-I literally do not care which brokerage you choose. Just choose one and start today. Here's why: if you're 35 and start today, you'll have $654K at 75. Start at 36 instead? You'll have $591K. That one year cost you $63,000. To see exactly how much waiting costs YOU, **use this calculator**. 
+<div class="warning-box">
+I literally do not care which brokerage you choose. Just choose one and start today. Here's why: if you're 35 and start today, you'll have $654K at 75. Start at 36 instead? You'll have $591K. That one year cost you $63,000. 
+</div>
+
+To see exactly how much waiting costs YOU, <div class="cta-button">
+  <a href="/your-link-here">USE THIS CALCULATOR →</a>
+</div>**. 
 
 That rejection wasn’t bad news. It was the best thing that could've happened to you. You were going to pay them for the privilege of investing your money. Now you get to cut out the middle man.
