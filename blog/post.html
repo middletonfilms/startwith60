@@ -21,7 +21,7 @@
   </div>
 
   <!-- Post Content -->
-  <article id="post-content" class="bg-slate-800 rounded-lg p-6 md:p-8">
+  <article id="post-content" class="bg-slate-800 rounded-lg p-6 md:p-10">
     <div class="text-center py-12">
       <div class="animate-pulse text-slate-400">Loading post...</div>
     </div>
@@ -47,164 +47,485 @@ if (!slug) {
       
       document.getElementById('page-title').textContent = `${title} | StartWith60`;
       document.getElementById('post-content').innerHTML = `<div class="prose prose-invert prose-lg max-w-none">${html}</div>`;
+      
+      // Post-process: Add comparison table styling
+      enhanceComparisonTables();
+      
+      // Post-process: Convert ALL CAPS text in quotes to section headers if they're not already H2/H3
+      enhanceSectionHeaders();
     })
     .catch(error => {
       document.getElementById('post-content').innerHTML = '<p class="text-center text-red-400">Post not found. Make sure the file exists in blog/posts/</p>';
       console.error('Error loading post:', error);
     });
 }
+
+// Smart enhancement: detect comparison tables and style them
+function enhanceComparisonTables() {
+  const tables = document.querySelectorAll('table');
+  tables.forEach(table => {
+    const headers = Array.from(table.querySelectorAll('th')).map(th => th.textContent.toLowerCase());
+    
+    // If table has "insurance" or "whole life" vs "index" columns, it's a comparison
+    const isComparison = headers.some(h => h.includes('insurance') || h.includes('whole life')) && 
+                         headers.some(h => h.includes('index'));
+    
+    if (isComparison) {
+      table.classList.add('comparison-table');
+      
+      // Highlight "they keep" row in red
+      const rows = table.querySelectorAll('tr');
+      rows.forEach(row => {
+        const firstCell = row.querySelector('td, th');
+        if (firstCell && firstCell.textContent.toLowerCase().includes('keep')) {
+          row.classList.add('keep-row');
+        }
+      });
+    }
+  });
+}
+
+// Smart enhancement: detect section headers in quotes
+function enhanceSectionHeaders() {
+  const paragraphs = document.querySelectorAll('p');
+  paragraphs.forEach(p => {
+    // Check if paragraph is just quoted ALL CAPS text (section header pattern)
+    const text = p.textContent.trim();
+    if (text.startsWith('"') && text.endsWith('"') && text === text.toUpperCase() && text.length < 60) {
+      p.classList.add('section-header-quote');
+    }
+  });
+}
 </script>
 
 <style>
-/* Blog post styling - Dark theme */
+/* ========================================
+   BASE PROSE STYLING
+   ======================================== */
+
 .prose-invert {
   color: #e2e8f0;
   line-height: 1.75;
 }
 
-/* Headers */
+/* ========================================
+   HEADERS - Smart hierarchy
+   ======================================== */
+
 .prose-invert h1 {
   font-size: 2.5rem;
   font-weight: 900;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   margin-top: 0;
   color: #fff;
-  line-height: 1.2;
+  line-height: 1.1;
 }
+
 .prose-invert h2 {
-  font-size: 1.75rem;
+  font-size: 1.875rem;
   font-weight: 800;
-  margin-top: 2.5rem;
-  margin-bottom: 1rem;
-  color: #f1f5f9;
-  line-height: 1.3;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  color: #fbbf24;
+  line-height: 1.2;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 0.5rem;
 }
+
 .prose-invert h3 {
   font-size: 1.5rem;
   font-weight: 700;
-  margin-top: 2rem;
+  margin-top: 2.5rem;
   margin-bottom: 1rem;
-  color: #f1f5f9;
-  line-height: 1.4;
+  color: #60a5fa;
+  line-height: 1.3;
 }
 
-/* Paragraphs */
+/* Section headers that appear as quoted all-caps text */
+.section-header-quote {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fbbf24;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 0.5rem;
+}
+
+/* ========================================
+   PARAGRAPHS & SPACING
+   ======================================== */
+
 .prose-invert p {
   margin-bottom: 1.5rem;
-  line-height: 1.75;
+  line-height: 1.8;
 }
 
-/* Bold and emphasis */
+/* Add extra spacing after key sections */
+.prose-invert h2 + p,
+.prose-invert h3 + p {
+  margin-top: 1rem;
+}
+
+/* ========================================
+   TEXT EMPHASIS
+   ======================================== */
+
 .prose-invert strong {
   font-weight: 700;
   color: #fff;
 }
+
 .prose-invert em {
   font-style: italic;
+  color: #cbd5e1;
 }
 
-/* Links */
+/* Bold + italic = pull quote treatment */
+.prose-invert strong em,
+.prose-invert em strong {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #10b981;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-left: 4px solid #10b981;
+  border-radius: 0.5rem;
+  font-style: normal;
+}
+
+/* ========================================
+   LINKS - High visibility CTAs
+   ======================================== */
+
 .prose-invert a {
   color: #60a5fa;
   text-decoration: underline;
+  font-weight: 600;
+  transition: all 0.2s;
 }
+
 .prose-invert a:hover {
   color: #93c5fd;
 }
 
-/* Lists */
-.prose-invert ul {
-  list-style: disc;
-  margin-left: 1.5rem;
-  margin-bottom: 1.5rem;
+/* ALL CAPS LINKS = CTA BUTTONS */
+.prose-invert a[href*="GUIDE"],
+.prose-invert a[href*="guide"],
+.prose-invert a[href*="calculator"],
+.prose-invert a[href*="start"] {
+  display: inline-block;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 1.1rem;
+  margin: 1rem 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s;
 }
+
+.prose-invert a[href*="GUIDE"]:hover,
+.prose-invert a[href*="guide"]:hover,
+.prose-invert a[href*="calculator"]:hover,
+.prose-invert a[href*="start"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+/* ========================================
+   LISTS - Better spacing
+   ======================================== */
+
+.prose-invert ul {
+  list-style: none;
+  margin-left: 0;
+  margin-bottom: 2rem;
+}
+
+.prose-invert ul li {
+  position: relative;
+  padding-left: 2rem;
+  margin-bottom: 1rem;
+  line-height: 1.8;
+}
+
+.prose-invert ul li:before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: #10b981;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+/* If list items contain dollar amounts or numbers, make them pop */
+.prose-invert li {
+  font-size: 1.1rem;
+}
+
 .prose-invert ol {
   list-style: decimal;
   margin-left: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-.prose-invert li {
-  margin-bottom: 0.5rem;
+  margin-bottom: 2rem;
 }
 
-/* Tables */
+.prose-invert ol li {
+  margin-bottom: 1rem;
+  line-height: 1.8;
+}
+
+/* ========================================
+   TABLES - Comparison styling
+   ======================================== */
+
 .prose-invert table {
   width: 100%;
   border-collapse: collapse;
-  margin: 2rem 0;
-  font-size: 0.95rem;
+  margin: 2.5rem 0;
+  font-size: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  border-radius: 0.5rem;
+  overflow: hidden;
 }
+
 .prose-invert th,
 .prose-invert td {
   border: 1px solid #475569;
-  padding: 0.75rem;
+  padding: 1rem;
   text-align: left;
 }
+
 .prose-invert th {
-  background: #334155;
-  font-weight: 700;
+  background: #1e293b;
+  font-weight: 800;
+  color: #fff;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.prose-invert td {
+  background: #0f172a;
+  font-size: 1.05rem;
+}
+
+/* Comparison table enhancements */
+.comparison-table th:last-child {
+  background: linear-gradient(135deg, #065f46 0%, #047857 100%);
   color: #fff;
 }
-.prose-invert td {
-  background: #1e293b;
+
+.comparison-table td:last-child {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  font-weight: 700;
+  color: #10b981;
 }
 
-/* Blockquotes */
+/* "They keep" row gets red highlight */
+.comparison-table .keep-row td:nth-child(2) {
+  color: #ef4444;
+  font-weight: 900;
+  font-size: 1.2rem;
+}
+
+.comparison-table .keep-row td:last-child {
+  color: #10b981;
+  font-weight: 900;
+  font-size: 1.2rem;
+}
+
+/* Table caption */
+.prose-invert table + p em {
+  display: block;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #94a3b8;
+  margin-top: -1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* ========================================
+   BLOCKQUOTES - Disclaimer & callouts
+   ======================================== */
+
 .prose-invert blockquote {
   border-left: 4px solid #3b82f6;
-  padding: 1rem 1.5rem;
-  margin: 1.5rem 0;
+  padding: 1.25rem 1.5rem;
+  margin: 2rem 0;
   background: #1e293b;
   border-radius: 0.5rem;
-}
-.prose-invert blockquote p {
-  margin: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Code */
+.prose-invert blockquote p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.prose-invert blockquote strong {
+  color: #60a5fa;
+}
+
+/* ========================================
+   CODE - Inline & blocks
+   ======================================== */
+
 .prose-invert code {
   background: #1e293b;
   padding: 0.2rem 0.4rem;
   border-radius: 0.25rem;
   font-size: 0.9em;
   color: #fbbf24;
+  font-family: 'Courier New', monospace;
 }
+
 .prose-invert pre {
-  background: #1e293b;
-  padding: 1rem;
+  background: #0f172a;
+  padding: 1.5rem;
   border-radius: 0.5rem;
   overflow-x: auto;
-  margin: 1.5rem 0;
+  margin: 2rem 0;
+  border: 1px solid #334155;
 }
+
 .prose-invert pre code {
   background: none;
   padding: 0;
   color: #e2e8f0;
 }
 
-/* Images */
+/* ========================================
+   IMAGES
+   ======================================== */
+
 .prose-invert img {
   max-width: 100%;
   height: auto;
   border-radius: 0.5rem;
-  margin: 2rem 0;
+  margin: 2.5rem 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
-/* Horizontal rules */
+/* ========================================
+   HORIZONTAL RULES
+   ======================================== */
+
 .prose-invert hr {
   border: none;
   border-top: 2px solid #334155;
-  margin: 2rem 0;
+  margin: 3rem 0;
 }
 
-/* Mobile adjustments */
+/* ========================================
+   CUSTOM COMPONENTS (paste these in markdown as HTML)
+   ======================================== */
+
+/* Big stat callout */
+.stat-box {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #10b981;
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 3px solid #10b981;
+  border-radius: 0.75rem;
+  margin: 2.5rem 0;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* CTA button */
+.cta-button {
+  text-align: center;
+  margin: 2.5rem 0;
+}
+
+.cta-button a {
+  display: inline-block;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 1.25rem 2.5rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-weight: 900;
+  font-size: 1.25rem;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cta-button a:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+/* Warning box */
+.warning-box {
+  background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+  border-left: 4px solid #ef4444;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  margin: 2rem 0;
+  font-weight: 700;
+  color: #fecaca;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Success/tip box */
+.tip-box {
+  background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+  border-left: 4px solid #10b981;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  margin: 2rem 0;
+  font-weight: 600;
+  color: #d1fae5;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Pull quote */
+.pull-quote {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: #10b981;
+  text-align: center;
+  padding: 2rem;
+  margin: 3rem 0;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-top: 3px solid #10b981;
+  border-bottom: 3px solid #10b981;
+  line-height: 1.4;
+}
+
+/* ========================================
+   MOBILE RESPONSIVE
+   ======================================== */
+
 @media (max-width: 768px) {
   .prose-invert h1 { font-size: 2rem; }
   .prose-invert h2 { font-size: 1.5rem; }
   .prose-invert h3 { font-size: 1.25rem; }
+  
   .prose-invert table { font-size: 0.875rem; }
   .prose-invert th,
-  .prose-invert td { padding: 0.5rem; }
+  .prose-invert td { padding: 0.75rem 0.5rem; }
+  
+  .stat-box { font-size: 2rem; padding: 1.5rem; }
+  .pull-quote { font-size: 1.35rem; padding: 1.5rem; }
+  
+  .cta-button a { 
+    padding: 1rem 1.5rem; 
+    font-size: 1rem; 
+  }
 }
 </style>
 
