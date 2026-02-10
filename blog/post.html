@@ -10,6 +10,7 @@
 <body class="bg-slate-900 text-white">
 
 <div class="max-w-3xl mx-auto px-4 py-8">
+  <!-- Back Link -->
   <div class="mb-8">
     <a href="index.html" class="text-blue-400 hover:text-blue-300 text-sm font-semibold flex items-center">
       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -19,7 +20,8 @@
     </a>
   </div>
 
-  <article id="post-content" class="bg-slate-800 rounded-lg p-8">
+  <!-- Post Content -->
+  <article id="post-content" class="bg-slate-800 rounded-lg p-6 md:p-8">
     <div class="text-center py-12">
       <div class="animate-pulse text-slate-400">Loading post...</div>
     </div>
@@ -47,19 +49,163 @@ if (!slug) {
       document.getElementById('post-content').innerHTML = `<div class="prose prose-invert prose-lg max-w-none">${html}</div>`;
     })
     .catch(error => {
-      document.getElementById('post-content').innerHTML = '<p class="text-center text-red-400">Post not found.</p>';
+      document.getElementById('post-content').innerHTML = '<p class="text-center text-red-400">Post not found. Make sure the file exists in blog/posts/</p>';
+      console.error('Error loading post:', error);
     });
 }
 </script>
 
 <style>
-.prose-invert { color: #e2e8f0; }
-.prose-invert h1 { font-size: 2.5rem; font-weight: 900; margin-bottom: 1rem; color: #fff; }
-.prose-invert h2 { font-size: 1.75rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; color: #f1f5f9; }
-.prose-invert p { margin-bottom: 1.5rem; line-height: 1.75; }
-.prose-invert strong { font-weight: 700; color: #fff; }
-.prose-invert ul { list-style: disc; margin-left: 1.5rem; margin-bottom: 1.5rem; }
-.prose-invert li { margin-bottom: 0.5rem; }
+/* Blog post styling - Dark theme */
+.prose-invert {
+  color: #e2e8f0;
+  line-height: 1.75;
+}
+
+/* Headers */
+.prose-invert h1 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin-bottom: 1.5rem;
+  margin-top: 0;
+  color: #fff;
+  line-height: 1.2;
+}
+.prose-invert h2 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  color: #f1f5f9;
+  line-height: 1.3;
+}
+.prose-invert h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #f1f5f9;
+  line-height: 1.4;
+}
+
+/* Paragraphs */
+.prose-invert p {
+  margin-bottom: 1.5rem;
+  line-height: 1.75;
+}
+
+/* Bold and emphasis */
+.prose-invert strong {
+  font-weight: 700;
+  color: #fff;
+}
+.prose-invert em {
+  font-style: italic;
+}
+
+/* Links */
+.prose-invert a {
+  color: #60a5fa;
+  text-decoration: underline;
+}
+.prose-invert a:hover {
+  color: #93c5fd;
+}
+
+/* Lists */
+.prose-invert ul {
+  list-style: disc;
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.prose-invert ol {
+  list-style: decimal;
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.prose-invert li {
+  margin-bottom: 0.5rem;
+}
+
+/* Tables */
+.prose-invert table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+  font-size: 0.95rem;
+}
+.prose-invert th,
+.prose-invert td {
+  border: 1px solid #475569;
+  padding: 0.75rem;
+  text-align: left;
+}
+.prose-invert th {
+  background: #334155;
+  font-weight: 700;
+  color: #fff;
+}
+.prose-invert td {
+  background: #1e293b;
+}
+
+/* Blockquotes */
+.prose-invert blockquote {
+  border-left: 4px solid #3b82f6;
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  background: #1e293b;
+  border-radius: 0.5rem;
+}
+.prose-invert blockquote p {
+  margin: 0;
+}
+
+/* Code */
+.prose-invert code {
+  background: #1e293b;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+  color: #fbbf24;
+}
+.prose-invert pre {
+  background: #1e293b;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+.prose-invert pre code {
+  background: none;
+  padding: 0;
+  color: #e2e8f0;
+}
+
+/* Images */
+.prose-invert img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 2rem 0;
+}
+
+/* Horizontal rules */
+.prose-invert hr {
+  border: none;
+  border-top: 2px solid #334155;
+  margin: 2rem 0;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .prose-invert h1 { font-size: 2rem; }
+  .prose-invert h2 { font-size: 1.5rem; }
+  .prose-invert h3 { font-size: 1.25rem; }
+  .prose-invert table { font-size: 0.875rem; }
+  .prose-invert th,
+  .prose-invert td { padding: 0.5rem; }
+}
 </style>
 
 </body>
