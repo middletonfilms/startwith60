@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="page-title">Post | StartWith60</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body class="bg-slate-900 text-white">
+
+<div class="max-w-3xl mx-auto px-4 py-8">
+  <div class="mb-8">
+    <a href="index.html" class="text-blue-400 hover:text-blue-300 text-sm font-semibold flex items-center">
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+      Back to Blog
+    </a>
+  </div>
+
+  <article id="post-content" class="bg-slate-800 rounded-lg p-8">
+    <div class="text-center py-12">
+      <div class="animate-pulse text-slate-400">Loading post...</div>
+    </div>
+  </article>
+</div>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const slug = urlParams.get('slug');
+
+if (!slug) {
+  document.getElementById('post-content').innerHTML = '<p class="text-center text-red-400">Post not found.</p>';
+} else {
+  fetch(`https://raw.githubusercontent.com/middletonfilms/startwith60/main/blog/posts/${slug}.md`)
+    .then(response => {
+      if (!response.ok) throw new Error('Post not found');
+      return response.text();
+    })
+    .then(markdown => {
+      const html = marked.parse(markdown);
+      const titleMatch = markdown.match(/^#\s+(.+)$/m);
+      const title = titleMatch ? titleMatch[1] : 'Post';
+      
+      document.getElementById('page-title').textContent = `${title} | StartWith60`;
+      document.getElementById('post-content').innerHTML = `<div class="prose prose-invert prose-lg max-w-none">${html}</div>`;
+    })
+    .catch(error => {
+      document.getElementById('post-content').innerHTML = '<p class="text-center text-red-400">Post not found.</p>';
+    });
+}
+</script>
+
+<style>
+.prose-invert { color: #e2e8f0; }
+.prose-invert h1 { font-size: 2.5rem; font-weight: 900; margin-bottom: 1rem; color: #fff; }
+.prose-invert h2 { font-size: 1.75rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; color: #f1f5f9; }
+.prose-invert p { margin-bottom: 1.5rem; line-height: 1.75; }
+.prose-invert strong { font-weight: 700; color: #fff; }
+.prose-invert ul { list-style: disc; margin-left: 1.5rem; margin-bottom: 1.5rem; }
+.prose-invert li { margin-bottom: 0.5rem; }
+</style>
+
+</body>
+</html>
