@@ -38,7 +38,7 @@ LET'S COMPARE:
 Same money. Different outcome.
 
 
-### “WHAT EXACTLY IS AN INDEX?”
+## “WHAT EXACTLY IS AN INDEX?”
 
 When you put $100 into an index fund, you instantly own tiny pieces of hundreds of companies. This is the most famous index: the S&P500. It consists of the top 500 companies in America, proportional to their size. 
 
@@ -53,7 +53,7 @@ And your stake in each slice grows and shrinks as the companies do. It’s self 
 
 The S&P500 goes up and down, but since it was created in 1913, it has averaged a 10.4% growth every year. 
 
-### “WHY HAVE I NEVER HEARD OF THIS BEFORE?”
+## “WHY HAVE I NEVER HEARD OF THIS BEFORE?”
 
 You have. Every time someone mentions their "401(k)" or "retirement account"—that's an index fund. The difference? Most people get access through their employer. You have to set it up yourself.
 
@@ -66,7 +66,7 @@ That's why you've never had someone pitch this to you in a living room.
 
 [closing]
 
-### GETTING IT DONE
+## GETTING IT DONE
  
 Setting up an index fund will be much shorter, easier, and more profitable than your phone call with the life insurance agent. You don’t need a list of prescriptions or a medical exam, or to sift through tons of paperwork. 
 
