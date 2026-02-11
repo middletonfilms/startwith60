@@ -48,34 +48,50 @@ if (!slug) {
       
       document.getElementById('page-title').textContent = `${title} | StartWith60`;
       
-      // Split content at first H2 or after disclaimer to move title/subtitle/disclaimer outside grey box
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = html;
+      // Check for [begin] and optional [end] markers
+      const hasBegin = html.includes('<!-- BEGIN_MAINBOX -->');
+      const hasEnd = html.includes('<!-- END_MAINBOX -->');
       
-      // Extract H1, first paragraphs, and disclaimer box that come before first H2
-      const beforeBox = [];
-      const afterBox = [];
-      let foundH2 = false;
-      
-      Array.from(tempDiv.children).forEach(child => {
-        if (child.tagName === 'H2' || foundH2) {
-          foundH2 = true;
-          afterBox.push(child.outerHTML);
+      if (hasBegin) {
+        let beforeBox = '';
+        let insideBox = '';
+        let afterBox = '';
+        
+        if (hasEnd) {
+          // Split into three parts: before [begin], between [begin] and [end], after [end]
+          const parts = html.split('<!-- BEGIN_MAINBOX -->');
+          beforeBox = parts[0];
+          const afterBegin = parts[1].split('<!-- END_MAINBOX -->');
+          insideBox = afterBegin[0];
+          afterBox = afterBegin[1] || '';
         } else {
-          beforeBox.push(child.outerHTML);
+          // Split into two parts: before [begin], after [begin]
+          const parts = html.split('<!-- BEGIN_MAINBOX -->');
+          beforeBox = parts[0];
+          insideBox = parts[1];
         }
-      });
-      
-      document.getElementById('post-content').innerHTML = `
-        <div class="prose prose-invert prose-lg max-w-none mb-8">
-          ${beforeBox.join('')}
-        </div>
-        <div class="bg-slate-800 rounded-lg p-6 md:p-10">
-          <div class="prose prose-invert prose-lg max-w-none">
-            ${afterBox.join('')}
+        
+        document.getElementById('post-content').innerHTML = `
+          <div class="prose prose-invert prose-lg max-w-none mb-8">
+            ${beforeBox}
           </div>
-        </div>
-      `;
+          <div class="bg-slate-800 rounded-lg p-6 md:p-10">
+            <div class="prose prose-invert prose-lg max-w-none">
+              ${insideBox}
+            </div>
+          </div>
+          ${afterBox ? `<div class="prose prose-invert prose-lg max-w-none mt-8">${afterBox}</div>` : ''}
+        `;
+      } else {
+        // No [begin] marker - put everything in grey box (default behavior)
+        document.getElementById('post-content').innerHTML = `
+          <div class="bg-slate-800 rounded-lg p-6 md:p-10">
+            <div class="prose prose-invert prose-lg max-w-none">
+              ${html}
+            </div>
+          </div>
+        `;
+      }
       
       // Apply table column/row colors
       applyTableColors();
@@ -177,6 +193,12 @@ function parseCustomSyntax(markdown) {
   if (markdown.includes('<div class="closing-section">')) {
     markdown += '</div>';
   }
+  
+  // [begin] -> marks start of grey article box
+  markdown = markdown.replace(/\[begin\]/g, '<!-- BEGIN_MAINBOX -->');
+  
+  // [end] -> marks end of grey article box (optional)
+  markdown = markdown.replace(/\[end\]/g, '<!-- END_MAINBOX -->');
   
   return markdown;
 }
