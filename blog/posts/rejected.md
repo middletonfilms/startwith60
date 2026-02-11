@@ -21,10 +21,11 @@ Now, 10.4% per year might sound boring to you. With regular stocks, the value ca
 
 Indexes are boring, and boring is good. Boring is safe. And for the record, boring is extremely lucrative.  
 
-People who put $100 a month into an index fund average:
-* $80K after 20 years
-* $235K after 30 years
-* $654K after 40 years
+If you put $100/month into an index for 20 years, you'll have about $80,000 by the end of it.
+
+After 30 years, you'll have $235,000. 
+
+[box(stat):After 40 years, you'll have $654,000.]
 
 And If you can set aside $200/month or more… now we’re looking at millions. For your retirement, for your family’s inheritance… whatever you want. 
 
