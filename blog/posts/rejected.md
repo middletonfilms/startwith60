@@ -1,7 +1,7 @@
 # SO YOU'VE BEEN REJECTED FOR LIFE INSURANCE
-**Don’t worry. You’ve still got options. (Really good ones.)**
+**[color(yellow):Don’t worry. You’ve still got options. (Really good ones.)]**
 
-[box(disclaimer):This website is a personal project. I am not affiliated with any bank, and I do not profit off your investment choices.]
+[color(yellow):[box(disclaimer):This website is a personal project. I am not affiliated with any bank, and I do not profit off your investment choices.]]
 
 [begin]
 I’ll cut to the chase. This is the insurance company’s loss, not yours.  
