@@ -7,7 +7,7 @@
 I’ll cut to the chase. This is the insurance company’s loss, not yours.  
 You were about to give them— what, $100 every month? Over 40 years, that'd be $48,000.
 
-They were going to invest that, turn it into over $600K, then hand you back $30-60K and pocket the rest.]
+They were going to invest that, turn it into over $600K, then hand you back $30-60K and pocket the rest.
 
 I have a better pitch for you. **Keep that full $600,000 for yourself.**
 
