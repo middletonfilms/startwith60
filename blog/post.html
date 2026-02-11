@@ -19,7 +19,7 @@
     </a>
   </div>
 
-  <article id="post-content" class="bg-slate-800 rounded-lg p-6 md:p-10">
+  <article id="post-content" class="max-w-3xl mx-auto">
     <div class="text-center py-12">
       <div class="animate-pulse text-slate-400">Loading post...</div>
     </div>
@@ -47,7 +47,35 @@ if (!slug) {
       const title = titleMatch ? titleMatch[1] : 'Post';
       
       document.getElementById('page-title').textContent = `${title} | StartWith60`;
-      document.getElementById('post-content').innerHTML = `<div class="prose prose-invert prose-lg max-w-none">${html}</div>`;
+      
+      // Split content at first H2 or after disclaimer to move title/subtitle/disclaimer outside grey box
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+      
+      // Extract H1, first paragraphs, and disclaimer box that come before first H2
+      const beforeBox = [];
+      const afterBox = [];
+      let foundH2 = false;
+      
+      Array.from(tempDiv.children).forEach(child => {
+        if (child.tagName === 'H2' || foundH2) {
+          foundH2 = true;
+          afterBox.push(child.outerHTML);
+        } else {
+          beforeBox.push(child.outerHTML);
+        }
+      });
+      
+      document.getElementById('post-content').innerHTML = `
+        <div class="prose prose-invert prose-lg max-w-none mb-8">
+          ${beforeBox.join('')}
+        </div>
+        <div class="bg-slate-800 rounded-lg p-6 md:p-10">
+          <div class="prose prose-invert prose-lg max-w-none">
+            ${afterBox.join('')}
+          </div>
+        </div>
+      `;
       
       // Apply table column/row colors
       applyTableColors();
