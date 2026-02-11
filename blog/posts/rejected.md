@@ -21,11 +21,14 @@ Now, 10.4% per year might sound boring to you. With regular stocks, the value ca
 
 Indexes are boring, and boring is good. Boring is safe. And for the record, boring is extremely lucrative.  
 
-If you put $100/month into an index for 20 years, you'll have about $80,000 by the end of it.
+If you set aside $100/month into an index every month, you'll have:
+* $20,000 after 20 years
+* $235,000 after 30 years
+* $654,000 after 40 years
 
-After 30 years, you'll have $235,000. 
+Let me repeat that last one.
 
-[box(stat):After 40 years, you'll have $654,000.]
+[box(stat):$654,000 after 40 years.]
 
 And If you can set aside $200/month or more… now we’re looking at millions. For your retirement, for your family’s inheritance… whatever you want. 
 
