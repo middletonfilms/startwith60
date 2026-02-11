@@ -3,6 +3,7 @@
 
 [box(disclaimer):This website is a personal project. I am not affiliated with any bank, and I do not profit off your investment choices.]
 
+[begin]
 I’ll cut to the chase. This is the insurance company’s loss, not yours.  
 You were about to give them— what, $100 every month? Over 40 years, that'd be $48,000.
 
