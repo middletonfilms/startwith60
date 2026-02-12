@@ -101,6 +101,15 @@
   
   tr:nth-child(even) { background: #fafafa; }
   
+  .rate-table-cell {
+    text-align: center;
+  }
+  
+  .active-rate {
+    background: #e8f5e9 !important;
+    font-weight: bold;
+  }
+  
   .array-table {
     margin-top: 15px;
     font-size: 10px;
@@ -163,10 +172,10 @@
   <h2>Budget & Insurance</h2>
   <div class="input-row">
     <label>Monthly Budget ($):</label>
-    <input type="number" id="monthlyBudget" value="100" oninput="handleBudgetInput()">
+    <input type="number" id="monthlyBudget" placeholder="Enter amount" oninput="handleBudgetInput()">
     <span style="margin: 0 10px;">OR</span>
     <label>Whole Life Policy ($):</label>
-    <input type="number" id="policySize" value="60000" class="override" oninput="handlePolicyInput()">
+    <input type="number" id="policySize" class="override" placeholder="Enter amount" oninput="handlePolicyInput()">
   </div>
   <div class="input-row">
     <label>Term Length (Years):</label>
@@ -180,7 +189,8 @@
   <h2>Personal Info</h2>
   <div class="input-row">
     <label>Sex:</label>
-    <select id="sex" onchange="handlePersonalInfoChange()">
+    <select id="sex" onchange="handleSexChange()">
+      <option value="">Select...</option>
       <option value="male">Male</option>
       <option value="female">Female</option>
     </select>
@@ -208,7 +218,7 @@
   </div>
   <div class="input-row">
     <label>Life Expectancy:</label>
-    <input type="number" id="lifeExpectancy" value="76" oninput="updateTimeHorizons()">
+    <input type="number" id="lifeExpectancy" placeholder="Auto-fills from sex" oninput="updateTimeHorizons()">
     <span style="margin-left: 10px; color: #666;">Time Horizon Death:</span>
     <input type="text" id="timeHorizonDeath" class="readonly" readonly style="width: 50px;">
     <span style="margin-left: 10px; color: #666;">Market Gain Death:</span>
@@ -236,6 +246,9 @@
 <div id="error" class="error" style="display:none;"></div>
 
 <div id="results">
+  <h2>Insurance Rate Table (Age <span id="rateTableAge"></span>, <span id="rateTableSex"></span>)</h2>
+  <table id="rate-table"></table>
+  
   <div class="tables-container">
     <div>
       <h2>Global Variables</h2>
@@ -269,7 +282,8 @@
 
 <script>
 let calcReady = false;
-let cagrPercentiles = {}; // Will store CAGR lookup by year
+let cagrPercentiles = {};
+let rawRateData = null;
 
 async function init() {
   const loading = document.getElementById('loading');
@@ -280,6 +294,7 @@ async function init() {
   try {
     await initCalcEngine();
     await loadCAGRPercentiles();
+    await loadRateTableData();
     calcReady = true;
     loading.style.display = 'none';
     updateTimeHorizons();
@@ -291,21 +306,19 @@ async function init() {
   }
 }
 
+async function loadRateTableData() {
+  rawRateData = await window.dataLoader.loadExcel('RateTables.xlsx', 'LI_RATES');
+}
+
 async function loadCAGRPercentiles() {
-  // Load market history and extract CAGR percentiles
   const marketData = await window.dataLoader.loadExcel('MarketHistory.xlsx', 'Market');
-  
-  // Rows 1386-1402 contain CAGR percentiles
-  // Column 2 has percentile (0.001...0.999)
-  // Columns 3+ have CAGR for different year spans
   
   for (let row = 1386; row <= 1402; row++) {
     const percentile = marketData[row][2];
     if (percentile) {
       cagrPercentiles[percentile] = {};
-      // Store CAGR for each year span (columns 3+)
       for (let col = 3; col < marketData[row].length; col++) {
-        const yearSpan = col - 2; // Column 3 = 1 year, column 4 = 2 years, etc
+        const yearSpan = col - 2;
         const cagr = marketData[row][col];
         if (cagr !== null && cagr !== undefined) {
           cagrPercentiles[percentile][yearSpan] = cagr;
@@ -316,10 +329,7 @@ async function loadCAGRPercentiles() {
 }
 
 function getCAGRForPercentile(percentile, years) {
-  // Convert percentile (50) to decimal (0.5)
   const pct = percentile / 100;
-  
-  // Find closest percentile in our data
   const available = Object.keys(cagrPercentiles).map(Number).sort((a,b) => a-b);
   let closest = available[0];
   let minDiff = Math.abs(pct - closest);
@@ -335,18 +345,215 @@ function getCAGRForPercentile(percentile, years) {
   const cagr = cagrPercentiles[closest][years];
   if (!cagr) return null;
   
-  // CAGR is stored as multiplier (1.104 = 10.4% growth)
-  // Convert to percentage
   return ((cagr - 1) * 100).toFixed(2);
 }
 
-function getRatePerThousand(age, sex) {
-  // Get rate from rate table
-  // Formula: rate per $1000 of coverage
-  const rates = window.calcEngine.data.rateTables;
-  if (!rates || !rates[age]) return null;
+function getRateBrackets(age, sex) {
+  // Find the row for this age
+  let ageRow = null;
+  for (let i = 4; i < rawRateData.length; i++) {
+    if (rawRateData[i][0] === age) {
+      ageRow = rawRateData[i];
+      break;
+    }
+  }
   
-  return rates[age][sex];
+  if (!ageRow) return null;
+  
+  // Determine if minor or adult (under 18 = minor)
+  const isMinor = age < 18;
+  
+  // Column structure based on sex and age category
+  // For males: columns 1, 5, 9, 13 (rates), columns 2, 6, 10, 14 (cutoffs)
+  // For females: columns 3, 7, 11, 15 (rates), columns 4, 8, 12, 16 (cutoffs)
+  
+  const brackets = [];
+  
+  if (sex === 'male') {
+    if (isMinor) {
+      brackets.push({
+        name: 'Standard',
+        range: '$0-$15,099',
+        ratePerThousand: ageRow[1],
+        cutoff: ageRow[2]
+      });
+      brackets.push({
+        name: 'Preferred',
+        range: '$15,100-$59,999',
+        ratePerThousand: ageRow[5],
+        cutoff: ageRow[6]
+      });
+      brackets.push({
+        name: 'Executive',
+        range: '$60,000-$9,999,999',
+        ratePerThousand: ageRow[9],
+        cutoff: ageRow[10]
+      });
+      brackets.push({
+        name: 'Select',
+        range: '-',
+        ratePerThousand: null,
+        cutoff: null
+      });
+    } else {
+      brackets.push({
+        name: 'Standard',
+        range: '$0-$34,999',
+        ratePerThousand: ageRow[1],
+        cutoff: ageRow[2]
+      });
+      brackets.push({
+        name: 'Preferred',
+        range: '$35,000-$59,999',
+        ratePerThousand: ageRow[5],
+        cutoff: ageRow[6]
+      });
+      brackets.push({
+        name: 'Executive',
+        range: '$60,000-$119,999',
+        ratePerThousand: ageRow[9],
+        cutoff: ageRow[10]
+      });
+      brackets.push({
+        name: 'Select',
+        range: '$120,000-$9,999,999',
+        ratePerThousand: ageRow[13],
+        cutoff: ageRow[14]
+      });
+    }
+  } else { // female
+    if (isMinor) {
+      brackets.push({
+        name: 'Standard',
+        range: '$0-$15,099',
+        ratePerThousand: ageRow[3],
+        cutoff: ageRow[4]
+      });
+      brackets.push({
+        name: 'Preferred',
+        range: '$15,100-$59,999',
+        ratePerThousand: ageRow[7],
+        cutoff: ageRow[8]
+      });
+      brackets.push({
+        name: 'Executive',
+        range: '$60,000-$9,999,999',
+        ratePerThousand: ageRow[11],
+        cutoff: ageRow[12]
+      });
+      brackets.push({
+        name: 'Select',
+        range: '-',
+        ratePerThousand: null,
+        cutoff: null
+      });
+    } else {
+      brackets.push({
+        name: 'Standard',
+        range: '$0-$34,999',
+        ratePerThousand: ageRow[3],
+        cutoff: ageRow[4]
+      });
+      brackets.push({
+        name: 'Preferred',
+        range: '$35,000-$59,999',
+        ratePerThousand: ageRow[7],
+        cutoff: ageRow[8]
+      });
+      brackets.push({
+        name: 'Executive',
+        range: '$60,000-$119,999',
+        ratePerThousand: ageRow[11],
+        cutoff: ageRow[12]
+      });
+      brackets.push({
+        name: 'Select',
+        range: '$120,000-$9,999,999',
+        ratePerThousand: ageRow[15],
+        cutoff: ageRow[16]
+      });
+    }
+  }
+  
+  return brackets;
+}
+
+function getActiveBracket(brackets, policySize, monthlyBudget) {
+  if (!brackets) return -1;
+  
+  if (policySize) {
+    // Easy: find which bracket the policy size falls into
+    if (policySize <= 15099) return 0;
+    if (policySize <= 59999) return 1;
+    if (policySize <= 119999) return 2;
+    return 3;
+  } else if (monthlyBudget) {
+    // Find bracket by checking cutoffs
+    const annualBudget = monthlyBudget * 12;
+    
+    for (let i = 0; i < brackets.length; i++) {
+      const bracket = brackets[i];
+      if (!bracket.cutoff) continue;
+      
+      if (annualBudget <= bracket.cutoff) {
+        return i;
+      }
+    }
+    
+    // If above all cutoffs, use last bracket
+    return brackets.length - 1;
+  }
+  
+  return -1;
+}
+
+function displayRateTable(age, sex, activeBracketIndex) {
+  const table = document.getElementById('rate-table');
+  document.getElementById('rateTableAge').textContent = age;
+  document.getElementById('rateTableSex').textContent = sex === 'male' ? 'Male' : 'Female';
+  
+  const brackets = getRateBrackets(age, sex);
+  if (!brackets) {
+    table.innerHTML = '<tr><td>No rate data available</td></tr>';
+    return;
+  }
+  
+  table.innerHTML = '';
+  
+  // Header row
+  const headerRow = document.createElement('tr');
+  headerRow.innerHTML = '<th></th>' + brackets.map(b => `<th class="rate-table-cell">${b.name}</th>`).join('');
+  table.appendChild(headerRow);
+  
+  // Range row
+  const rangeRow = document.createElement('tr');
+  rangeRow.innerHTML = '<td><strong>Coverage Range</strong></td>' + 
+    brackets.map((b, i) => `<td class="rate-table-cell ${activeBracketIndex === i ? 'active-rate' : ''}">${b.range}</td>`).join('');
+  table.appendChild(rangeRow);
+  
+  // Rate row
+  const rateRow = document.createElement('tr');
+  rateRow.innerHTML = '<td><strong>Rate per $1,000</strong></td>' + 
+    brackets.map((b, i) => `<td class="rate-table-cell ${activeBracketIndex === i ? 'active-rate' : ''}">${b.ratePerThousand !== null ? '$' + b.ratePerThousand.toFixed(2) : '-'}</td>`).join('');
+  table.appendChild(rateRow);
+  
+  // Cutoff row
+  const cutoffRow = document.createElement('tr');
+  cutoffRow.innerHTML = '<td><strong>Annual Premium Cutoff</strong></td>' + 
+    brackets.map((b, i) => `<td class="rate-table-cell ${activeBracketIndex === i ? 'active-rate' : ''}">${b.cutoff !== null ? '$' + b.cutoff.toFixed(2) : '-'}</td>`).join('');
+  table.appendChild(cutoffRow);
+}
+
+function handleSexChange() {
+  const sex = document.getElementById('sex').value;
+  const lifeExpectancy = document.getElementById('lifeExpectancy');
+  
+  // Auto-fill life expectancy if empty
+  if (!lifeExpectancy.value && sex) {
+    lifeExpectancy.value = sex === 'female' ? 81 : 76;
+  }
+  
+  handlePersonalInfoChange();
 }
 
 function handleBudgetInput() {
@@ -355,18 +562,23 @@ function handleBudgetInput() {
   const age = parseInt(document.getElementById('age').value);
   const sex = document.getElementById('sex').value;
   
+  if (!sex || !age) return;
+  
   if (budget.value) {
     policy.classList.add('override');
+    policy.value = '';
     
-    // Calculate policy size from budget
-    // Formula: (Monthly Budget * 12) / (Rate per 1000 / 1000) = Policy Size
     const monthlyBudget = parseFloat(budget.value);
-    const rate = getRatePerThousand(age, sex);
+    const annualBudget = monthlyBudget * 12;
+    const brackets = getRateBrackets(age, sex);
+    const activeBracket = getActiveBracket(brackets, null, monthlyBudget);
     
-    if (rate) {
-      const annualBudget = monthlyBudget * 12;
-      const policySize = (annualBudget / rate) * 1000;
-      policy.value = Math.round(policySize);
+    if (brackets && activeBracket >= 0) {
+      const rate = brackets[activeBracket].ratePerThousand;
+      if (rate) {
+        const policySize = (annualBudget / rate) * 1000;
+        policy.value = Math.round(policySize);
+      }
     }
   } else {
     policy.classList.remove('override');
@@ -381,18 +593,23 @@ function handlePolicyInput() {
   const age = parseInt(document.getElementById('age').value);
   const sex = document.getElementById('sex').value;
   
+  if (!sex || !age) return;
+  
   if (policy.value) {
     budget.classList.add('override');
+    budget.value = '';
     
-    // Calculate budget from policy size
-    // Formula: (Policy Size / 1000) * Rate = Annual Premium
     const policySize = parseFloat(policy.value);
-    const rate = getRatePerThousand(age, sex);
+    const brackets = getRateBrackets(age, sex);
+    const activeBracket = getActiveBracket(brackets, policySize, null);
     
-    if (rate) {
-      const annualPremium = (policySize / 1000) * rate;
-      const monthlyBudget = annualPremium / 12;
-      budget.value = monthlyBudget.toFixed(2);
+    if (brackets && activeBracket >= 0) {
+      const rate = brackets[activeBracket].ratePerThousand;
+      if (rate) {
+        const annualPremium = (policySize / 1000) * rate;
+        const monthlyBudget = annualPremium / 12;
+        budget.value = monthlyBudget.toFixed(2);
+      }
     }
   } else {
     budget.classList.remove('override');
@@ -402,11 +619,9 @@ function handlePolicyInput() {
 }
 
 function handlePersonalInfoChange() {
-  // Age, sex, or tobacco changed - recalculate insurance
   const budget = document.getElementById('monthlyBudget');
   const policy = document.getElementById('policySize');
   
-  // Recalculate whichever is not overridden
   if (budget.value && !budget.classList.contains('override')) {
     handleBudgetInput();
   } else if (policy.value && !policy.classList.contains('override')) {
@@ -445,33 +660,30 @@ function handlePercentileInput() {
 function updateTimeHorizons() {
   const age = parseInt(document.getElementById('age').value) || 35;
   const retirementAge = parseInt(document.getElementById('retirementAge').value) || 65;
-  const lifeExpectancy = parseInt(document.getElementById('lifeExpectancy').value) || 76;
+  const lifeExpectancy = parseInt(document.getElementById('lifeExpectancy').value);
   const customAgeCutoff = parseInt(document.getElementById('customAgeCutoff').value) || null;
   const marketGain = parseFloat(document.getElementById('marketGain').value) || 10.4;
   const percentile = parseFloat(document.getElementById('performancePercentile').value) || null;
   
   const timeHorizonRetire = retirementAge - age;
-  const timeHorizonDeath = lifeExpectancy - age;
+  const timeHorizonDeath = lifeExpectancy ? lifeExpectancy - age : null;
   const timeHorizonCustom = customAgeCutoff ? customAgeCutoff - age : null;
   
   document.getElementById('timeHorizonRetire').value = timeHorizonRetire;
-  document.getElementById('timeHorizonDeath').value = timeHorizonDeath;
+  document.getElementById('timeHorizonDeath').value = timeHorizonDeath !== null ? timeHorizonDeath : '';
   document.getElementById('timeHorizonCustom').value = timeHorizonCustom !== null ? timeHorizonCustom : '';
   
-  // Calculate market gains
   if (percentile) {
-    // Use percentile lookup
     const retireGain = getCAGRForPercentile(percentile, timeHorizonRetire);
-    const deathGain = getCAGRForPercentile(percentile, timeHorizonDeath);
+    const deathGain = timeHorizonDeath ? getCAGRForPercentile(percentile, timeHorizonDeath) : null;
     const customGain = timeHorizonCustom ? getCAGRForPercentile(percentile, timeHorizonCustom) : null;
     
     document.getElementById('marketGainRetire').value = retireGain ? `${retireGain}% (P${percentile})` : '-';
-    document.getElementById('marketGainDeath').value = deathGain ? `${deathGain}% (P${percentile})` : '-';
+    document.getElementById('marketGainDeath').value = deathGain ? `${deathGain}% (P${percentile})` : '';
     document.getElementById('marketGainCustom').value = customGain ? `${customGain}% (P${percentile})` : '';
   } else {
-    // Use default market gain
     document.getElementById('marketGainRetire').value = `${marketGain}%`;
-    document.getElementById('marketGainDeath').value = `${marketGain}%`;
+    document.getElementById('marketGainDeath').value = timeHorizonDeath ? `${marketGain}%` : '';
     document.getElementById('marketGainCustom').value = timeHorizonCustom ? `${marketGain}%` : '';
   }
   
@@ -481,24 +693,38 @@ function updateTimeHorizons() {
 function runCalculation() {
   if (!calcReady) return;
   
+  const age = parseInt(document.getElementById('age').value);
+  const sex = document.getElementById('sex').value;
+  const lifeExp = parseInt(document.getElementById('lifeExpectancy').value);
+  const monthlyBudget = parseFloat(document.getElementById('monthlyBudget').value) || 0;
+  const policySize = parseFloat(document.getElementById('policySize').value) || 0;
+  
+  if (!sex || !age) return;
+  
   const inputs = {
     inflation: parseFloat(document.getElementById('inflation').value) / 100,
     marketGain: parseFloat(document.getElementById('marketGain').value) / 100,
     retirementAge: parseInt(document.getElementById('retirementAge').value),
-    lifeExpectancy: parseInt(document.getElementById('lifeExpectancy').value),
+    lifeExpectancy: lifeExp || (sex === 'female' ? 81 : 76),
     tobaccoUser: document.getElementById('tobaccoUser').value === 'true',
-    age: parseInt(document.getElementById('age').value),
-    sex: document.getElementById('sex').value,
-    monthlyBudget: parseFloat(document.getElementById('monthlyBudget').value) || 0,
-    policySize: parseFloat(document.getElementById('policySize').value) || 0,
+    age: age,
+    sex: sex,
+    monthlyBudget: monthlyBudget,
+    policySize: policySize,
     termPolicy: parseInt(document.getElementById('termPolicy').value) || null,
     termBudget: parseFloat(document.getElementById('termBudget').value) || 0,
     customTimeHorizon: parseInt(document.getElementById('customAgeCutoff').value) ? 
-      parseInt(document.getElementById('customAgeCutoff').value) - parseInt(document.getElementById('age').value) : null,
+      parseInt(document.getElementById('customAgeCutoff').value) - age : null,
     performancePercentile: parseFloat(document.getElementById('performancePercentile').value) || null
   };
   
   const result = window.calcEngine.calculate(inputs);
+  
+  // Display rate table
+  const brackets = getRateBrackets(age, sex);
+  const activeBracket = getActiveBracket(brackets, policySize, monthlyBudget);
+  displayRateTable(age, sex, activeBracket);
+  
   displayResults(result);
 }
 
