@@ -50,50 +50,73 @@ class CalcEngine {
       (_, i) => i
     );
 
-    // === INFLATION ARRAY ===
-    // For each year in time horizon: inflation_adjusted = 1 * (INFLATION_MULT ^ year)
-    const INFLATION_ARRAY = TIME_HORIZON_ARRAY.map(year => 
-      Math.pow(INFLATION_MULT, year)
-    );
-
     // === ANNUAL BUDGET ===
     const ANNUAL_BUDGET = MONTHLY_BUDGET * 12;
 
-    // === PAID IN ARRAY ===
-    // Each year: ANNUAL_BUDGET - TERM_BUDGET (if term policy exists)
-    // TODO: Term budget needs to reference rate table
-    const PAID_IN_ARRAY = TIME_HORIZON_ARRAY.map(year => {
-      // If term policy exists and this year is within term, subtract term cost
-      // For now, simple version:
-      return ANNUAL_BUDGET - (TERM_BUDGET || 0);
-    });
-
-    // === PAID IN INFLATION ADJUSTED ===
-    // For each year: contribution * (INFLATION_MULT ^ year)
-    const PAID_IN_INFLATION_ADJUSTED = PAID_IN_ARRAY.map((contribution, index) =>
-      contribution * Math.pow(INFLATION_MULT, index)
+    // === DEVELOPER-FRIENDLY ARRAY NAMES ===
+    // inflationValue = $1 buying power after N years of inflation
+    const inflationValue = TIME_HORIZON_ARRAY.map(year => 
+      Math.pow(INFLATION_MULT, year)
     );
 
-    // === ACCOUNT TOTAL ARRAY ===
-    // Year 0: initial contribution
-    // Year N: (previous total + new contribution) * MARKET_MULT
-    const ACCOUNT_TOTAL_ARRAY = [];
+    // payIn = Annual contribution before any adjustments
+    const payIn = TIME_HORIZON_ARRAY.map(year => ANNUAL_BUDGET);
+
+    // termSetAside = Money set aside for term insurance each year
+    const termSetAside = TIME_HORIZON_ARRAY.map(year => {
+      // If term policy exists and this year is within term period
+      if (TERM_POLICY && year < TERM_POLICY) {
+        return TERM_BUDGET * 12; // Convert monthly to annual
+      }
+      return 0;
+    });
+
+    // payInAdjusted = Annual contribution adjusted for inflation
+    // Formula: PAY IN * (INFLATION_MULT ^ year)
+    const payInAdjusted = payIn.map((contribution, year) =>
+      contribution * Math.pow(INFLATION_MULT, year)
+    );
+
+    // marketGains = Gains from previous year's total (NOT including current contribution)
+    // Formula: Previous total * MARKET_GAIN
+    const marketGains = [];
+    
+    // accountTotal = Running total in account after contribution and growth
+    // Year 0: Just the contribution
+    // Year N: (Previous total + current contribution - term cost) * MARKET_MULT
+    const accountTotal = [];
+    
     let runningTotal = 0;
     
-    for (let i = 0; i < PAID_IN_ARRAY.length; i++) {
-      const contribution = PAID_IN_ARRAY[i];
-      runningTotal += contribution;
-      runningTotal *= MARKET_MULT;
-      ACCOUNT_TOTAL_ARRAY.push(runningTotal);
+    for (let i = 0; i < TIME_HORIZON_ARRAY.length; i++) {
+      const contribution = payIn[i];
+      const termCost = termSetAside[i];
+      
+      if (i === 0) {
+        // Year 0: Just the contribution (no growth yet)
+        runningTotal = contribution - termCost;
+        marketGains.push(0);
+      } else {
+        // Calculate gains from previous year's balance
+        const gains = runningTotal * MARKET_GAIN;
+        marketGains.push(gains);
+        
+        // Add contribution, subtract term cost, add gains
+        runningTotal = runningTotal + contribution - termCost + gains;
+      }
+      
+      accountTotal.push(runningTotal);
     }
 
     // === FINAL METRICS ===
-    const ACCOUNT_TOTAL = ACCOUNT_TOTAL_ARRAY[ACCOUNT_TOTAL_ARRAY.length - 1];
+    const ACCOUNT_TOTAL = accountTotal[accountTotal.length - 1];
     const ACCOUNT_INCOME = ACCOUNT_TOTAL * MARKET_GAIN;
-    const FINAL_YEAR_GROWTH = ACCOUNT_TOTAL - (ACCOUNT_TOTAL_ARRAY[ACCOUNT_TOTAL_ARRAY.length - 2] || 0);
+    const FINAL_YEAR_GROWTH = accountTotal[accountTotal.length - 1] - (accountTotal[accountTotal.length - 2] || 0);
     
     // Total paid in over time horizon
-    const TOTAL_PAID_IN = PAID_IN_ARRAY.reduce((sum, val) => sum + val, 0);
+    const TOTAL_PAID_IN = payIn.reduce((sum, val) => sum + val, 0);
+    const TOTAL_PAID_IN_ADJUSTED = payInAdjusted.reduce((sum, val) => sum + val, 0);
+    const TOTAL_TERM_COST = termSetAside.reduce((sum, val) => sum + val, 0);
 
     // === MORTALITY LOOKUP ===
     const MORTALITY_LIKELIHOOD = this._getMortalityProbability(
@@ -157,13 +180,15 @@ class CalcEngine {
         ACTIVE_TIME_HORIZON
       },
       
-      // Arrays
+      // Arrays (developer-friendly names)
       arrays: {
-        TIME_HORIZON_ARRAY,
-        INFLATION_ARRAY,
-        PAID_IN_ARRAY,
-        PAID_IN_INFLATION_ADJUSTED,
-        ACCOUNT_TOTAL_ARRAY
+        year: TIME_HORIZON_ARRAY,
+        inflationValue: inflationValue,
+        payIn: payIn,
+        payInAdjusted: payInAdjusted,
+        termSetAside: termSetAside,
+        marketGains: marketGains,
+        accountTotal: accountTotal
       },
       
       // Final results
@@ -172,6 +197,8 @@ class CalcEngine {
         ACCOUNT_INCOME,
         FINAL_YEAR_GROWTH,
         TOTAL_PAID_IN,
+        TOTAL_PAID_IN_ADJUSTED,
+        TOTAL_TERM_COST,
         MORTALITY_LIKELIHOOD,
         MARKET_PERFORMANCE_OVERRIDE
       },
