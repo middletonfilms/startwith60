@@ -50,9 +50,24 @@
     font-size: 12px;
   }
   
+  /* Remove spinner arrows */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+  
   .input-row .readonly {
     background: #e9e9e9;
     color: #666;
+  }
+  
+  .input-row .override {
+    background: #e3f2fd;
   }
   
   button {
@@ -88,12 +103,14 @@
     font-weight: bold;
     text-align: left;
     font-size: 10px;
+    white-space: nowrap;
   }
   
   td {
     padding: 3px 4px;
     border: 1px solid #ddd;
     text-align: left;
+    white-space: nowrap;
   }
   
   tr:nth-child(even) {
@@ -103,6 +120,8 @@
   .array-table {
     margin-top: 15px;
     font-size: 10px;
+    width: auto;
+    table-layout: auto;
   }
   
   .array-table th {
@@ -110,15 +129,18 @@
     top: 0;
     background: #e9e9e9;
     font-size: 9px;
-    padding: 3px;
+    padding: 3px 5px;
+    white-space: nowrap;
   }
   
   .array-table td {
-    padding: 2px 3px;
+    padding: 2px 5px;
     text-align: right;
+    white-space: nowrap;
   }
   
-  .array-table td:first-child {
+  .array-table td:first-child,
+  .array-table td:nth-child(2) {
     text-align: center;
     font-weight: bold;
   }
@@ -161,7 +183,7 @@
   <h2>Global Variables</h2>
   <div class="input-row">
     <label>Market Gain (%):</label>
-    <input type="number" id="marketGain" value="10.4" step="0.1">
+    <input type="number" id="marketGain" value="10.4" step="0.1" oninput="handleMarketGainInput()">
   </div>
   <div class="input-row">
     <label>Inflation Rate (%):</label>
@@ -171,10 +193,10 @@
   <h2>Budget & Insurance</h2>
   <div class="input-row">
     <label>Monthly Budget ($):</label>
-    <input type="number" id="monthlyBudget" value="100">
+    <input type="number" id="monthlyBudget" value="100" oninput="handleBudgetInput()">
     <span style="margin: 0 10px;">OR</span>
     <label>Whole Life Policy ($):</label>
-    <input type="number" id="policySize" value="60000">
+    <input type="number" id="policySize" value="60000" class="override" oninput="handlePolicyInput()">
   </div>
   <div class="input-row">
     <label>Term Length (Years):</label>
@@ -188,14 +210,14 @@
   <h2>Personal Info</h2>
   <div class="input-row">
     <label>Sex:</label>
-    <select id="sex">
+    <select id="sex" onchange="updateTimeHorizons()">
       <option value="male">Male</option>
       <option value="female">Female</option>
     </select>
   </div>
   <div class="input-row">
     <label>Current Age:</label>
-    <input type="number" id="age" value="35">
+    <input type="number" id="age" value="35" oninput="updateTimeHorizons()">
   </div>
   <div class="input-row">
     <label>Tobacco User:</label>
@@ -208,25 +230,33 @@
   <h2>Time Horizons</h2>
   <div class="input-row">
     <label>Retirement Age:</label>
-    <input type="number" id="retirementAge" value="65">
+    <input type="number" id="retirementAge" value="65" oninput="updateTimeHorizons()">
     <span style="margin-left: 10px; color: #666;">Time Horizon Retire:</span>
-    <input type="text" id="timeHorizonRetire" class="readonly" readonly>
+    <input type="text" id="timeHorizonRetire" class="readonly" readonly style="width: 50px;">
+    <span style="margin-left: 10px; color: #666;">Market Gain Retire:</span>
+    <input type="text" id="marketGainRetire" class="readonly" readonly style="width: 100px;">
   </div>
   <div class="input-row">
     <label>Life Expectancy:</label>
-    <input type="number" id="lifeExpectancy" value="76">
+    <input type="number" id="lifeExpectancy" value="76" oninput="updateTimeHorizons()">
     <span style="margin-left: 10px; color: #666;">Time Horizon Death:</span>
-    <input type="text" id="timeHorizonDeath" class="readonly" readonly>
+    <input type="text" id="timeHorizonDeath" class="readonly" readonly style="width: 50px;">
+    <span style="margin-left: 10px; color: #666;">Market Gain Death:</span>
+    <input type="text" id="marketGainDeath" class="readonly" readonly style="width: 100px;">
   </div>
   <div class="input-row">
-    <label>Custom Time Horizon (Years):</label>
-    <input type="number" id="customTimeHorizon" placeholder="Leave empty for life expectancy">
+    <label>Custom Age Cutoff:</label>
+    <input type="number" id="customAgeCutoff" placeholder="Leave empty" oninput="updateTimeHorizons()">
+    <span style="margin-left: 10px; color: #666;">Time Horizon Custom:</span>
+    <input type="text" id="timeHorizonCustom" class="readonly" readonly style="width: 50px;">
+    <span style="margin-left: 10px; color: #666;">Market Gain Custom:</span>
+    <input type="text" id="marketGainCustom" class="readonly" readonly style="width: 100px;">
   </div>
   
   <h2>Advanced</h2>
   <div class="input-row">
     <label>Performance Percentile (%):</label>
-    <input type="number" id="performancePercentile" placeholder="Leave empty for default 10.4%">
+    <input type="number" id="performancePercentile" class="override" placeholder="Leave empty for default" oninput="handlePercentileInput()">
   </div>
   
   <button onclick="runCalculation()">Run Calculation</button>
@@ -280,12 +310,87 @@ async function init() {
     await initCalcEngine();
     calcReady = true;
     loading.style.display = 'none';
+    updateTimeHorizons();
   } catch (err) {
     loading.style.display = 'none';
     error.style.display = 'block';
     error.textContent = `Error loading data: ${err.message}`;
     console.error(err);
   }
+}
+
+function handleBudgetInput() {
+  const budget = document.getElementById('monthlyBudget');
+  const policy = document.getElementById('policySize');
+  
+  if (budget.value) {
+    policy.classList.add('override');
+    policy.value = ''; // Clear policy when budget is entered
+  } else {
+    policy.classList.remove('override');
+  }
+}
+
+function handlePolicyInput() {
+  const budget = document.getElementById('monthlyBudget');
+  const policy = document.getElementById('policySize');
+  
+  if (policy.value) {
+    budget.classList.add('override');
+    // Calculate budget from policy (this is just a placeholder calculation)
+    // You'd use actual rate table logic here
+    budget.value = ''; // Clear budget when policy is entered
+  } else {
+    budget.classList.remove('override');
+  }
+}
+
+function handleMarketGainInput() {
+  const marketGain = document.getElementById('marketGain');
+  const percentile = document.getElementById('performancePercentile');
+  
+  if (marketGain.value) {
+    percentile.classList.add('override');
+  }
+  
+  updateTimeHorizons();
+}
+
+function handlePercentileInput() {
+  const marketGain = document.getElementById('marketGain');
+  const percentile = document.getElementById('performancePercentile');
+  
+  if (percentile.value) {
+    marketGain.classList.add('override');
+  } else {
+    marketGain.classList.remove('override');
+  }
+  
+  updateTimeHorizons();
+}
+
+function updateTimeHorizons() {
+  const age = parseInt(document.getElementById('age').value) || 35;
+  const retirementAge = parseInt(document.getElementById('retirementAge').value) || 65;
+  const lifeExpectancy = parseInt(document.getElementById('lifeExpectancy').value) || 76;
+  const customAgeCutoff = parseInt(document.getElementById('customAgeCutoff').value) || null;
+  const marketGain = parseFloat(document.getElementById('marketGain').value) || 10.4;
+  const percentile = parseFloat(document.getElementById('performancePercentile').value) || null;
+  
+  const timeHorizonRetire = retirementAge - age;
+  const timeHorizonDeath = lifeExpectancy - age;
+  const timeHorizonCustom = customAgeCutoff ? customAgeCutoff - age : null;
+  
+  document.getElementById('timeHorizonRetire').value = timeHorizonRetire;
+  document.getElementById('timeHorizonDeath').value = timeHorizonDeath;
+  document.getElementById('timeHorizonCustom').value = timeHorizonCustom !== null ? timeHorizonCustom : '';
+  
+  // Market gains - either from percentile lookup or default market gain
+  // For now, just show the market gain percentage
+  const marketGainDisplay = percentile ? `${percentile}th percentile` : `${marketGain}%`;
+  document.getElementById('marketGainRetire').value = marketGainDisplay;
+  document.getElementById('marketGainDeath').value = marketGainDisplay;
+  document.getElementById('marketGainCustom').value = timeHorizonCustom !== null ? marketGainDisplay : '';
 }
 
 function runCalculation() {
@@ -302,19 +407,14 @@ function runCalculation() {
     tobaccoUser: document.getElementById('tobaccoUser').value === 'true',
     age: parseInt(document.getElementById('age').value),
     sex: document.getElementById('sex').value,
-    monthlyBudget: parseFloat(document.getElementById('monthlyBudget').value),
+    monthlyBudget: parseFloat(document.getElementById('monthlyBudget').value) || 0,
     policySize: parseFloat(document.getElementById('policySize').value) || 0,
     termPolicy: parseInt(document.getElementById('termPolicy').value) || null,
     termBudget: parseFloat(document.getElementById('termBudget').value) || 0,
-    customTimeHorizon: parseInt(document.getElementById('customTimeHorizon').value) || null,
+    customTimeHorizon: parseInt(document.getElementById('customAgeCutoff').value) ? 
+      parseInt(document.getElementById('customAgeCutoff').value) - parseInt(document.getElementById('age').value) : null,
     performancePercentile: parseFloat(document.getElementById('performancePercentile').value) || null
   };
-  
-  // Update time horizon displays
-  const timeHorizonRetire = inputs.retirementAge - inputs.age;
-  const timeHorizonDeath = inputs.lifeExpectancy - inputs.age;
-  document.getElementById('timeHorizonRetire').value = timeHorizonRetire;
-  document.getElementById('timeHorizonDeath').value = timeHorizonDeath;
   
   const result = window.calcEngine.calculate(inputs);
   displayResults(result);
@@ -329,7 +429,7 @@ function displayResults(result) {
   displayVariableTable('horizons-table', result.timeHorizons);
   displayVariableTable('insurance-table', result.insurance);
   displayVariableTable('results-table', result.results);
-  displayArrays(result.arrays);
+  displayArrays(result.arrays, parseInt(document.getElementById('age').value));
 }
 
 function displayVariableTable(tableId, variables) {
@@ -352,7 +452,7 @@ function displayVariableTable(tableId, variables) {
   table.appendChild(tbody);
 }
 
-function displayArrays(arrays) {
+function displayArrays(arrays, currentAge) {
   const container = document.getElementById('arrays-container');
   container.innerHTML = '';
   
@@ -363,9 +463,9 @@ function displayArrays(arrays) {
   
   const thead = document.createElement('thead');
   const headerRow = document.createElement('tr');
-  headerRow.innerHTML = '<th>Year</th>';
+  headerRow.innerHTML = '<th>Year</th><th>Age</th>';
   
-  const columnNames = Object.keys(arrays);
+  const columnNames = Object.keys(arrays).filter(k => k !== 'year');
   for (const key of columnNames) {
     headerRow.innerHTML += `<th>${key}</th>`;
   }
@@ -375,13 +475,13 @@ function displayArrays(arrays) {
   const tbody = document.createElement('tbody');
   for (let i = 0; i < maxLength; i++) {
     const row = document.createElement('tr');
-    row.innerHTML = `<td>${i}</td>`;
+    const age = currentAge + i;
+    row.innerHTML = `<td>${i}</td><td>${age}</td>`;
     
     columnNames.forEach(key => {
       const arr = arrays[key];
       const value = arr[i];
       
-      // Determine cell class based on column
       let cellClass = '';
       if (['marketGainsTotal', 'paidInTotal', 'payInYearAdjusted', 'paidInTotalAdjusted', 'totalInAccountAdjusted'].includes(key)) {
         cellClass = 'col-grey';
@@ -406,12 +506,16 @@ function formatValue(value, key) {
     return '-';
   }
   if (typeof value === 'number') {
-    // No decimals for years
+    // No decimals for years/ages
     if (key && (key.includes('AGE') || key.includes('YEAR') || key.includes('HORIZON') || key === 'year')) {
       return Math.round(value).toString();
     }
-    // Regular numbers with decimals
-    if (value > 1000 || value < -1000) {
+    // 4 decimals for inflationValue
+    if (key === 'inflationValue') {
+      return value.toFixed(4);
+    }
+    // 2 decimals for dollar amounts
+    if (value > 100 || value < -100) {
       return value.toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
     }
     return value.toFixed(4);
