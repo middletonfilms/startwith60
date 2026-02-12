@@ -11,160 +11,137 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   
   body {
-    font-family: 'Courier New', monospace;
-    background: #0f172a;
-    color: #e2e8f0;
-    padding: 2rem;
-    line-height: 1.6;
+    font-family: Arial, sans-serif;
+    background: white;
+    color: #333;
+    padding: 20px;
+    font-size: 13px;
   }
   
   h1 {
-    color: #10b981;
-    margin-bottom: 2rem;
-    font-size: 2rem;
+    font-size: 20px;
+    margin-bottom: 15px;
   }
   
   h2 {
-    color: #fbbf24;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
-    border-bottom: 2px solid #334155;
-    padding-bottom: 0.5rem;
+    font-size: 14px;
+    margin-top: 15px;
+    margin-bottom: 8px;
+    font-weight: bold;
   }
   
-  .section {
-    background: #1e293b;
-    padding: 1.5rem;
-    border-radius: 0.5rem;
-    margin-bottom: 2rem;
-    border: 1px solid #334155;
-  }
-  
-  .input-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .input-group {
+  .input-row {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    margin-bottom: 6px;
   }
   
-  label {
-    color: #94a3b8;
-    font-size: 0.875rem;
-    margin-bottom: 0.25rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+  .input-row label {
+    width: 200px;
+    font-size: 12px;
   }
   
-  input, select {
-    background: #0f172a;
-    border: 1px solid #475569;
-    color: #e2e8f0;
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-    font-family: 'Courier New', monospace;
+  .input-row input,
+  .input-row select {
+    width: 120px;
+    padding: 4px;
+    border: 1px solid #ccc;
+    background: #f5f5f5;
+    font-size: 12px;
   }
   
-  input:focus, select:focus {
-    outline: none;
-    border-color: #10b981;
+  .input-row .readonly {
+    background: #e9e9e9;
+    color: #666;
   }
   
   button {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    border: none;
-    padding: 0.75rem 2rem;
-    border-radius: 0.5rem;
-    font-weight: bold;
-    font-size: 1rem;
+    margin-top: 10px;
+    padding: 8px 20px;
+    border: 1px solid #ccc;
+    background: #f0f0f0;
     cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    font-size: 13px;
   }
   
   button:hover {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    background: #e0e0e0;
   }
   
-  .variable-table {
+  .tables-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+  }
+  
+  table {
     width: 100%;
     border-collapse: collapse;
-    margin: 1rem 0;
+    font-size: 11px;
   }
   
-  .variable-table th {
-    background: #0f172a;
+  th {
+    background: #e9e9e9;
+    padding: 4px;
+    border: 1px solid #ccc;
+    font-weight: bold;
     text-align: left;
-    padding: 0.75rem;
-    border: 1px solid #475569;
-    color: #fbbf24;
-    font-weight: bold;
+    font-size: 10px;
   }
   
-  .variable-table td {
-    padding: 0.75rem;
-    border: 1px solid #475569;
+  td {
+    padding: 3px 4px;
+    border: 1px solid #ddd;
+    text-align: left;
   }
   
-  .variable-table tr:nth-child(even) {
-    background: #0f172a;
-  }
-  
-  .var-name {
-    color: #60a5fa;
-    font-weight: bold;
-  }
-  
-  .var-value {
-    color: #10b981;
-    font-family: monospace;
+  tr:nth-child(even) {
+    background: #fafafa;
   }
   
   .array-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 1rem 0;
-    font-size: 0.875rem;
+    margin-top: 15px;
+    font-size: 10px;
   }
   
   .array-table th {
-    background: #0f172a;
-    padding: 0.5rem;
-    border: 1px solid #475569;
-    color: #fbbf24;
     position: sticky;
     top: 0;
+    background: #e9e9e9;
+    font-size: 9px;
+    padding: 3px;
   }
   
   .array-table td {
-    padding: 0.5rem;
-    border: 1px solid #475569;
+    padding: 2px 3px;
     text-align: right;
   }
   
   .array-table td:first-child {
-    color: #60a5fa;
+    text-align: center;
     font-weight: bold;
   }
   
-  .loading {
-    text-align: center;
-    padding: 2rem;
-    color: #94a3b8;
+  /* Column background colors */
+  .col-grey {
+    background: #f0f0f0 !important;
+  }
+  
+  .col-blue {
+    background: #e3f2fd !important;
+  }
+  
+  .col-green {
+    background: #e8f5e9 !important;
   }
   
   .error {
-    background: #7f1d1d;
-    color: #fecaca;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    border: 1px solid #991b1b;
+    background: #fee;
+    color: #c00;
+    padding: 10px;
+    border: 1px solid #fcc;
+    margin: 10px 0;
   }
   
   #results {
@@ -178,132 +155,121 @@
 </head>
 <body>
 
-<h1>📊 CALCULATOR DEV TOOL</h1>
+<h1>Calculator Dev Tool</h1>
 
-<div class="section">
-  <h2>USER INPUTS</h2>
-  
-  <div class="input-grid">
-    <!-- Global Variables -->
-    <div class="input-group">
-      <label>Inflation Rate (%)</label>
-      <input type="number" id="inflation" value="3.28" step="0.01">
-    </div>
-    
-    <div class="input-group">
-      <label>Market Gain (%)</label>
-      <input type="number" id="marketGain" value="10.4" step="0.1">
-    </div>
-    
-    <div class="input-group">
-      <label>Retirement Age</label>
-      <input type="number" id="retirementAge" value="65">
-    </div>
-    
-    <div class="input-group">
-      <label>Life Expectancy</label>
-      <input type="number" id="lifeExpectancy" value="76">
-    </div>
-    
-    <div class="input-group">
-      <label>Tobacco User</label>
-      <select id="tobaccoUser">
-        <option value="false">No</option>
-        <option value="true">Yes</option>
-      </select>
-    </div>
-    
-    <!-- Required Inputs -->
-    <div class="input-group">
-      <label>Current Age</label>
-      <input type="number" id="age" value="35" required>
-    </div>
-    
-    <div class="input-group">
-      <label>Sex</label>
-      <select id="sex" required>
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-      </select>
-    </div>
-    
-    <div class="input-group">
-      <label>Monthly Budget ($)</label>
-      <input type="number" id="monthlyBudget" value="100" required>
-    </div>
-    
-    <div class="input-group">
-      <label>Policy Size ($)</label>
-      <input type="number" id="policySize" value="60000">
-    </div>
-    
-    <!-- Optional Inputs -->
-    <div class="input-group">
-      <label>Term Policy (Years)</label>
-      <input type="number" id="termPolicy" placeholder="Leave empty if none">
-    </div>
-    
-    <div class="input-group">
-      <label>Term Budget ($/mo)</label>
-      <input type="number" id="termBudget" value="0">
-    </div>
-    
-    <div class="input-group">
-      <label>Custom Time Horizon (Years)</label>
-      <input type="number" id="customTimeHorizon" placeholder="Leave empty for life expectancy">
-    </div>
-    
-    <div class="input-group">
-      <label>Performance Percentile (%)</label>
-      <input type="number" id="performancePercentile" placeholder="Leave empty for default 10.4%">
-    </div>
+<div>
+  <h2>Global Variables</h2>
+  <div class="input-row">
+    <label>Market Gain (%):</label>
+    <input type="number" id="marketGain" value="10.4" step="0.1">
+  </div>
+  <div class="input-row">
+    <label>Inflation Rate (%):</label>
+    <input type="number" id="inflation" value="3.28" step="0.01">
   </div>
   
-  <button onclick="runCalculation()">🚀 RUN CALCULATION</button>
+  <h2>Budget & Insurance</h2>
+  <div class="input-row">
+    <label>Monthly Budget ($):</label>
+    <input type="number" id="monthlyBudget" value="100">
+    <span style="margin: 0 10px;">OR</span>
+    <label>Whole Life Policy ($):</label>
+    <input type="number" id="policySize" value="60000">
+  </div>
+  <div class="input-row">
+    <label>Term Length (Years):</label>
+    <input type="number" id="termPolicy" placeholder="Leave empty if none">
+  </div>
+  <div class="input-row">
+    <label>Term Budget ($/mo):</label>
+    <input type="number" id="termBudget" value="0">
+  </div>
+  
+  <h2>Personal Info</h2>
+  <div class="input-row">
+    <label>Sex:</label>
+    <select id="sex">
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
+  </div>
+  <div class="input-row">
+    <label>Current Age:</label>
+    <input type="number" id="age" value="35">
+  </div>
+  <div class="input-row">
+    <label>Tobacco User:</label>
+    <select id="tobaccoUser">
+      <option value="false">No</option>
+      <option value="true">Yes</option>
+    </select>
+  </div>
+  
+  <h2>Time Horizons</h2>
+  <div class="input-row">
+    <label>Retirement Age:</label>
+    <input type="number" id="retirementAge" value="65">
+    <span style="margin-left: 10px; color: #666;">Time Horizon Retire:</span>
+    <input type="text" id="timeHorizonRetire" class="readonly" readonly>
+  </div>
+  <div class="input-row">
+    <label>Life Expectancy:</label>
+    <input type="number" id="lifeExpectancy" value="76">
+    <span style="margin-left: 10px; color: #666;">Time Horizon Death:</span>
+    <input type="text" id="timeHorizonDeath" class="readonly" readonly>
+  </div>
+  <div class="input-row">
+    <label>Custom Time Horizon (Years):</label>
+    <input type="number" id="customTimeHorizon" placeholder="Leave empty for life expectancy">
+  </div>
+  
+  <h2>Advanced</h2>
+  <div class="input-row">
+    <label>Performance Percentile (%):</label>
+    <input type="number" id="performancePercentile" placeholder="Leave empty for default 10.4%">
+  </div>
+  
+  <button onclick="runCalculation()">Run Calculation</button>
 </div>
 
-<div id="loading" class="loading" style="display:none;">
-  Loading data files...
-</div>
-
+<div id="loading" style="display:none; margin: 10px 0; color: #666;">Loading data files...</div>
 <div id="error" class="error" style="display:none;"></div>
 
 <div id="results">
-  <div class="section">
-    <h2>GLOBAL VARIABLES</h2>
-    <table class="variable-table" id="globals-table"></table>
+  <div class="tables-container">
+    <div>
+      <h2>Global Variables</h2>
+      <table id="globals-table"></table>
+    </div>
+    
+    <div>
+      <h2>User Inputs</h2>
+      <table id="inputs-table"></table>
+    </div>
+    
+    <div>
+      <h2>Time Horizons</h2>
+      <table id="horizons-table"></table>
+    </div>
+    
+    <div>
+      <h2>Insurance Rates</h2>
+      <table id="insurance-table"></table>
+    </div>
+    
+    <div>
+      <h2>Final Results</h2>
+      <table id="results-table"></table>
+    </div>
   </div>
   
-  <div class="section">
-    <h2>USER INPUTS</h2>
-    <table class="variable-table" id="inputs-table"></table>
-  </div>
-  
-  <div class="section">
-    <h2>TIME HORIZONS</h2>
-    <table class="variable-table" id="horizons-table"></table>
-  </div>
-  
-  <div class="section">
-    <h2>INSURANCE RATES</h2>
-    <table class="variable-table" id="insurance-table"></table>
-  </div>
-  
-  <div class="section">
-    <h2>FINAL RESULTS</h2>
-    <table class="variable-table" id="results-table"></table>
-  </div>
-  
-  <div class="section">
-    <h2>ARRAYS</h2>
-    <div id="arrays-container"></div>
-  </div>
+  <h2>Year-by-Year Breakdown</h2>
+  <div id="arrays-container"></div>
 </div>
 
 <script>
 let calcReady = false;
 
-// Wait for calc engine to initialize
 async function init() {
   const loading = document.getElementById('loading');
   const error = document.getElementById('error');
@@ -328,7 +294,6 @@ function runCalculation() {
     return;
   }
   
-  // Gather inputs
   const inputs = {
     inflation: parseFloat(document.getElementById('inflation').value) / 100,
     marketGain: parseFloat(document.getElementById('marketGain').value) / 100,
@@ -345,10 +310,13 @@ function runCalculation() {
     performancePercentile: parseFloat(document.getElementById('performancePercentile').value) || null
   };
   
-  // Run calculation
-  const result = window.calcEngine.calculate(inputs);
+  // Update time horizon displays
+  const timeHorizonRetire = inputs.retirementAge - inputs.age;
+  const timeHorizonDeath = inputs.lifeExpectancy - inputs.age;
+  document.getElementById('timeHorizonRetire').value = timeHorizonRetire;
+  document.getElementById('timeHorizonDeath').value = timeHorizonDeath;
   
-  // Display results
+  const result = window.calcEngine.calculate(inputs);
   displayResults(result);
 }
 
@@ -356,22 +324,11 @@ function displayResults(result) {
   const resultsDiv = document.getElementById('results');
   resultsDiv.classList.add('visible');
   
-  // Display globals
   displayVariableTable('globals-table', result.globals);
-  
-  // Display inputs
   displayVariableTable('inputs-table', result.inputs);
-  
-  // Display time horizons
   displayVariableTable('horizons-table', result.timeHorizons);
-  
-  // Display insurance
   displayVariableTable('insurance-table', result.insurance);
-  
-  // Display final results
   displayVariableTable('results-table', result.results);
-  
-  // Display arrays
   displayArrays(result.arrays);
 }
 
@@ -379,18 +336,16 @@ function displayVariableTable(tableId, variables) {
   const table = document.getElementById(tableId);
   table.innerHTML = '';
   
-  // Header
   const thead = document.createElement('thead');
   thead.innerHTML = '<tr><th>Variable</th><th>Value</th></tr>';
   table.appendChild(thead);
   
-  // Body
   const tbody = document.createElement('tbody');
   for (const [key, value] of Object.entries(variables)) {
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td class="var-name">${key}</td>
-      <td class="var-value">${formatValue(value)}</td>
+      <td>${key}</td>
+      <td>${formatValue(value, key)}</td>
     `;
     tbody.appendChild(row);
   }
@@ -401,33 +356,43 @@ function displayArrays(arrays) {
   const container = document.getElementById('arrays-container');
   container.innerHTML = '';
   
-  // Get the longest array to determine row count
   const maxLength = Math.max(...Object.values(arrays).map(arr => arr.length));
   
-  // Create combined table
   const table = document.createElement('table');
   table.className = 'array-table';
   
-  // Header
   const thead = document.createElement('thead');
   const headerRow = document.createElement('tr');
-  headerRow.innerHTML = '<th>Index</th>';
-  for (const key of Object.keys(arrays)) {
+  headerRow.innerHTML = '<th>Year</th>';
+  
+  const columnNames = Object.keys(arrays);
+  for (const key of columnNames) {
     headerRow.innerHTML += `<th>${key}</th>`;
   }
   thead.appendChild(headerRow);
   table.appendChild(thead);
   
-  // Body
   const tbody = document.createElement('tbody');
   for (let i = 0; i < maxLength; i++) {
     const row = document.createElement('tr');
     row.innerHTML = `<td>${i}</td>`;
     
-    for (const arr of Object.values(arrays)) {
+    columnNames.forEach(key => {
+      const arr = arrays[key];
       const value = arr[i];
-      row.innerHTML += `<td>${formatValue(value)}</td>`;
-    }
+      
+      // Determine cell class based on column
+      let cellClass = '';
+      if (['marketGainsTotal', 'paidInTotal', 'payInYearAdjusted', 'paidInTotalAdjusted', 'totalInAccountAdjusted'].includes(key)) {
+        cellClass = 'col-grey';
+      } else if (key === 'accountIfWindowEnded') {
+        cellClass = 'col-blue';
+      } else if (key === 'totalInAccount') {
+        cellClass = 'col-green';
+      }
+      
+      row.innerHTML += `<td class="${cellClass}">${formatValue(value, key)}</td>`;
+    });
     
     tbody.appendChild(row);
   }
@@ -436,23 +401,27 @@ function displayArrays(arrays) {
   container.appendChild(table);
 }
 
-function formatValue(value) {
+function formatValue(value, key) {
   if (value === null || value === undefined) {
-    return '<span style="color:#64748b;">null</span>';
+    return '-';
   }
   if (typeof value === 'number') {
+    // No decimals for years
+    if (key && (key.includes('AGE') || key.includes('YEAR') || key.includes('HORIZON') || key === 'year')) {
+      return Math.round(value).toString();
+    }
+    // Regular numbers with decimals
     if (value > 1000 || value < -1000) {
-      return value.toLocaleString('en-US', { maximumFractionDigits: 2 });
+      return value.toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
     }
     return value.toFixed(4);
   }
   if (typeof value === 'boolean') {
-    return value ? 'true' : 'false';
+    return value ? 'Yes' : 'No';
   }
   return String(value);
 }
 
-// Initialize on load
 init();
 </script>
 
