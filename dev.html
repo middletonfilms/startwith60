@@ -18,17 +18,8 @@
     font-size: 13px;
   }
   
-  h1 {
-    font-size: 20px;
-    margin-bottom: 15px;
-  }
-  
-  h2 {
-    font-size: 14px;
-    margin-top: 15px;
-    margin-bottom: 8px;
-    font-weight: bold;
-  }
+  h1 { font-size: 20px; margin-bottom: 15px; }
+  h2 { font-size: 14px; margin-top: 15px; margin-bottom: 8px; font-weight: bold; }
   
   .input-row {
     display: flex;
@@ -50,23 +41,20 @@
     font-size: 12px;
   }
   
-  /* Remove spinner arrows */
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
   
-  input[type="number"] {
-    -moz-appearance: textfield;
-  }
+  input[type="number"] { -moz-appearance: textfield; }
   
-  .input-row .readonly {
+  .readonly {
     background: #e9e9e9;
     color: #666;
   }
   
-  .input-row .override {
+  .override {
     background: #e3f2fd;
   }
   
@@ -79,9 +67,7 @@
     font-size: 13px;
   }
   
-  button:hover {
-    background: #e0e0e0;
-  }
+  button:hover { background: #e0e0e0; }
   
   .tables-container {
     display: grid;
@@ -113,9 +99,7 @@
     white-space: nowrap;
   }
   
-  tr:nth-child(even) {
-    background: #fafafa;
-  }
+  tr:nth-child(even) { background: #fafafa; }
   
   .array-table {
     margin-top: 15px;
@@ -145,18 +129,9 @@
     font-weight: bold;
   }
   
-  /* Column background colors */
-  .col-grey {
-    background: #f0f0f0 !important;
-  }
-  
-  .col-blue {
-    background: #e3f2fd !important;
-  }
-  
-  .col-green {
-    background: #e8f5e9 !important;
-  }
+  .col-grey { background: #f0f0f0 !important; }
+  .col-blue { background: #e3f2fd !important; }
+  .col-green { background: #e8f5e9 !important; }
   
   .error {
     background: #fee;
@@ -166,13 +141,8 @@
     margin: 10px 0;
   }
   
-  #results {
-    display: none;
-  }
-  
-  #results.visible {
-    display: block;
-  }
+  #results { display: none; }
+  #results.visible { display: block; }
 </style>
 </head>
 <body>
@@ -187,7 +157,7 @@
   </div>
   <div class="input-row">
     <label>Inflation Rate (%):</label>
-    <input type="number" id="inflation" value="3.28" step="0.01">
+    <input type="number" id="inflation" value="3.28" step="0.01" oninput="runCalculation()">
   </div>
   
   <h2>Budget & Insurance</h2>
@@ -200,28 +170,28 @@
   </div>
   <div class="input-row">
     <label>Term Length (Years):</label>
-    <input type="number" id="termPolicy" placeholder="Leave empty if none">
+    <input type="number" id="termPolicy" placeholder="Leave empty if none" oninput="runCalculation()">
   </div>
   <div class="input-row">
     <label>Term Budget ($/mo):</label>
-    <input type="number" id="termBudget" value="0">
+    <input type="number" id="termBudget" value="0" oninput="runCalculation()">
   </div>
   
   <h2>Personal Info</h2>
   <div class="input-row">
     <label>Sex:</label>
-    <select id="sex" onchange="updateTimeHorizons()">
+    <select id="sex" onchange="handlePersonalInfoChange()">
       <option value="male">Male</option>
       <option value="female">Female</option>
     </select>
   </div>
   <div class="input-row">
     <label>Current Age:</label>
-    <input type="number" id="age" value="35" oninput="updateTimeHorizons()">
+    <input type="number" id="age" value="35" oninput="handlePersonalInfoChange()">
   </div>
   <div class="input-row">
     <label>Tobacco User:</label>
-    <select id="tobaccoUser">
+    <select id="tobaccoUser" onchange="handlePersonalInfoChange()">
       <option value="false">No</option>
       <option value="true">Yes</option>
     </select>
@@ -299,6 +269,7 @@
 
 <script>
 let calcReady = false;
+let cagrPercentiles = {}; // Will store CAGR lookup by year
 
 async function init() {
   const loading = document.getElementById('loading');
@@ -308,6 +279,7 @@ async function init() {
   
   try {
     await initCalcEngine();
+    await loadCAGRPercentiles();
     calcReady = true;
     loading.style.display = 'none';
     updateTimeHorizons();
@@ -319,30 +291,129 @@ async function init() {
   }
 }
 
+async function loadCAGRPercentiles() {
+  // Load market history and extract CAGR percentiles
+  const marketData = await window.dataLoader.loadExcel('MarketHistory.xlsx', 'Market');
+  
+  // Rows 1386-1402 contain CAGR percentiles
+  // Column 2 has percentile (0.001...0.999)
+  // Columns 3+ have CAGR for different year spans
+  
+  for (let row = 1386; row <= 1402; row++) {
+    const percentile = marketData[row][2];
+    if (percentile) {
+      cagrPercentiles[percentile] = {};
+      // Store CAGR for each year span (columns 3+)
+      for (let col = 3; col < marketData[row].length; col++) {
+        const yearSpan = col - 2; // Column 3 = 1 year, column 4 = 2 years, etc
+        const cagr = marketData[row][col];
+        if (cagr !== null && cagr !== undefined) {
+          cagrPercentiles[percentile][yearSpan] = cagr;
+        }
+      }
+    }
+  }
+}
+
+function getCAGRForPercentile(percentile, years) {
+  // Convert percentile (50) to decimal (0.5)
+  const pct = percentile / 100;
+  
+  // Find closest percentile in our data
+  const available = Object.keys(cagrPercentiles).map(Number).sort((a,b) => a-b);
+  let closest = available[0];
+  let minDiff = Math.abs(pct - closest);
+  
+  for (const p of available) {
+    const diff = Math.abs(pct - p);
+    if (diff < minDiff) {
+      minDiff = diff;
+      closest = p;
+    }
+  }
+  
+  const cagr = cagrPercentiles[closest][years];
+  if (!cagr) return null;
+  
+  // CAGR is stored as multiplier (1.104 = 10.4% growth)
+  // Convert to percentage
+  return ((cagr - 1) * 100).toFixed(2);
+}
+
+function getRatePerThousand(age, sex) {
+  // Get rate from rate table
+  // Formula: rate per $1000 of coverage
+  const rates = window.calcEngine.data.rateTables;
+  if (!rates || !rates[age]) return null;
+  
+  return rates[age][sex];
+}
+
 function handleBudgetInput() {
   const budget = document.getElementById('monthlyBudget');
   const policy = document.getElementById('policySize');
+  const age = parseInt(document.getElementById('age').value);
+  const sex = document.getElementById('sex').value;
   
   if (budget.value) {
     policy.classList.add('override');
-    policy.value = ''; // Clear policy when budget is entered
+    
+    // Calculate policy size from budget
+    // Formula: (Monthly Budget * 12) / (Rate per 1000 / 1000) = Policy Size
+    const monthlyBudget = parseFloat(budget.value);
+    const rate = getRatePerThousand(age, sex);
+    
+    if (rate) {
+      const annualBudget = monthlyBudget * 12;
+      const policySize = (annualBudget / rate) * 1000;
+      policy.value = Math.round(policySize);
+    }
   } else {
     policy.classList.remove('override');
   }
+  
+  runCalculation();
 }
 
 function handlePolicyInput() {
   const budget = document.getElementById('monthlyBudget');
   const policy = document.getElementById('policySize');
+  const age = parseInt(document.getElementById('age').value);
+  const sex = document.getElementById('sex').value;
   
   if (policy.value) {
     budget.classList.add('override');
-    // Calculate budget from policy (this is just a placeholder calculation)
-    // You'd use actual rate table logic here
-    budget.value = ''; // Clear budget when policy is entered
+    
+    // Calculate budget from policy size
+    // Formula: (Policy Size / 1000) * Rate = Annual Premium
+    const policySize = parseFloat(policy.value);
+    const rate = getRatePerThousand(age, sex);
+    
+    if (rate) {
+      const annualPremium = (policySize / 1000) * rate;
+      const monthlyBudget = annualPremium / 12;
+      budget.value = monthlyBudget.toFixed(2);
+    }
   } else {
     budget.classList.remove('override');
   }
+  
+  runCalculation();
+}
+
+function handlePersonalInfoChange() {
+  // Age, sex, or tobacco changed - recalculate insurance
+  const budget = document.getElementById('monthlyBudget');
+  const policy = document.getElementById('policySize');
+  
+  // Recalculate whichever is not overridden
+  if (budget.value && !budget.classList.contains('override')) {
+    handleBudgetInput();
+  } else if (policy.value && !policy.classList.contains('override')) {
+    handlePolicyInput();
+  }
+  
+  updateTimeHorizons();
 }
 
 function handleMarketGainInput() {
@@ -354,6 +425,7 @@ function handleMarketGainInput() {
   }
   
   updateTimeHorizons();
+  runCalculation();
 }
 
 function handlePercentileInput() {
@@ -367,6 +439,7 @@ function handlePercentileInput() {
   }
   
   updateTimeHorizons();
+  runCalculation();
 }
 
 function updateTimeHorizons() {
@@ -385,19 +458,28 @@ function updateTimeHorizons() {
   document.getElementById('timeHorizonDeath').value = timeHorizonDeath;
   document.getElementById('timeHorizonCustom').value = timeHorizonCustom !== null ? timeHorizonCustom : '';
   
-  // Market gains - either from percentile lookup or default market gain
-  // For now, just show the market gain percentage
-  const marketGainDisplay = percentile ? `${percentile}th percentile` : `${marketGain}%`;
-  document.getElementById('marketGainRetire').value = marketGainDisplay;
-  document.getElementById('marketGainDeath').value = marketGainDisplay;
-  document.getElementById('marketGainCustom').value = timeHorizonCustom !== null ? marketGainDisplay : '';
+  // Calculate market gains
+  if (percentile) {
+    // Use percentile lookup
+    const retireGain = getCAGRForPercentile(percentile, timeHorizonRetire);
+    const deathGain = getCAGRForPercentile(percentile, timeHorizonDeath);
+    const customGain = timeHorizonCustom ? getCAGRForPercentile(percentile, timeHorizonCustom) : null;
+    
+    document.getElementById('marketGainRetire').value = retireGain ? `${retireGain}% (P${percentile})` : '-';
+    document.getElementById('marketGainDeath').value = deathGain ? `${deathGain}% (P${percentile})` : '-';
+    document.getElementById('marketGainCustom').value = customGain ? `${customGain}% (P${percentile})` : '';
+  } else {
+    // Use default market gain
+    document.getElementById('marketGainRetire').value = `${marketGain}%`;
+    document.getElementById('marketGainDeath').value = `${marketGain}%`;
+    document.getElementById('marketGainCustom').value = timeHorizonCustom ? `${marketGain}%` : '';
+  }
+  
+  runCalculation();
 }
 
 function runCalculation() {
-  if (!calcReady) {
-    alert('Calculator not ready yet. Please wait...');
-    return;
-  }
+  if (!calcReady) return;
   
   const inputs = {
     inflation: parseFloat(document.getElementById('inflation').value) / 100,
@@ -506,15 +588,12 @@ function formatValue(value, key) {
     return '-';
   }
   if (typeof value === 'number') {
-    // No decimals for years/ages
     if (key && (key.includes('AGE') || key.includes('YEAR') || key.includes('HORIZON') || key === 'year')) {
       return Math.round(value).toString();
     }
-    // 4 decimals for inflationValue
     if (key === 'inflationValue') {
       return value.toFixed(4);
     }
-    // 2 decimals for dollar amounts
     if (value > 100 || value < -100) {
       return value.toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
     }
