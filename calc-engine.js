@@ -148,11 +148,6 @@ class CalcEngine {
     const TOTAL_PAID_IN_ADJUSTED = paidInTotalAdjusted[paidInTotalAdjusted.length - 1];
     const TOTAL_MARKET_GAINS = marketGainsTotal[marketGainsTotal.length - 1] || 0;
     const TOTAL_TERM_COST = termSetAside.reduce((sum, val) => sum + val, 0);
-    
-    // Total paid in over time horizon
-    const TOTAL_PAID_IN = payIn.reduce((sum, val) => sum + val, 0);
-    const TOTAL_PAID_IN_ADJUSTED = payInAdjusted.reduce((sum, val) => sum + val, 0);
-    const TOTAL_TERM_COST = termSetAside.reduce((sum, val) => sum + val, 0);
 
     // === MORTALITY LOOKUP ===
     const MORTALITY_LIKELIHOOD = this._getMortalityProbability(
