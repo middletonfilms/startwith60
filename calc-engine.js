@@ -54,64 +54,100 @@ class CalcEngine {
     const ANNUAL_BUDGET = MONTHLY_BUDGET * 12;
 
     // === DEVELOPER-FRIENDLY ARRAY NAMES ===
+    
     // inflationValue = $1 buying power after N years of inflation
     const inflationValue = TIME_HORIZON_ARRAY.map(year => 
       Math.pow(INFLATION_MULT, year)
     );
 
-    // payIn = Annual contribution before any adjustments
-    const payIn = TIME_HORIZON_ARRAY.map(year => ANNUAL_BUDGET);
-
     // termSetAside = Money set aside for term insurance each year
     const termSetAside = TIME_HORIZON_ARRAY.map(year => {
-      // If term policy exists and this year is within term period
-      if (TERM_POLICY && year < TERM_POLICY) {
+      if (TERM_POLICY && year < TERM_POLICY && year > 0) {
         return TERM_BUDGET * 12; // Convert monthly to annual
       }
       return 0;
     });
 
-    // payInAdjusted = Annual contribution adjusted for inflation
-    // Formula: PAY IN * (INFLATION_MULT ^ year)
-    const payInAdjusted = payIn.map((contribution, year) =>
+    // payInYear = Annual contribution each year (constant)
+    const payInYear = TIME_HORIZON_ARRAY.map(() => ANNUAL_BUDGET);
+
+    // paidInTotal = Cumulative contributions over time
+    const paidInTotal = [];
+    let cumulativePayIn = 0;
+    for (let i = 0; i < TIME_HORIZON_ARRAY.length; i++) {
+      cumulativePayIn += payInYear[i];
+      paidInTotal.push(cumulativePayIn);
+    }
+
+    // payInYearAdjusted = Annual contribution adjusted for inflation
+    const payInYearAdjusted = payInYear.map((contribution, year) =>
       contribution * Math.pow(INFLATION_MULT, year)
     );
 
-    // marketGains = Gains from previous year's total (NOT including current contribution)
-    // Formula: Previous total * MARKET_GAIN
-    const marketGains = [];
+    // paidInTotalAdjusted = Cumulative inflation-adjusted contributions
+    const paidInTotalAdjusted = [];
+    let cumulativePayInAdj = 0;
+    for (let i = 0; i < TIME_HORIZON_ARRAY.length; i++) {
+      cumulativePayInAdj += payInYearAdjusted[i];
+      paidInTotalAdjusted.push(cumulativePayInAdj);
+    }
+
+    // marketGainsYear = Market gains THIS year (from previous balance)
+    // marketGainsTotal = Cumulative market gains over all years
+    // accountIfWindowEnded = What account would be worth if cashed out (no new contributions)
+    // totalInAccount = Running account total with contributions
+    // totalInAccountAdjusted = Account total adjusted for inflation
     
-    // accountTotal = Running total in account after contribution and growth
-    // Year 0: Just the contribution
-    // Year N: (Previous total + current contribution - term cost) * MARKET_MULT
-    const accountTotal = [];
+    const marketGainsYear = [];
+    const marketGainsTotal = [];
+    const accountIfWindowEnded = [];
+    const totalInAccount = [];
+    const totalInAccountAdjusted = [];
     
     let runningTotal = 0;
+    let cumulativeGains = 0;
     
     for (let i = 0; i < TIME_HORIZON_ARRAY.length; i++) {
-      const contribution = payIn[i];
+      const contribution = payInYear[i];
       const termCost = termSetAside[i];
       
       if (i === 0) {
         // Year 0: Just the contribution (no growth yet)
         runningTotal = contribution - termCost;
-        marketGains.push(0);
+        marketGainsYear.push(null); // No gains first year
+        marketGainsTotal.push(null);
+        accountIfWindowEnded.push(null);
       } else {
         // Calculate gains from previous year's balance
-        const gains = runningTotal * MARKET_GAIN;
-        marketGains.push(gains);
+        const gainsThisYear = runningTotal * MARKET_GAIN;
+        cumulativeGains += gainsThisYear;
         
-        // Add contribution, subtract term cost, add gains
-        runningTotal = runningTotal + contribution - termCost + gains;
+        marketGainsYear.push(gainsThisYear);
+        marketGainsTotal.push(cumulativeGains);
+        
+        // Account if window ended = previous total + gains (no new contribution)
+        accountIfWindowEnded.push(runningTotal + gainsThisYear);
+        
+        // Add contribution and gains, subtract term cost
+        runningTotal = runningTotal + gainsThisYear + contribution - termCost;
       }
       
-      accountTotal.push(runningTotal);
+      totalInAccount.push(runningTotal);
+      
+      // Adjust for inflation
+      const inflationAdjusted = runningTotal * inflationValue[i];
+      totalInAccountAdjusted.push(inflationAdjusted);
     }
 
     // === FINAL METRICS ===
-    const ACCOUNT_TOTAL = accountTotal[accountTotal.length - 1];
+    const ACCOUNT_TOTAL = totalInAccount[totalInAccount.length - 1];
+    const ACCOUNT_TOTAL_ADJUSTED = totalInAccountAdjusted[totalInAccountAdjusted.length - 1];
     const ACCOUNT_INCOME = ACCOUNT_TOTAL * MARKET_GAIN;
-    const FINAL_YEAR_GROWTH = accountTotal[accountTotal.length - 1] - (accountTotal[accountTotal.length - 2] || 0);
+    const FINAL_YEAR_GROWTH = totalInAccount[totalInAccount.length - 1] - (totalInAccount[totalInAccount.length - 2] || 0);
+    const TOTAL_PAID_IN = paidInTotal[paidInTotal.length - 1];
+    const TOTAL_PAID_IN_ADJUSTED = paidInTotalAdjusted[paidInTotalAdjusted.length - 1];
+    const TOTAL_MARKET_GAINS = marketGainsTotal[marketGainsTotal.length - 1] || 0;
+    const TOTAL_TERM_COST = termSetAside.reduce((sum, val) => sum + val, 0);
     
     // Total paid in over time horizon
     const TOTAL_PAID_IN = payIn.reduce((sum, val) => sum + val, 0);
@@ -180,24 +216,31 @@ class CalcEngine {
         ACTIVE_TIME_HORIZON
       },
       
-      // Arrays (developer-friendly names)
+      // Arrays (developer-friendly names matching Excel columns)
       arrays: {
         year: TIME_HORIZON_ARRAY,
         inflationValue: inflationValue,
-        payIn: payIn,
-        payInAdjusted: payInAdjusted,
+        marketGainsYear: marketGainsYear,
+        marketGainsTotal: marketGainsTotal,
+        accountIfWindowEnded: accountIfWindowEnded,
         termSetAside: termSetAside,
-        marketGains: marketGains,
-        accountTotal: accountTotal
+        payInYear: payInYear,
+        paidInTotal: paidInTotal,
+        payInYearAdjusted: payInYearAdjusted,
+        paidInTotalAdjusted: paidInTotalAdjusted,
+        totalInAccount: totalInAccount,
+        totalInAccountAdjusted: totalInAccountAdjusted
       },
       
       // Final results
       results: {
         ACCOUNT_TOTAL,
+        ACCOUNT_TOTAL_ADJUSTED,
         ACCOUNT_INCOME,
         FINAL_YEAR_GROWTH,
         TOTAL_PAID_IN,
         TOTAL_PAID_IN_ADJUSTED,
+        TOTAL_MARKET_GAINS,
         TOTAL_TERM_COST,
         MORTALITY_LIKELIHOOD,
         MARKET_PERFORMANCE_OVERRIDE
