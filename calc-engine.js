@@ -349,7 +349,7 @@ async function initCalcEngine() {
   return window.calcEngine;
 }
 
-// Auto-initialize if not already done
-if (typeof window !== 'undefined' && window.dataLoader) {
-  initCalcEngine().catch(console.error);
+// Make initCalcEngine globally available
+if (typeof window !== 'undefined') {
+  window.initCalcEngine = initCalcEngine;
 }
