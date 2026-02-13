@@ -148,42 +148,43 @@ class DataLoader {
    * Structure: Array of { year, month, amount, growth_1yr, growth_2yr, ... }
    */
   _parseMarketHistory(raw) {
-    const history = [];
+  const history = [];
+  
+  // Row 1 has headers: Year, Month, Amount ($), then 1, 2, 3, 4... (year spans)
+  const header = raw[1];
+  
+  // Data starts at row 2, goes until row 1385 (before percentile section at 1386)
+  for (let i = 2; i < 1386; i++) {
+    const row = raw[i];
     
-    // Row 0 has headers: Year, Month, Amount ($), then growth columns
-    const header = raw[0];
+    const year = row[0];
+    const month = row[1];
+    const amount = row[2];
     
-    for (let i = 1; i < raw.length; i++) {
-      const row = raw[i];
+    if (!year || !month || !amount) continue;
+    
+    const entry = {
+      year,
+      month,
+      amount,
+      growth: {}
+    };
+    
+    // Columns 3+ are growth over X years
+    for (let j = 3; j < row.length; j++) {
+      const years = header[j]; // This is 1, 2, 3, 4, etc.
+      const growthValue = row[j];
       
-      const year = row[0];
-      const month = row[1];
-      const amount = row[2];
-      
-      if (!year || !month || !amount) continue;
-      
-      const entry = {
-        year,
-        month,
-        amount,
-        growth: {}
-      };
-      
-      // Columns 3+ are growth over X years
-      for (let j = 3; j < row.length; j++) {
-        const years = header[j];
-        const growthValue = row[j];
-        
-        if (years !== null && growthValue !== null) {
-          entry.growth[years] = growthValue;
-        }
+      if (years !== null && years !== undefined && growthValue !== null && growthValue !== undefined) {
+        entry.growth[years] = growthValue;
       }
-      
-      history.push(entry);
     }
     
-    return history;
+    history.push(entry);
   }
+  
+  return history;
+}
 }
 
 // Create global instance
