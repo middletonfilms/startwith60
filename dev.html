@@ -189,29 +189,8 @@
     <label>Term Budget ($/mo):</label>
     <input type="number" id="termBudget" value="0" oninput="runCalculation()">
   </div>
-  
-  <h2>Personal Info</h2>
-  <div class="input-row">
-    <label>Sex:</label>
-    <select id="sex" onchange="handleSexChange()">
-      <option value="">Select...</option>
-      <option value="male">Male</option>
-      <option value="female">Female</option>
-    </select>
-  </div>
-  <div class="input-row">
-    <label>Current Age:</label>
-    <input type="number" id="age" value="35" oninput="handlePersonalInfoChange()">
-  </div>
-  <div class="input-row">
-    <label>Tobacco User:</label>
-    <select id="tobaccoUser" onchange="handlePersonalInfoChange()">
-      <option value="false">No</option>
-      <option value="true">Yes</option>
-    </select>
-  </div>
-  
-  <h2>Time Horizons</h2>
+
+   <h2>Time Horizons</h2>
   <div class="input-row">
     <label>Retirement Age:</label>
     <input type="number" id="retirementAge" value="65" oninput="updateTimeHorizons()">
@@ -237,13 +216,33 @@
     <input type="text" id="marketGainCustom" class="readonly" readonly style="width: 100px;">
   </div>
   
+  <h2>Personal Info</h2>
+  <div class="input-row">
+    <label>Sex:</label>
+    <select id="sex" onchange="handleSexChange()">
+      <option value="">Select...</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
+  </div>
+  <div class="input-row">
+    <label>Current Age:</label>
+    <input type="number" id="age" value="35" oninput="handlePersonalInfoChange()">
+  </div>
+  <div class="input-row">
+    <label>Tobacco User:</label>
+    <select id="tobaccoUser" onchange="handlePersonalInfoChange()">
+      <option value="false">No</option>
+      <option value="true">Yes</option>
+    </select>
+  </div>
+  
   <h2>Advanced</h2>
   <div class="input-row">
     <label>Performance Percentile (%):</label>
     <input type="number" id="performancePercentile" class="override" placeholder="Leave empty for default" oninput="handlePercentileInput()">
   </div>
   
-  <button onclick="runCalculation()">Run Calculation</button>
 </div>
 
 <div id="loading" style="display:none; margin: 10px 0; color: #666;">Loading data files...</div>
@@ -333,21 +332,27 @@ async function loadCAGRPercentiles() {
 }
 
 function getCAGRForPercentile(percentile, years) {
-  const pct = percentile / 100;
-  const available = Object.keys(cagrPercentiles).map(Number).sort((a,b) => a-b);
-  let closest = available[0];
-  let minDiff = Math.abs(pct - closest);
+  if (years > 80) return 10.4; // Revert to default
   
-  for (const p of available) {
-    const diff = Math.abs(pct - p);
-    if (diff < minDiff) {
-      minDiff = diff;
-      closest = p;
+  if (!window.calcEngine || !window.calcEngine.data.marketHistory) return null;
+  
+  const history = window.calcEngine.data.marketHistory;
+  const performances = [];
+  
+  // Collect all performances for this time horizon
+  for (const entry of history) {
+    const growth = entry.growth[years];
+    if (growth !== null && growth !== undefined) {
+      performances.push(growth);
     }
   }
   
-  const cagr = cagrPercentiles[closest][years];
-  if (!cagr) return null;
+  if (performances.length === 0) return null;
+  
+  // Sort and find percentile
+  performances.sort((a, b) => a - b);
+  const index = Math.floor((percentile / 100) * (performances.length - 1));
+  const cagr = performances[index];
   
   return ((cagr - 1) * 100).toFixed(2);
 }
@@ -736,6 +741,13 @@ function displayVariableTable(tableId, variables) {
   table.appendChild(tbody);
 }
 
+function getMortalityForYear(currentAge, sex, yearsAhead) {
+  if (!window.calcEngine || !window.calcEngine.data.mortality) return null;
+  const mortality = window.calcEngine.data.mortality[sex];
+  if (!mortality || !mortality[currentAge]) return null;
+  return mortality[currentAge][yearsAhead] || null;
+}
+
 function displayArrays(arrays, currentAge) {
   const container = document.getElementById('arrays-container');
   container.innerHTML = '';
@@ -750,6 +762,7 @@ function displayArrays(arrays, currentAge) {
   headerRow.innerHTML = '<th>Year</th><th>Age</th>';
   
   const columnNames = Object.keys(arrays).filter(k => k !== 'year');
+  columnNames.push('mortalityLikelihood'); // Add mortality column
   for (const key of columnNames) {
     headerRow.innerHTML += `<th>${key}</th>`;
   }
@@ -763,19 +776,26 @@ function displayArrays(arrays, currentAge) {
     row.innerHTML = `<td>${i}</td><td>${age}</td>`;
     
     columnNames.forEach(key => {
-      const arr = arrays[key];
-      const value = arr[i];
-      
-      let cellClass = '';
-      if (['marketGainsTotal', 'paidInTotal', 'payInYearAdjusted', 'paidInTotalAdjusted', 'totalInAccountAdjusted'].includes(key)) {
-        cellClass = 'col-grey';
-      } else if (key === 'accountIfWindowEnded') {
-        cellClass = 'col-blue';
-      } else if (key === 'totalInAccount') {
-        cellClass = 'col-green';
+      if (key === 'mortalityLikelihood') {
+        // Get mortality from data
+        const yearsAhead = i;
+        const mortality = getMortalityForYear(currentAge, sex, yearsAhead);
+        row.innerHTML += `<td>${mortality !== null ? (mortality * 100).toFixed(2) + '%' : '-'}</td>`;
+      } else {
+        const arr = arrays[key];
+        const value = arr[i];
+        
+        let cellClass = '';
+        if (['marketGainsTotal', 'paidInTotal', 'payInYearAdjusted', 'paidInTotalAdjusted', 'totalInAccountAdjusted'].includes(key)) {
+          cellClass = 'col-grey';
+        } else if (key === 'accountIfWindowEnded') {
+          cellClass = 'col-blue';
+        } else if (key === 'totalInAccount') {
+          cellClass = 'col-green';
+        }
+        
+        row.innerHTML += `<td class="${cellClass}">${formatValue(value, key)}</td>`;
       }
-      
-      row.innerHTML += `<td class="${cellClass}">${formatValue(value, key)}</td>`;
     });
     
     tbody.appendChild(row);
@@ -790,7 +810,7 @@ function formatValue(value, key) {
     return '-';
   }
   if (typeof value === 'number') {
-    // No decimals for years/ages/life expectancy/horizons
+    // No decimals for years/ages/horizons
     if (key && (key.includes('AGE') || key.includes('YEAR') || key.includes('HORIZON') || 
                 key === 'year' || key === 'LIFE_EXPECTANCY' || 
                 key === 'TIME_HORIZON_DEATH' || key === 'TIME_HORIZON_RETIRE' || 
@@ -798,20 +818,32 @@ function formatValue(value, key) {
       return Math.round(value).toString();
     }
     
-    // 4 decimals for mortality likelihood and inflation value
+    // 4 decimals for mortality and inflation
     if (key === 'MORTALITY_LIKELIHOOD' || key === 'inflationValue') {
       return value.toFixed(4);
     }
     
-    // 2 decimals for all money/rate values
+    // Dollar amounts with $ and commas, 2 decimals
     if (key === 'MONTHLY_BUDGET' || key === 'POLICY_SIZE' || key === 'TERM_BUDGET' || 
-        key === 'TERM_POLICY_SIZE' || key === 'WHOLE_LIFE_RATE' || key === 'TERM_RATE' ||
-        key === 'WHOLE_LIFE_ANNUAL_COST' || key === 'TERM_ANNUAL_COST' ||
+        key === 'TERM_POLICY_SIZE' || key === 'WHOLE_LIFE_ANNUAL_COST' || key === 'TERM_ANNUAL_COST' ||
         key === 'ACCOUNT_TOTAL' || key === 'ACCOUNT_TOTAL_ADJUSTED' || 
         key === 'ACCOUNT_INCOME' || key === 'FINAL_YEAR_GROWTH' ||
         key === 'TOTAL_PAID_IN' || key === 'TOTAL_PAID_IN_ADJUSTED' ||
         key === 'TOTAL_MARKET_GAINS' || key === 'TOTAL_TERM_COST' ||
-        value > 100 || value < -100) {
+        key === 'payInYear' || key === 'paidInTotal' || key === 'payInYearAdjusted' ||
+        key === 'paidInTotalAdjusted' || key === 'marketGainsYear' || key === 'marketGainsTotal' ||
+        key === 'accountIfWindowEnded' || key === 'totalInAccount' || key === 'totalInAccountAdjusted' ||
+        key === 'termSetAside') {
+      return '$' + value.toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+    }
+    
+    // Rates (no $ sign)
+    if (key === 'WHOLE_LIFE_RATE' || key === 'TERM_RATE') {
+      return '$' + value.toFixed(2);
+    }
+    
+    // Everything else 2 decimals with commas
+    if (value > 100 || value < -100) {
       return value.toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
     }
     
