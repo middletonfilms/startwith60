@@ -1,280 +1,305 @@
 /**
  * CALCULATION ENGINE
- * Pure calculation logic - no UI
- * Takes user inputs, returns ALL variables and arrays
+ * Core business logic for all financial calculations
+ * Version controlled and self-documenting
  */
 
 class CalcEngine {
-  constructor(data) {
-    this.data = data; // rateTables, mortality, marketHistory from dataLoader
+  constructor() {
+    this.VERSION = '2/13/2026, 12:59 PM';
+    this.data = null;
   }
 
   /**
-   * Main calculation function
-   * @param {Object} inputs - User inputs
-   * @returns {Object} All variables, arrays, and results
+   * Initialize engine with data from Excel files
+   */
+  async init() {
+    if (!window.dataLoader) {
+      throw new Error('DataLoader not found. Make sure data-loader.js is loaded first.');
+    }
+    
+    this.data = await window.dataLoader.loadAll();
+    console.log('CalcEngine initialized with data:', this.data);
+  }
+
+  /**
+   * Main calculation method
+   * Returns organized data structure for visualization
    */
   calculate(inputs) {
-    // === GLOBAL VARIABLES (with defaults) ===
-    const INFLATION = inputs.inflation ?? 0.0328;
+    // Validate required inputs
+    if (!inputs.age || !inputs.sex) {
+      throw new Error('Age and sex are required');
+    }
+
+    // === GLOBAL VARIABLES ===
+    const INFLATION = inputs.inflation || 0.0328;
     const INFLATION_MULT = 1 - (INFLATION / (1 + INFLATION));
-    const MARKET_GAIN = inputs.marketGain ?? 0.104;
+    const MARKET_GAIN = inputs.marketGain || 0.104;
     const MARKET_MULT = 1 + MARKET_GAIN;
-    const RETIREMENT_AGE = inputs.retirementAge ?? 65;
-    const LIFE_EXPECTANCY = inputs.lifeExpectancy ?? (inputs.sex === 'female' ? 81 : 76);
-    const TOBACCO_USER = inputs.tobaccoUser ?? false;
+    const RETIREMENT_AGE = inputs.retirementAge || 65;
+    const LIFE_EXPECTANCY = inputs.lifeExpectancy || (inputs.sex === 'female' ? 81 : 76);
+    const TOBACCO_USER = inputs.tobaccoUser || false;
 
-    // === REQUIRED USER INPUTS ===
-    const AGE = inputs.age;
-    const SEX = inputs.sex; // 'male' or 'female'
-    const MONTHLY_BUDGET = inputs.monthlyBudget;
-    const POLICY_SIZE = inputs.policySize;
+    // === TIME HORIZONS ===
+    const TIME_HORIZON_DEATH = LIFE_EXPECTANCY - inputs.age;
+    const TIME_HORIZON_RETIRE = RETIREMENT_AGE - inputs.age;
+    const TIME_HORIZON_CUSTOM = inputs.customTimeHorizon || null;
+    const ACTIVE_TIME_HORIZON = TIME_HORIZON_CUSTOM || TIME_HORIZON_DEATH;
+
+    // === INSURANCE CALCULATIONS ===
+    const rateBrackets = this.getRateBrackets(inputs.age, inputs.sex);
+    const activeBracketIndex = this.getActiveBracket(rateBrackets, inputs.policySize, inputs.monthlyBudget);
+    const activeBracket = rateBrackets?.[activeBracketIndex] || null;
     
-    // === OPTIONAL INPUTS ===
-    const TERM_POLICY = inputs.termPolicy ?? null;
-    const TERM_BUDGET = inputs.termBudget ?? 0;
-    const TERM_POLICY_SIZE = inputs.termPolicySize ?? 0;
-    const PERFORMANCE_PERCENTILE = inputs.performancePercentile ?? null;
+    const MONTHLY_BUDGET = inputs.monthlyBudget || 
+      (inputs.policySize && activeBracket ? (inputs.policySize / 1000) * activeBracket.ratePerThousand : 0);
+    const POLICY_SIZE = inputs.policySize || 
+      (inputs.monthlyBudget && activeBracket ? (inputs.monthlyBudget / activeBracket.ratePerThousand) * 1000 : 0);
     
-    // === CUSTOM TIME HORIZONS ===
-    const CUSTOM_TIME_HORIZON = inputs.customTimeHorizon ?? null;
-
-    // === CALCULATED TIME HORIZONS ===
-    const TIME_HORIZON_DEATH = LIFE_EXPECTANCY - AGE;
-    const TIME_HORIZON_RETIRE = RETIREMENT_AGE - AGE;
-    const ACTIVE_TIME_HORIZON = CUSTOM_TIME_HORIZON ?? TIME_HORIZON_DEATH;
-
-    // === TIME HORIZON ARRAY (0 to ACTIVE_TIME_HORIZON inclusive) ===
-    const TIME_HORIZON_ARRAY = Array.from(
-      { length: ACTIVE_TIME_HORIZON + 1 }, 
-      (_, i) => i
-    );
-
-    // === ANNUAL BUDGET ===
-    const ANNUAL_BUDGET = MONTHLY_BUDGET * 12;
-
-    // === DEVELOPER-FRIENDLY ARRAY NAMES ===
+    const WHOLE_LIFE_RATE = activeBracket?.ratePerThousand || 0;
+    const WHOLE_LIFE_ANNUAL_COST = MONTHLY_BUDGET * 12;
     
-    // inflationValue = $1 buying power after N years of inflation
-    const inflationValue = TIME_HORIZON_ARRAY.map(year => 
-      Math.pow(INFLATION_MULT, year)
-    );
+    const TERM_POLICY = inputs.termPolicy || null;
+    const TERM_BUDGET = inputs.termBudget || 0;
+    const TERM_POLICY_SIZE = inputs.termPolicySize || 0;
+    const TERM_RATE = 0; // TODO: Calculate from term rate table
+    const TERM_ANNUAL_COST = TERM_BUDGET * 12;
 
-    // termSetAside = Money set aside for term insurance each year
-    const termSetAside = TIME_HORIZON_ARRAY.map(year => {
-      if (TERM_POLICY && year < TERM_POLICY && year > 0) {
-        return TERM_BUDGET * 12; // Convert monthly to annual
-      }
-      return 0;
+    // === MORTALITY ===
+    const MORTALITY_LIKELIHOOD = this.getMortalityProbability(inputs.age, inputs.sex, ACTIVE_TIME_HORIZON);
+
+    // === ARRAY CALCULATIONS ===
+    const arrays = this.calculateArrays({
+      timeHorizon: ACTIVE_TIME_HORIZON,
+      monthlyBudget: MONTHLY_BUDGET,
+      termBudget: TERM_BUDGET,
+      termPolicy: TERM_POLICY,
+      marketMult: MARKET_MULT,
+      inflationMult: INFLATION_MULT,
+      currentAge: inputs.age,
+      sex: inputs.sex
     });
 
-    // payInYear = Annual contribution each year (constant)
-    const payInYear = TIME_HORIZON_ARRAY.map(() => ANNUAL_BUDGET);
-
-    // paidInTotal = Cumulative contributions over time
-    const paidInTotal = [];
-    let cumulativePayIn = 0;
-    for (let i = 0; i < TIME_HORIZON_ARRAY.length; i++) {
-      cumulativePayIn += payInYear[i];
-      paidInTotal.push(cumulativePayIn);
-    }
-
-    // payInYearAdjusted = Annual contribution adjusted for inflation
-    const payInYearAdjusted = payInYear.map((contribution, year) =>
-      contribution * Math.pow(INFLATION_MULT, year)
-    );
-
-    // paidInTotalAdjusted = Cumulative inflation-adjusted contributions
-    const paidInTotalAdjusted = [];
-    let cumulativePayInAdj = 0;
-    for (let i = 0; i < TIME_HORIZON_ARRAY.length; i++) {
-      cumulativePayInAdj += payInYearAdjusted[i];
-      paidInTotalAdjusted.push(cumulativePayInAdj);
-    }
-
-    // marketGainsYear = Market gains THIS year (from previous balance)
-    // marketGainsTotal = Cumulative market gains over all years
-    // accountIfWindowEnded = What account would be worth if cashed out (no new contributions)
-    // totalInAccount = Running account total with contributions
-    // totalInAccountAdjusted = Account total adjusted for inflation
-    
-    const marketGainsYear = [];
-    const marketGainsTotal = [];
-    const accountIfWindowEnded = [];
-    const totalInAccount = [];
-    const totalInAccountAdjusted = [];
-    
-    let runningTotal = 0;
-    let cumulativeGains = 0;
-    
-    for (let i = 0; i < TIME_HORIZON_ARRAY.length; i++) {
-      const contribution = payInYear[i];
-      const termCost = termSetAside[i];
-      
-      if (i === 0) {
-        // Year 0: Just the contribution (no growth yet)
-        runningTotal = contribution - termCost;
-        marketGainsYear.push(null); // No gains first year
-        marketGainsTotal.push(null);
-        accountIfWindowEnded.push(null);
-      } else {
-        // Calculate gains from previous year's balance
-        const gainsThisYear = runningTotal * MARKET_GAIN;
-        cumulativeGains += gainsThisYear;
-        
-        marketGainsYear.push(gainsThisYear);
-        marketGainsTotal.push(cumulativeGains);
-        
-        // Account if window ended = previous total + gains (no new contribution)
-        accountIfWindowEnded.push(runningTotal + gainsThisYear);
-        
-        // Add contribution and gains, subtract term cost
-        runningTotal = runningTotal + gainsThisYear + contribution - termCost;
-      }
-      
-      totalInAccount.push(runningTotal);
-      
-      // Adjust for inflation
-      const inflationAdjusted = runningTotal * inflationValue[i];
-      totalInAccountAdjusted.push(inflationAdjusted);
-    }
-
-    // === FINAL METRICS ===
-    const ACCOUNT_TOTAL = totalInAccount[totalInAccount.length - 1];
-    const ACCOUNT_TOTAL_ADJUSTED = totalInAccountAdjusted[totalInAccountAdjusted.length - 1];
+    // === FINAL RESULTS ===
+    const ACCOUNT_TOTAL = arrays.totalInAccount[arrays.totalInAccount.length - 1];
+    const ACCOUNT_TOTAL_ADJUSTED = arrays.totalInAccountAdjusted[arrays.totalInAccountAdjusted.length - 1];
     const ACCOUNT_INCOME = ACCOUNT_TOTAL * MARKET_GAIN;
-    const FINAL_YEAR_GROWTH = totalInAccount[totalInAccount.length - 1] - (totalInAccount[totalInAccount.length - 2] || 0);
-    const TOTAL_PAID_IN = paidInTotal[paidInTotal.length - 1];
-    const TOTAL_PAID_IN_ADJUSTED = paidInTotalAdjusted[paidInTotalAdjusted.length - 1];
-    const TOTAL_MARKET_GAINS = marketGainsTotal[marketGainsTotal.length - 1] || 0;
-    const TOTAL_TERM_COST = termSetAside.reduce((sum, val) => sum + val, 0);
+    const FINAL_YEAR_GROWTH = arrays.marketGainsYear[arrays.marketGainsYear.length - 1];
+    const TOTAL_PAID_IN = arrays.paidInTotal[arrays.paidInTotal.length - 1];
+    const TOTAL_PAID_IN_ADJUSTED = arrays.paidInTotalAdjusted[arrays.paidInTotalAdjusted.length - 1];
+    const TOTAL_MARKET_GAINS = arrays.marketGainsTotal[arrays.marketGainsTotal.length - 1];
+    const TOTAL_TERM_COST = arrays.termSetAside.reduce((sum, val) => sum + val, 0);
 
-    // === MORTALITY LOOKUP ===
-    const MORTALITY_LIKELIHOOD = this._getMortalityProbability(
-      AGE, 
-      SEX, 
-      ACTIVE_TIME_HORIZON
-    );
-
-    // === MARKET PERFORMANCE LOOKUP (if percentile specified) ===
-    let MARKET_PERFORMANCE_OVERRIDE = null;
-    if (PERFORMANCE_PERCENTILE !== null) {
-      MARKET_PERFORMANCE_OVERRIDE = this._getMarketPerformance(
-        ACTIVE_TIME_HORIZON,
-        PERFORMANCE_PERCENTILE
-      );
-    }
-
-    // === RATE TABLE LOOKUPS ===
-    const WHOLE_LIFE_RATE = this._getInsuranceRate(AGE, SEX, TOBACCO_USER, 'whole');
-    const TERM_RATE = TERM_POLICY ? this._getInsuranceRate(AGE, SEX, TOBACCO_USER, 'term') : null;
-
-    // Calculate actual insurance costs if policy sizes are known
-    const WHOLE_LIFE_ANNUAL_COST = POLICY_SIZE && WHOLE_LIFE_RATE 
-      ? (POLICY_SIZE / 1000) * WHOLE_LIFE_RATE * 12
-      : null;
-    
-    const TERM_ANNUAL_COST = TERM_POLICY_SIZE && TERM_RATE
-      ? (TERM_POLICY_SIZE / 1000) * TERM_RATE * 12
-      : null;
-
-    // === RETURN ALL VARIABLES ===
+    // === RETURN ORGANIZED STRUCTURE ===
     return {
-      // Global variables
-      globals: {
-        INFLATION,
-        INFLATION_MULT,
-        MARKET_GAIN,
-        MARKET_MULT,
-        RETIREMENT_AGE,
-        LIFE_EXPECTANCY,
-        TOBACCO_USER
+      metadata: {
+        engineVersion: this.VERSION,
+        calculatedAt: new Date().toLocaleString()
       },
-      
-      // User inputs
-      inputs: {
-        AGE,
-        SEX,
-        MONTHLY_BUDGET,
-        POLICY_SIZE,
-        TERM_POLICY,
-        TERM_BUDGET,
-        TERM_POLICY_SIZE,
-        PERFORMANCE_PERCENTILE,
-        CUSTOM_TIME_HORIZON
+
+      sections: {
+        globals: {
+          INFLATION,
+          INFLATION_MULT,
+          MARKET_GAIN,
+          MARKET_MULT,
+          RETIREMENT_AGE,
+          LIFE_EXPECTANCY,
+          TOBACCO_USER
+        },
+
+        inputs: {
+          AGE: inputs.age,
+          SEX: inputs.sex,
+          MONTHLY_BUDGET,
+          POLICY_SIZE,
+          TERM_POLICY,
+          TERM_BUDGET,
+          TERM_POLICY_SIZE
+        },
+
+        timeHorizons: {
+          TIME_HORIZON_DEATH,
+          TIME_HORIZON_RETIRE,
+          TIME_HORIZON_CUSTOM,
+          ACTIVE_TIME_HORIZON
+        },
+
+        insurance: {
+          WHOLE_LIFE_RATE,
+          WHOLE_LIFE_ANNUAL_COST,
+          TERM_RATE,
+          TERM_ANNUAL_COST,
+          MORTALITY_LIKELIHOOD
+        },
+
+        results: {
+          ACCOUNT_TOTAL,
+          ACCOUNT_TOTAL_ADJUSTED,
+          ACCOUNT_INCOME,
+          FINAL_YEAR_GROWTH,
+          TOTAL_PAID_IN,
+          TOTAL_PAID_IN_ADJUSTED,
+          TOTAL_MARKET_GAINS,
+          TOTAL_TERM_COST
+        }
       },
-      
-      // Time horizons
-      timeHorizons: {
-        TIME_HORIZON_DEATH,
-        TIME_HORIZON_RETIRE,
-        ACTIVE_TIME_HORIZON
-      },
-      
-      // Arrays (developer-friendly names matching Excel columns)
-      arrays: {
-        year: TIME_HORIZON_ARRAY,
-        inflationValue: inflationValue,
-        marketGainsYear: marketGainsYear,
-        marketGainsTotal: marketGainsTotal,
-        accountIfWindowEnded: accountIfWindowEnded,
-        termSetAside: termSetAside,
-        payInYear: payInYear,
-        paidInTotal: paidInTotal,
-        payInYearAdjusted: payInYearAdjusted,
-        paidInTotalAdjusted: paidInTotalAdjusted,
-        totalInAccount: totalInAccount,
-        totalInAccountAdjusted: totalInAccountAdjusted
-      },
-      
-      // Final results
-      results: {
-        ACCOUNT_TOTAL,
-        ACCOUNT_TOTAL_ADJUSTED,
-        ACCOUNT_INCOME,
-        FINAL_YEAR_GROWTH,
-        TOTAL_PAID_IN,
-        TOTAL_PAID_IN_ADJUSTED,
-        TOTAL_MARKET_GAINS,
-        TOTAL_TERM_COST,
-        MORTALITY_LIKELIHOOD,
-        MARKET_PERFORMANCE_OVERRIDE
-      },
-      
-      // Insurance rates
-      insurance: {
-        WHOLE_LIFE_RATE,
-        TERM_RATE,
-        WHOLE_LIFE_ANNUAL_COST,
-        TERM_ANNUAL_COST
+
+      arrays: arrays,
+
+      tables: {
+        rateTable: {
+          age: inputs.age,
+          sex: inputs.sex,
+          brackets: rateBrackets,
+          activeBracketIndex: activeBracketIndex
+        }
       }
     };
   }
 
   /**
-   * Look up mortality probability
+   * Calculate year-by-year arrays
    */
-  _getMortalityProbability(age, sex, years) {
-    if (!this.data.mortality || !this.data.mortality[sex]) {
-      return null;
+  calculateArrays(params) {
+    const { timeHorizon, monthlyBudget, termBudget, termPolicy, marketMult, inflationMult, currentAge, sex } = params;
+    
+    const arrays = {
+      year: [],
+      inflationValue: [],
+      payInYear: [],
+      paidInTotal: [],
+      payInYearAdjusted: [],
+      paidInTotalAdjusted: [],
+      termSetAside: [],
+      marketGainsYear: [],
+      marketGainsTotal: [],
+      accountIfWindowEnded: [],
+      totalInAccount: [],
+      totalInAccountAdjusted: [],
+      mortalityLikelihood: []
+    };
+
+    const annualContribution = monthlyBudget * 12;
+    const annualTermCost = termBudget * 12;
+
+    for (let year = 0; year <= timeHorizon; year++) {
+      arrays.year.push(year);
+      arrays.inflationValue.push(Math.pow(inflationMult, year));
+
+      // Year 0 special case
+      if (year === 0) {
+        arrays.payInYear.push(annualContribution);
+        arrays.paidInTotal.push(annualContribution);
+        arrays.payInYearAdjusted.push(annualContribution);
+        arrays.paidInTotalAdjusted.push(annualContribution);
+        arrays.termSetAside.push(0);
+        arrays.marketGainsYear.push(0);
+        arrays.marketGainsTotal.push(0);
+        arrays.accountIfWindowEnded.push(annualContribution);
+        arrays.totalInAccount.push(annualContribution);
+        arrays.totalInAccountAdjusted.push(annualContribution);
+        arrays.mortalityLikelihood.push(null); // Year 0 = no value
+      } else {
+        // Term insurance cost
+        const termCost = (termPolicy && year <= termPolicy) ? annualTermCost : 0;
+        arrays.termSetAside.push(termCost);
+
+        // Contributions
+        arrays.payInYear.push(annualContribution);
+        arrays.paidInTotal.push(arrays.paidInTotal[year - 1] + annualContribution);
+        
+        const adjustedContribution = annualContribution * Math.pow(inflationMult, year);
+        arrays.payInYearAdjusted.push(adjustedContribution);
+        arrays.paidInTotalAdjusted.push(arrays.paidInTotalAdjusted[year - 1] + adjustedContribution);
+
+        // Market gains
+        const previousBalance = arrays.totalInAccount[year - 1];
+        const gainsThisYear = previousBalance * (marketMult - 1);
+        arrays.marketGainsYear.push(gainsThisYear);
+        arrays.marketGainsTotal.push(arrays.marketGainsTotal[year - 1] + gainsThisYear);
+
+        // Account totals
+        const newTotal = previousBalance + gainsThisYear + annualContribution - termCost;
+        arrays.totalInAccount.push(newTotal);
+        arrays.totalInAccountAdjusted.push(newTotal * Math.pow(inflationMult, year));
+
+        // Account if window ended (no new contributions)
+        const noNewContributions = previousBalance + gainsThisYear - termCost;
+        arrays.accountIfWindowEnded.push(noNewContributions);
+
+        // Mortality likelihood
+        const mortality = this.getMortalityProbability(currentAge, sex, year);
+        arrays.mortalityLikelihood.push(mortality);
+      }
     }
-    
-    const ageData = this.data.mortality[sex][age];
-    if (!ageData) return null;
-    
-    return ageData[years] ?? null;
+
+    return arrays;
   }
 
   /**
-   * Look up historical market performance at given percentile
+   * Get rate brackets for given age and sex
    */
-  _getMarketPerformance(years, percentile) {
-    if (!this.data.marketHistory) return null;
+  getRateBrackets(age, sex) {
+    if (!this.data?.rateTables) return null;
+
+    const rawRates = this.data.rateTables;
+    let ageRow = null;
+
+    // Find the row for this age in raw rate data
+    // This assumes rawRates structure from data-loader
+    // TODO: Update once we confirm exact structure
     
-    // Find all periods matching this time horizon
+    const isMinor = age < 18;
+    const brackets = [];
+
+    // Placeholder - will need actual column indices from rate table
+    // This is a simplified version
+    brackets.push({
+      name: 'Standard',
+      range: isMinor ? '$0-$15,099' : '$0-$34,999',
+      ratePerThousand: 1.85, // TODO: Get from actual data
+      monthlyCutoff: 56.35
+    });
+
+    return brackets;
+  }
+
+  /**
+   * Get active bracket index based on policy size or monthly budget
+   */
+  getActiveBracket(brackets, policySize, monthlyBudget) {
+    if (!brackets) return -1;
+
+    if (policySize) {
+      if (policySize <= 15099) return 0;
+      if (policySize <= 59999) return 1;
+      if (policySize <= 119999) return 2;
+      return 3;
+    } else if (monthlyBudget) {
+      for (let i = 0; i < brackets.length; i++) {
+        if (brackets[i].monthlyCutoff && monthlyBudget <= brackets[i].monthlyCutoff) {
+          return i;
+        }
+      }
+      return brackets.length - 1;
+    }
+
+    return -1;
+  }
+
+  /**
+   * Get CAGR for given percentile and time horizon
+   */
+  getCAGRForPercentile(percentile, years) {
+    if (years > 80) return 10.4;
+    
+    const history = this.data?.marketHistory;
+    if (!history || history.length === 0) return null;
+    
     const performances = [];
-    
-    for (const entry of this.data.marketHistory) {
+    for (const entry of history) {
       const growth = entry.growth[years];
       if (growth !== null && growth !== undefined) {
         performances.push(growth);
@@ -283,73 +308,33 @@ class CalcEngine {
     
     if (performances.length === 0) return null;
     
-    // Sort and find percentile
     performances.sort((a, b) => a - b);
-    const index = Math.floor((percentile / 100) * performances.length);
+    const index = Math.floor((percentile / 100) * (performances.length - 1));
+    const totalGrowth = performances[index];
     
-    return performances[index];
+    // Convert total growth to annualized CAGR
+    const cagr = Math.pow(totalGrowth, 1/years);
+    
+    return ((cagr - 1) * 100).toFixed(2);
   }
 
   /**
-   * Look up insurance rate from rate table
+   * Get mortality probability for age, sex, years ahead
    */
-  _getInsuranceRate(age, sex, tobacco, type) {
-    if (!this.data.rateTables || !this.data.rateTables[age]) {
-      return null;
-    }
-    
-    const ageRates = this.data.rateTables[age];
-    
-    // TODO: Add tobacco user logic when rate table structure is clear
-    // For now, return basic rate
-    return ageRates[sex] ?? null;
-  }
-
-  /**
-   * Calculate comparison: Whole Life vs Index Fund
-   */
-  compareWholeLifeVsIndex(inputs) {
-    // Scenario 1: Money goes to whole life insurance
-    const wholeLifeResult = this.calculate({
-      ...inputs,
-      monthlyBudget: 0, // No investing, all to insurance
-      policySize: inputs.policySize
-    });
-    
-    // Scenario 2: Money goes to index fund
-    const indexResult = this.calculate({
-      ...inputs,
-      monthlyBudget: inputs.monthlyBudget,
-      policySize: 0 // No insurance
-    });
-    
-    return {
-      wholeLif: wholeLifeResult,
-      index: indexResult,
-      comparison: {
-        indexAdvantage: indexResult.results.ACCOUNT_TOTAL - (inputs.policySize || 0),
-        theyKeep: indexResult.results.ACCOUNT_TOTAL - (inputs.policySize || 0)
-      }
-    };
+  getMortalityProbability(age, sex, yearsAhead) {
+    if (!this.data?.mortality) return null;
+    const mortality = this.data.mortality[sex];
+    if (!mortality || !mortality[age]) return null;
+    return mortality[age][yearsAhead] || null;
   }
 }
 
-// Create global instance once data is loaded
-window.calcEngine = null;
-
-// Initialize when data is ready
+// Initialize global instance
 async function initCalcEngine() {
-  if (!window.dataLoader) {
-    throw new Error('dataLoader not found. Include data-loader.js first.');
-  }
-  
-  const data = await window.dataLoader.loadAll();
-  window.calcEngine = new CalcEngine(data);
-  
-  return window.calcEngine;
+  window.calcEngine = new CalcEngine();
+  await window.calcEngine.init();
+  console.log('CalcEngine ready, version:', window.calcEngine.VERSION);
 }
 
-// Make initCalcEngine globally available
-if (typeof window !== 'undefined') {
-  window.initCalcEngine = initCalcEngine;
-}
+// Expose initialization function
+window.initCalcEngine = initCalcEngine;
