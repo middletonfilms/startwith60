@@ -6,7 +6,7 @@
 
 class CalcEngine {
   constructor() {
-    this.VERSION = '2/13/2026, 3:04 PM';
+    this.VERSION = '2/13/2026, 3:38 PM';
     this.data = null;
   }
 
@@ -163,80 +163,79 @@ class CalcEngine {
    * Calculate year-by-year arrays
    */
   calculateArrays(params) {
-    const { timeHorizon, monthlyBudget, termBudget, termPolicy, marketMult, inflationMult, currentAge, sex } = params;
+  const { timeHorizon, monthlyBudget, termBudget, termPolicy, marketMult, inflationMult, currentAge, sex } = params;
+  
+  const arrays = {
+    year: [],
+    termSetAside: [],        // MOVED BEFORE payInYear
+    payInYear: [],
+    inflationValue: [],
+    paidInTotal: [],
+    payInYearAdjusted: [],
+    paidInTotalAdjusted: [],
+    marketGainsYear: [],
+    marketGainsTotal: [],
+    accountIfWindowEnded: [],
+    totalInAccount: [],
+    totalInAccountAdjusted: [],
+    mortalityLikelihood: []
+  };
+
+  const annualContribution = monthlyBudget * 12;
+  const annualTermCost = termBudget * 12;
+  
+  // Determine term length (0 if none, 10 if "10 YEAR")
+  const termLength = termPolicy === '10 YEAR' ? 10 : 0;
+
+  for (let year = 0; year <= timeHorizon; year++) {
+    arrays.year.push(year);
     
-    const arrays = {
-      year: [],
-      inflationValue: [],
-      payInYear: [],
-      paidInTotal: [],
-      payInYearAdjusted: [],
-      paidInTotalAdjusted: [],
-      termSetAside: [],
-      marketGainsYear: [],
-      marketGainsTotal: [],
-      accountIfWindowEnded: [],
-      totalInAccount: [],
-      totalInAccountAdjusted: [],
-      mortalityLikelihood: []
-    };
+    // Term insurance cost (starts at year 0)
+    const termCost = (termLength > 0 && year < termLength) ? annualTermCost : 0;
+    arrays.termSetAside.push(termCost);
+    
+    // Pay in year = contribution minus term cost
+    const payInYear = annualContribution - termCost;
+    arrays.payInYear.push(payInYear);
 
-    const annualContribution = monthlyBudget * 12;
-    const annualTermCost = termBudget * 12;
+    arrays.inflationValue.push(Math.pow(inflationMult, year));
 
-    for (let year = 0; year <= timeHorizon; year++) {
-      arrays.year.push(year);
-      arrays.inflationValue.push(Math.pow(inflationMult, year));
+    if (year === 0) {
+      arrays.paidInTotal.push(payInYear);
+      arrays.payInYearAdjusted.push(payInYear);
+      arrays.paidInTotalAdjusted.push(payInYear);
+      arrays.marketGainsYear.push(0);
+      arrays.marketGainsTotal.push(0);
+      arrays.accountIfWindowEnded.push(payInYear);
+      arrays.totalInAccount.push(payInYear);
+      arrays.totalInAccountAdjusted.push(payInYear);
+      arrays.mortalityLikelihood.push(null);
+    } else {
+      arrays.paidInTotal.push(arrays.paidInTotal[year - 1] + payInYear);
+      
+      const adjustedContribution = payInYear * Math.pow(inflationMult, year);
+      arrays.payInYearAdjusted.push(adjustedContribution);
+      arrays.paidInTotalAdjusted.push(arrays.paidInTotalAdjusted[year - 1] + adjustedContribution);
 
-      // Year 0 special case
-      if (year === 0) {
-        arrays.payInYear.push(annualContribution);
-        arrays.paidInTotal.push(annualContribution);
-        arrays.payInYearAdjusted.push(annualContribution);
-        arrays.paidInTotalAdjusted.push(annualContribution);
-        arrays.termSetAside.push(0);
-        arrays.marketGainsYear.push(0);
-        arrays.marketGainsTotal.push(0);
-        arrays.accountIfWindowEnded.push(annualContribution);
-        arrays.totalInAccount.push(annualContribution);
-        arrays.totalInAccountAdjusted.push(annualContribution);
-        arrays.mortalityLikelihood.push(null); // Year 0 = no value
-      } else {
-        // Term insurance cost
-        const termCost = (termPolicy && year <= termPolicy) ? annualTermCost : 0;
-        arrays.termSetAside.push(termCost);
+      const previousBalance = arrays.totalInAccount[year - 1];
+      const gainsThisYear = previousBalance * (marketMult - 1);
+      arrays.marketGainsYear.push(gainsThisYear);
+      arrays.marketGainsTotal.push(arrays.marketGainsTotal[year - 1] + gainsThisYear);
 
-        // Contributions
-        arrays.payInYear.push(annualContribution);
-        arrays.paidInTotal.push(arrays.paidInTotal[year - 1] + annualContribution);
-        
-        const adjustedContribution = annualContribution * Math.pow(inflationMult, year);
-        arrays.payInYearAdjusted.push(adjustedContribution);
-        arrays.paidInTotalAdjusted.push(arrays.paidInTotalAdjusted[year - 1] + adjustedContribution);
+      const newTotal = previousBalance + gainsThisYear + payInYear;
+      arrays.totalInAccount.push(newTotal);
+      arrays.totalInAccountAdjusted.push(newTotal * Math.pow(inflationMult, year));
 
-        // Market gains
-        const previousBalance = arrays.totalInAccount[year - 1];
-        const gainsThisYear = previousBalance * (marketMult - 1);
-        arrays.marketGainsYear.push(gainsThisYear);
-        arrays.marketGainsTotal.push(arrays.marketGainsTotal[year - 1] + gainsThisYear);
+      const noNewContributions = previousBalance + gainsThisYear;
+      arrays.accountIfWindowEnded.push(noNewContributions);
 
-        // Account totals
-        const newTotal = previousBalance + gainsThisYear + annualContribution - termCost;
-        arrays.totalInAccount.push(newTotal);
-        arrays.totalInAccountAdjusted.push(newTotal * Math.pow(inflationMult, year));
-
-        // Account if window ended (no new contributions)
-        const noNewContributions = previousBalance + gainsThisYear - termCost;
-        arrays.accountIfWindowEnded.push(noNewContributions);
-
-        // Mortality likelihood
-        const mortality = this.getMortalityProbability(currentAge, sex, year);
-        arrays.mortalityLikelihood.push(mortality);
-      }
+      const mortality = this.getMortalityProbability(currentAge, sex, year);
+      arrays.mortalityLikelihood.push(mortality);
     }
-
-    return arrays;
   }
+
+  return arrays;
+}
 
   /**
    * Get rate brackets for given age and sex
