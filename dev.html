@@ -10,20 +10,6 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   
-  body {
-    font-family: Arial, sans-serif;
-    background: white;
-    color: #333;
-    padding: 20px;
-    font-size: 13px;
-  }
-  
-  <body>
-
-  <div style="position: fixed; top: 10px; right: 10px; background: #fee; color: #c00; padding: 5px 10px; border: 1px solid #fcc; font-size: 11px; border-radius: 3px; z-index: 1000;">
-  Last Updated: <span id="last-updated"></span>
-  </div>
-  
   h1 { font-size: 20px; margin-bottom: 15px; }
   h2 { font-size: 14px; margin-top: 15px; margin-bottom: 8px; font-weight: bold; }
   
@@ -850,8 +836,6 @@ function formatValue(value, key) {
 
 // Display last updated timestamp
 document.getElementById('last-updated').textContent = new Date().toLocaleString();
-
-init();
  
 init();
 </script>
