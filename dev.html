@@ -338,14 +338,31 @@ async function loadCAGRPercentiles() {
 }
 
 function getCAGRForPercentile(percentile, years) {
-  if (years > 80) return 10.4; // Revert to default
+  if (years > 80) return 10.4;
   
-  if (!window.calcEngine || !window.calcEngine.data.marketHistory) return null;
+  // Fallback to old method if marketHistory not available
+  if (!window.calcEngine || !window.calcEngine.data || !window.calcEngine.data.marketHistory) {
+    const pct = percentile / 100;
+    const available = Object.keys(cagrPercentiles).map(Number).sort((a,b) => a-b);
+    let closest = available[0];
+    let minDiff = Math.abs(pct - closest);
+    
+    for (const p of available) {
+      const diff = Math.abs(pct - p);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closest = p;
+      }
+    }
+    
+    const cagr = cagrPercentiles[closest][years];
+    if (!cagr) return null;
+    return ((cagr - 1) * 100).toFixed(2);
+  }
   
   const history = window.calcEngine.data.marketHistory;
   const performances = [];
   
-  // Collect all performances for this time horizon
   for (const entry of history) {
     const growth = entry.growth[years];
     if (growth !== null && growth !== undefined) {
@@ -355,7 +372,6 @@ function getCAGRForPercentile(percentile, years) {
   
   if (performances.length === 0) return null;
   
-  // Sort and find percentile
   performances.sort((a, b) => a - b);
   const index = Math.floor((percentile / 100) * (performances.length - 1));
   const cagr = performances[index];
@@ -764,10 +780,11 @@ function displayVariableTable(tableId, variables) {
 
 function getMortalityForYear(currentAge, sex, yearsAhead) {
   if (!window.calcEngine || !window.calcEngine.data.mortality) return null;
-  const sexStr = document.getElementById('sex').value; // Get from DOM
+  const sexStr = document.getElementById('sex').value;
   const mortality = window.calcEngine.data.mortality[sexStr];
   if (!mortality || !mortality[currentAge]) return null;
-  return mortality[currentAge][yearsAhead + 1] || null; // +1 because year 1 = 1 year ahead
+  // yearsAhead directly maps to column (1 year = index 1, 20 years = index 20)
+  return mortality[currentAge][yearsAhead] || null;
 }
 
 function displayArrays(arrays, currentAge) {
@@ -878,7 +895,7 @@ function formatValue(value, key) {
 }
 
 // Display last updated timestamp
-document.getElementById('last-updated').textContent = '2/12/2026, 5:52 PM';
+document.getElementById('last-updated').textContent = '2/12/2026, 8:48 PM';
  
 init();
 </script>
