@@ -361,6 +361,8 @@ function getCAGRForPercentile(percentile, years) {
   }
   
   const history = window.calcEngine.data.marketHistory;
+  console.log('marketHistory exists?', !!history);
+  console.log('marketHistory length:', history?.length);
   const performances = [];
   
   for (const entry of history) {
@@ -369,7 +371,10 @@ function getCAGRForPercentile(percentile, years) {
       performances.push(growth);
     }
   }
-  
+
+  console.log(`For ${years} years, found ${performances.length} performance values`);
+  console.log('Sample values:', performances.slice(0, 5));
+ 
   if (performances.length === 0) return null;
   
   performances.sort((a, b) => a - b);
@@ -907,7 +912,7 @@ function formatValue(value, key) {
 }
 
 // Display last updated timestamp
-document.getElementById('last-updated').textContent = '2/12/2026, 11:23 PM';
+document.getElementById('last-updated').textContent = '2/12/2026, 11:29 PM';
  
 init();
 </script>
