@@ -123,19 +123,19 @@ class DataLoader {
     
     mortality.male[age] = {};
     for (let col = 2; col < raw[row].length; col++) {
-      const years = col - 1; // col 2 = year 1, col 3 = year 2, etc
+      const years = col - 2 + 1; // col 2 = 1 year, col 3 = 2 years
       mortality.male[age][years] = raw[row][col];
     }
   }
   
-  // Female section: rows 115+ (starts at row 115 = age 0)
+  // Female section: rows 115-227
   for (let row = 115; row < raw.length && row <= 227; row++) {
     const age = raw[row][0];
     if (age === null || age === undefined) continue;
     
     mortality.female[age] = {};
     for (let col = 2; col < raw[row].length; col++) {
-      const years = col - 1; // col 2 = year 1, col 3 = year 2, etc
+      const years = col - 2 + 1; // col 2 = 1 year, col 3 = 2 years
       mortality.female[age][years] = raw[row][col];
     }
   }
