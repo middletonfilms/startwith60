@@ -172,7 +172,28 @@
     <label>Inflation Rate (%):</label>
     <input type="number" id="inflation" value="3.28" step="0.01" oninput="runCalculation()">
   </div>
-  
+ 
+<h2>Personal Info</h2>
+  <div class="input-row">
+    <label>Sex:</label>
+    <select id="sex" onchange="handleSexChange()">
+      <option value="">Select...</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
+  </div>
+  <div class="input-row">
+    <label>Current Age:</label>
+    <input type="number" id="age" value="" oninput="handlePersonalInfoChange()">
+  </div>
+  <div class="input-row">
+    <label>Tobacco User:</label>
+    <select id="tobaccoUser" onchange="handlePersonalInfoChange()">
+      <option value="false">No</option>
+      <option value="true">Yes</option>
+    </select>
+  </div>
+ 
   <h2>Budget & Insurance</h2>
   <div class="input-row">
     <label>Monthly Budget ($):</label>
@@ -214,27 +235,6 @@
     <input type="text" id="timeHorizonCustom" class="readonly" readonly style="width: 50px;">
     <span style="margin-left: 10px; color: #666;">Market Gain Custom:</span>
     <input type="text" id="marketGainCustom" class="readonly" readonly style="width: 100px;">
-  </div>
-  
-  <h2>Personal Info</h2>
-  <div class="input-row">
-    <label>Sex:</label>
-    <select id="sex" onchange="handleSexChange()">
-      <option value="">Select...</option>
-      <option value="male">Male</option>
-      <option value="female">Female</option>
-    </select>
-  </div>
-  <div class="input-row">
-    <label>Current Age:</label>
-    <input type="number" id="age" value="" oninput="handlePersonalInfoChange()">
-  </div>
-  <div class="input-row">
-    <label>Tobacco User:</label>
-    <select id="tobaccoUser" onchange="handlePersonalInfoChange()">
-      <option value="false">No</option>
-      <option value="true">Yes</option>
-    </select>
   </div>
   
   <h2>Advanced</h2>
@@ -856,7 +856,7 @@ function formatValue(value, key) {
 }
 
 // Display last updated timestamp
-document.getElementById('last-updated').textContent = '2/12/2026, 5:24 PM';
+document.getElementById('last-updated').textContent = '2/12/2026, 5:28 PM';
  
 init();
 </script>
