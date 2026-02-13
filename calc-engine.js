@@ -6,7 +6,7 @@
 
 class CalcEngine {
   constructor() {
-    this.VERSION = '2/13/2026, 3:38 PM';
+    this.VERSION = '2/13/2026, 3:58 PM';
     this.data = null;
   }
 
@@ -60,11 +60,28 @@ class CalcEngine {
     const WHOLE_LIFE_RATE = activeBracket?.ratePerThousand || 0;
     const WHOLE_LIFE_ANNUAL_COST = MONTHLY_BUDGET * 12;
     
-    const TERM_POLICY = inputs.termPolicy || null;
-    const TERM_BUDGET = inputs.termBudget || 0;
-    const TERM_POLICY_SIZE = inputs.termPolicySize || 0;
-    const TERM_RATE = 0; // TODO: Calculate from term rate table
-    const TERM_ANNUAL_COST = TERM_BUDGET * 12;
+    const TERM_POLICY = inputs.termPolicy || '';
+    const TERM_RATE = TERM_POLICY ? await this.getTermRate(inputs.age, inputs.sex) : 0;
+    let TERM_BUDGET = inputs.termBudget || 0;
+    let TERM_POLICY_SIZE = inputs.termPolicySize || 0;
+
+    if (TERM_POLICY && TERM_RATE) {
+  if (inputs.termBudget && !inputs.termPolicySize) {
+    // Calculate policy from budget
+    TERM_POLICY_SIZE = (inputs.termBudget / TERM_RATE) * 1000;
+  } else if (inputs.termPolicySize && !inputs.termBudget) {
+    // Calculate budget from policy
+    TERM_BUDGET = (inputs.termPolicySize / 1000) * TERM_RATE;
+  }
+  
+  // Cap term budget at monthly budget
+  if (TERM_BUDGET > MONTHLY_BUDGET) {
+    TERM_BUDGET = MONTHLY_BUDGET;
+    TERM_POLICY_SIZE = (TERM_BUDGET / TERM_RATE) * 1000;
+  }
+}
+
+const TERM_ANNUAL_COST = TERM_BUDGET * 12;
 
     // === MORTALITY ===
     const MORTALITY_LIKELIHOOD = this.getMortalityProbability(inputs.age, inputs.sex, ACTIVE_TIME_HORIZON);
@@ -363,6 +380,23 @@ class CalcEngine {
     return -1;
   }
 
+  async getTermRate(age, sex) {
+  const rawRateData = await window.dataLoader.loadExcel('RateTables.xlsx', 'LI_RATES');
+  
+  let ageRow = null;
+  for (let i = 4; i < rawRateData.length; i++) {
+    if (rawRateData[i][0] === age) {
+      ageRow = rawRateData[i];
+      break;
+    }
+  }
+  
+  if (!ageRow) return null;
+  
+  // Term rates: Male col 17, Female col 18
+  return sex === 'male' ? ageRow[17] : ageRow[18];
+}
+  
   /**
    * Get CAGR for given percentile and time horizon
    */
