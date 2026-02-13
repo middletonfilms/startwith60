@@ -18,6 +18,12 @@
     font-size: 13px;
   }
   
+ <body>
+
+<div style="position: fixed; top: 10px; right: 10px; background: #fee; color: #c00; padding: 5px 10px; border: 1px solid #fcc; font-size: 11px; border-radius: 3px; z-index: 1000;">
+  Last Updated: <span id="last-updated"></span>
+</div>
+  
   h1 { font-size: 20px; margin-bottom: 15px; }
   h2 { font-size: 14px; margin-top: 15px; margin-bottom: 8px; font-weight: bold; }
   
@@ -809,26 +815,31 @@ function formatValue(value, key) {
     return '-';
   }
   if (typeof value === 'number') {
-    // No decimals for years/ages/life expectancy
-    if (key && (key.includes('AGE') || key.includes('YEAR') || key.includes('HORIZON') || key === 'year' || key === 'LIFE_EXPECTANCY')) {
+    // No decimals for years/ages/life expectancy/horizons
+    if (key && (key.includes('AGE') || key.includes('YEAR') || key.includes('HORIZON') || 
+                key === 'year' || key === 'LIFE_EXPECTANCY' || 
+                key === 'TIME_HORIZON_DEATH' || key === 'TIME_HORIZON_RETIRE' || 
+                key === 'ACTIVE_TIME_HORIZON')) {
       return Math.round(value).toString();
     }
-    // 4 decimals for mortality likelihood
-    if (key === 'MORTALITY_LIKELIHOOD') {
+    
+    // 4 decimals for mortality likelihood and inflation value
+    if (key === 'MORTALITY_LIKELIHOOD' || key === 'inflationValue') {
       return value.toFixed(4);
     }
-    // 4 decimals for inflation value
-    if (key === 'inflationValue') {
-      return value.toFixed(4);
-    }
-    // 2 decimals for money amounts in inputs
-    if (key === 'MONTHLY_BUDGET' || key === 'POLICY_SIZE' || key === 'TERM_BUDGET' || key === 'TERM_POLICY_SIZE') {
+    
+    // 2 decimals for all money/rate values
+    if (key === 'MONTHLY_BUDGET' || key === 'POLICY_SIZE' || key === 'TERM_BUDGET' || 
+        key === 'TERM_POLICY_SIZE' || key === 'WHOLE_LIFE_RATE' || key === 'TERM_RATE' ||
+        key === 'WHOLE_LIFE_ANNUAL_COST' || key === 'TERM_ANNUAL_COST' ||
+        key === 'ACCOUNT_TOTAL' || key === 'ACCOUNT_TOTAL_ADJUSTED' || 
+        key === 'ACCOUNT_INCOME' || key === 'FINAL_YEAR_GROWTH' ||
+        key === 'TOTAL_PAID_IN' || key === 'TOTAL_PAID_IN_ADJUSTED' ||
+        key === 'TOTAL_MARKET_GAINS' || key === 'TOTAL_TERM_COST' ||
+        value > 100 || value < -100) {
       return value.toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
     }
-    // 2 decimals for insurance rates and most results
-    if (value > 100 || value < -100) {
-      return value.toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
-    }
+    
     return value.toFixed(4);
   }
   if (typeof value === 'boolean') {
@@ -837,6 +848,11 @@ function formatValue(value, key) {
   return String(value);
 }
 
+// Display last updated timestamp
+document.getElementById('last-updated').textContent = new Date().toLocaleString();
+
+init();
+ 
 init();
 </script>
 
