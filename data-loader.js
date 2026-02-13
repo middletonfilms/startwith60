@@ -114,39 +114,34 @@ class DataLoader {
    * Structure: { male: { age: { years: probability } }, female: { ... } }
    */
   _parseMortality(raw) {
-    const mortality = {
-      male: {},
-      female: {}
-    };
+  const mortality = { male: {}, female: {} };
+  
+  // Male section: rows 1-113 (age 0-112)
+  for (let row = 1; row <= 113; row++) {
+    const age = raw[row][0];
+    if (age === null || age === undefined) continue;
     
-    // Row 0 has header: MALE, PROBABILITY OF DYING IN THE NEXT X YEARS:, 1, 2, 3...
-    // Rows 1+ have: age, population, prob_1yr, prob_2yr, prob_3yr...
-    
-    const header = raw[0];
-    const yearColumns = header.slice(2); // Years are in columns 2+
-    
-    for (let i = 1; i < raw.length; i++) {
-      const row = raw[i];
-      const age = row[0];
-      
-      if (age === null || age === undefined) break;
-      
-      mortality.male[age] = {};
-      
-      for (let j = 0; j < yearColumns.length; j++) {
-        const years = yearColumns[j];
-        const probability = row[j + 2];
-        
-        if (probability !== null && probability !== undefined) {
-          mortality.male[age][years] = probability;
-        }
-      }
+    mortality.male[age] = {};
+    for (let col = 2; col < raw[row].length; col++) {
+      const years = col - 1; // col 2 = year 1, col 3 = year 2, etc
+      mortality.male[age][years] = raw[row][col];
     }
-    
-    // TODO: Add female mortality parsing if in separate section
-    
-    return mortality;
   }
+  
+  // Female section: rows 115+ (starts at row 115 = age 0)
+  for (let row = 115; row < raw.length && row <= 227; row++) {
+    const age = raw[row][0];
+    if (age === null || age === undefined) continue;
+    
+    mortality.female[age] = {};
+    for (let col = 2; col < raw[row].length; col++) {
+      const years = col - 1; // col 2 = year 1, col 3 = year 2, etc
+      mortality.female[age][years] = raw[row][col];
+    }
+  }
+  
+  return mortality;
+}
 
   /**
    * Parse market history
