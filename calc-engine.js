@@ -6,7 +6,7 @@
 
 class CalcEngine {
   constructor() {
-    this.VERSION = '2/13/2026, 12:59 PM';
+    this.VERSION = '2/13/2026, 3:04 PM';
     this.data = null;
   }
 
@@ -26,7 +26,7 @@ class CalcEngine {
    * Main calculation method
    * Returns organized data structure for visualization
    */
-  calculate(inputs) {
+  async calculate(inputs) {
     // Validate required inputs
     if (!inputs.age || !inputs.sex) {
       throw new Error('Age and sex are required');
@@ -48,7 +48,7 @@ class CalcEngine {
     const ACTIVE_TIME_HORIZON = TIME_HORIZON_CUSTOM || TIME_HORIZON_DEATH;
 
     // === INSURANCE CALCULATIONS ===
-    const rateBrackets = this.getRateBrackets(inputs.age, inputs.sex);
+    const rateBrackets = await this.getRateBrackets(inputs.age, inputs.sex);
     const activeBracketIndex = this.getActiveBracket(rateBrackets, inputs.policySize, inputs.monthlyBudget);
     const activeBracket = rateBrackets?.[activeBracketIndex] || null;
     
@@ -241,28 +241,103 @@ class CalcEngine {
   /**
    * Get rate brackets for given age and sex
    */
-  getRateBrackets(age, sex) {
-    if (!this.data?.rateTables) return null;
-
-    const rawRates = this.data.rateTables;
+  async getRateBrackets(age, sex) {
+    // Load raw rate data
+    const rawRateData = await window.dataLoader.loadExcel('RateTables.xlsx', 'LI_RATES');
+    
     let ageRow = null;
-
-    // Find the row for this age in raw rate data
-    // This assumes rawRates structure from data-loader
-    // TODO: Update once we confirm exact structure
+    for (let i = 4; i < rawRateData.length; i++) {
+      if (rawRateData[i][0] === age) {
+        ageRow = rawRateData[i];
+        break;
+      }
+    }
+    
+    if (!ageRow) return null;
     
     const isMinor = age < 18;
     const brackets = [];
-
-    // Placeholder - will need actual column indices from rate table
-    // This is a simplified version
-    brackets.push({
-      name: 'Standard',
-      range: isMinor ? '$0-$15,099' : '$0-$34,999',
-      ratePerThousand: 1.85, // TODO: Get from actual data
-      monthlyCutoff: 56.35
-    });
-
+    
+    if (sex === 'male') {
+      brackets.push({
+        name: 'Standard',
+        range: isMinor ? '$0-$15,099' : '$0-$34,999',
+        ratePerThousand: ageRow[1],
+        monthlyCutoff: ageRow[2]
+      });
+      brackets.push({
+        name: 'Preferred',
+        range: isMinor ? '$15,100-$59,999' : '$35,000-$59,999',
+        ratePerThousand: ageRow[5],
+        monthlyCutoff: ageRow[6]
+      });
+      brackets.push({
+        name: 'Executive',
+        range: isMinor ? '$60,000-$9,999,999' : '$60,000-$119,999',
+        ratePerThousand: ageRow[9],
+        monthlyCutoff: ageRow[10]
+      });
+      
+      if (isMinor) {
+        brackets.push({
+          name: 'Select',
+          range: '-',
+          ratePerThousand: null,
+          monthlyCutoff: null
+        });
+      } else {
+        const selectRate = ageRow[13];
+        const selectCeiling = ageRow[14];
+        const selectCutoff = selectCeiling !== 9999999 ? (selectCeiling / 1000) * selectRate / 12 : null;
+        
+        brackets.push({
+          name: 'Select',
+          range: '$120,000-$9,999,999',
+          ratePerThousand: selectRate,
+          monthlyCutoff: selectCutoff
+        });
+      }
+    } else { // female
+      brackets.push({
+        name: 'Standard',
+        range: isMinor ? '$0-$15,099' : '$0-$34,999',
+        ratePerThousand: ageRow[3],
+        monthlyCutoff: ageRow[4]
+      });
+      brackets.push({
+        name: 'Preferred',
+        range: isMinor ? '$15,100-$59,999' : '$35,000-$59,999',
+        ratePerThousand: ageRow[7],
+        monthlyCutoff: ageRow[8]
+      });
+      brackets.push({
+        name: 'Executive',
+        range: isMinor ? '$60,000-$9,999,999' : '$60,000-$119,999',
+        ratePerThousand: ageRow[11],
+        monthlyCutoff: ageRow[12]
+      });
+      
+      if (isMinor) {
+        brackets.push({
+          name: 'Select',
+          range: '-',
+          ratePerThousand: null,
+          monthlyCutoff: null
+        });
+      } else {
+        const selectRate = ageRow[15];
+        const selectCeiling = ageRow[16];
+        const selectCutoff = selectCeiling !== 9999999 ? (selectCeiling / 1000) * selectRate / 12 : null;
+        
+        brackets.push({
+          name: 'Select',
+          range: '$120,000-$9,999,999',
+          ratePerThousand: selectRate,
+          monthlyCutoff: selectCutoff
+        });
+      }
+    }
+    
     return brackets;
   }
 
