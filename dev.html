@@ -816,9 +816,10 @@ function displayArrays(arrays, currentAge) {
     
     columnNames.forEach(key => {
       if (key === 'mortalityLikelihood') {
-        // Get mortality from data
-        const yearsAhead = i;
-        const mortality = getMortalityForYear(currentAge, sex, yearsAhead);
+        // Get mortality from data - use the age at that year, not current age
+        const ageAtYear = currentAge + i;
+        const sex = document.getElementById('sex').value;
+        const mortality = window.calcEngine?.data?.mortality?.[sex]?.[ageAtYear]?.[1] || null;
         row.innerHTML += `<td>${mortality !== null ? (mortality * 100).toFixed(2) + '%' : '-'}</td>`;
       } else {
         const arr = arrays[key];
