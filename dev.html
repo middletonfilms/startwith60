@@ -219,6 +219,8 @@
     <input type="text" id="timeHorizonRetire" class="readonly" readonly style="width: 50px;">
     <span style="margin-left: 10px; color: #666;">Market Gain Retire:</span>
     <input type="text" id="marketGainRetire" class="readonly" readonly style="width: 100px;">
+    <span style="margin-left: 10px; color: #666;">Account Value:</span>
+    <input type="text" id="accountValueRetire" class="readonly" readonly style="width: 120px;">
   </div>
   <div class="input-row">
     <label>Life Expectancy:</label>
@@ -227,6 +229,8 @@
     <input type="text" id="timeHorizonDeath" class="readonly" readonly style="width: 50px;">
     <span style="margin-left: 10px; color: #666;">Market Gain Death:</span>
     <input type="text" id="marketGainDeath" class="readonly" readonly style="width: 100px;">
+    <span style="margin-left: 10px; color: #666;">Account Value:</span>
+    <input type="text" id="accountValueDeath" class="readonly" readonly style="width: 120px;">
   </div>
   <div class="input-row">
     <label>Custom Age Cutoff:</label>
@@ -235,6 +239,8 @@
     <input type="text" id="timeHorizonCustom" class="readonly" readonly style="width: 50px;">
     <span style="margin-left: 10px; color: #666;">Market Gain Custom:</span>
     <input type="text" id="marketGainCustom" class="readonly" readonly style="width: 100px;">
+    <span style="margin-left: 10px; color: #666;">Account Value:</span>
+    <input type="text" id="accountValueCustom" class="readonly" readonly style="width: 120px;">
   </div>
   
   <h2>Advanced</h2>
@@ -530,8 +536,8 @@ function handleSexChange() {
   const sex = document.getElementById('sex').value;
   const lifeExpectancy = document.getElementById('lifeExpectancy');
   
-  // Auto-fill life expectancy if empty
-  if (!lifeExpectancy.value && sex) {
+  // ALWAYS update life expectancy when sex changes
+  if (sex) {
     lifeExpectancy.value = sex === 'female' ? 81 : 76;
   }
   
@@ -654,18 +660,18 @@ function updateTimeHorizons() {
   document.getElementById('timeHorizonDeath').value = timeHorizonDeath !== null ? timeHorizonDeath : '';
   document.getElementById('timeHorizonCustom').value = timeHorizonCustom !== null ? timeHorizonCustom : '';
   
-  if (percentile) {
+  if (percentile && percentile > 0) {
     const retireGain = getCAGRForPercentile(percentile, timeHorizonRetire);
     const deathGain = timeHorizonDeath ? getCAGRForPercentile(percentile, timeHorizonDeath) : null;
     const customGain = timeHorizonCustom ? getCAGRForPercentile(percentile, timeHorizonCustom) : null;
     
     document.getElementById('marketGainRetire').value = retireGain ? `${retireGain}% (P${percentile})` : '-';
-    document.getElementById('marketGainDeath').value = deathGain ? `${deathGain}% (P${percentile})` : '';
-    document.getElementById('marketGainCustom').value = customGain ? `${customGain}% (P${percentile})` : '';
+    document.getElementById('marketGainDeath').value = deathGain ? `${deathGain}% (P${percentile})` : '-';
+    document.getElementById('marketGainCustom').value = customGain ? `${customGain}% (P${percentile})` : '-';
   } else {
     document.getElementById('marketGainRetire').value = `${marketGain}%`;
-    document.getElementById('marketGainDeath').value = timeHorizonDeath ? `${marketGain}%` : '';
-    document.getElementById('marketGainCustom').value = timeHorizonCustom ? `${marketGain}%` : '';
+    document.getElementById('marketGainDeath').value = timeHorizonDeath ? `${marketGain}%` : '-';
+    document.getElementById('marketGainCustom').value = timeHorizonCustom ? `${marketGain}%` : '-';
   }
   
   runCalculation();
@@ -719,6 +725,21 @@ function displayResults(result) {
   displayVariableTable('insurance-table', result.insurance);
   displayVariableTable('results-table', result.results);
   displayArrays(result.arrays, parseInt(document.getElementById('age').value));
+
+  // Update account values
+  const retireHorizon = parseInt(document.getElementById('timeHorizonRetire').value);
+  const deathHorizon = parseInt(document.getElementById('timeHorizonDeath').value);
+  const customHorizon = parseInt(document.getElementById('timeHorizonCustom').value);
+  
+  if (result.arrays.accountIfWindowEnded) {
+    document.getElementById('accountValueRetire').value = retireHorizon >= 0 ? 
+      '$' + (result.arrays.accountIfWindowEnded[retireHorizon] || 0).toLocaleString('en-US', {maximumFractionDigits: 2, minimumFractionDigits: 2}) : '-';
+    document.getElementById('accountValueDeath').value = deathHorizon >= 0 ? 
+      '$' + (result.arrays.accountIfWindowEnded[deathHorizon] || 0).toLocaleString('en-US', {maximumFractionDigits: 2, minimumFractionDigits: 2}) : '-';
+    document.getElementById('accountValueCustom').value = customHorizon >= 0 ? 
+      '$' + (result.arrays.accountIfWindowEnded[customHorizon] || 0).toLocaleString('en-US', {maximumFractionDigits: 2, minimumFractionDigits: 2}) : '-';
+  }
+ 
 }
 
 function displayVariableTable(tableId, variables) {
@@ -743,9 +764,10 @@ function displayVariableTable(tableId, variables) {
 
 function getMortalityForYear(currentAge, sex, yearsAhead) {
   if (!window.calcEngine || !window.calcEngine.data.mortality) return null;
-  const mortality = window.calcEngine.data.mortality[sex];
+  const sexStr = document.getElementById('sex').value; // Get from DOM
+  const mortality = window.calcEngine.data.mortality[sexStr];
   if (!mortality || !mortality[currentAge]) return null;
-  return mortality[currentAge][yearsAhead] || null;
+  return mortality[currentAge][yearsAhead + 1] || null; // +1 because year 1 = 1 year ahead
 }
 
 function displayArrays(arrays, currentAge) {
@@ -856,7 +878,7 @@ function formatValue(value, key) {
 }
 
 // Display last updated timestamp
-document.getElementById('last-updated').textContent = '2/12/2026, 5:28 PM';
+document.getElementById('last-updated').textContent = '2/12/2026, 5:52 PM';
  
 init();
 </script>
