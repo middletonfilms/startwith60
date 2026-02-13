@@ -816,11 +816,15 @@ function displayArrays(arrays, currentAge) {
     
     columnNames.forEach(key => {
       if (key === 'mortalityLikelihood') {
-        // Get mortality from data - use the age at that year, not current age
-        const ageAtYear = currentAge + i;
-        const sex = document.getElementById('sex').value;
-        const mortality = window.calcEngine?.data?.mortality?.[sex]?.[ageAtYear]?.[1] || null;
-        row.innerHTML += `<td>${mortality !== null ? (mortality * 100).toFixed(2) + '%' : '-'}</td>`;
+        // Year 0 = no value (-)
+        // Year N = probability of dying in next N years from CURRENT age
+        if (i === 0) {
+          row.innerHTML += `<td>-</td>`;
+        } else {
+          const sex = document.getElementById('sex').value;
+          const mortality = window.calcEngine?.data?.mortality?.[sex]?.[currentAge]?.[i] || null;
+          row.innerHTML += `<td>${mortality !== null ? (mortality * 100).toFixed(2) + '%' : '-'}</td>`;
+        }
       } else {
         const arr = arrays[key];
         const value = arr[i];
@@ -896,7 +900,7 @@ function formatValue(value, key) {
 }
 
 // Display last updated timestamp
-document.getElementById('last-updated').textContent = '2/12/2026, 8:57 PM';
+document.getElementById('last-updated').textContent = '2/12/2026, 9:05 PM';
  
 init();
 </script>
