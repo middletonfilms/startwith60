@@ -791,6 +791,13 @@ function displayArrays(arrays, currentAge) {
   const container = document.getElementById('arrays-container');
   container.innerHTML = '';
   
+  const sex = document.getElementById('sex').value;
+  
+  // DEBUG: Log what we have
+  console.log('Current Age:', currentAge);
+  console.log('Sex:', sex);
+  console.log('Mortality data for age', currentAge, ':', window.calcEngine?.data?.mortality?.[sex]?.[currentAge]);
+  
   const maxLength = Math.max(...Object.values(arrays).map(arr => arr.length));
   
   const table = document.createElement('table');
