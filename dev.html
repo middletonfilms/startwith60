@@ -367,25 +367,26 @@ function getRateBrackets(age, sex) {
   const brackets = [];
   
   if (sex === 'male') {
+    brackets.push({
+      name: 'Standard',
+      range: isMinor ? '$0-$15,099' : '$0-$34,999',
+      ratePerThousand: ageRow[1],
+      monthlyCutoff: ageRow[2]
+    });
+    brackets.push({
+      name: 'Preferred',
+      range: isMinor ? '$15,100-$59,999' : '$35,000-$59,999',
+      ratePerThousand: ageRow[5],
+      monthlyCutoff: ageRow[6]
+    });
+    brackets.push({
+      name: 'Executive',
+      range: isMinor ? '$60,000-$9,999,999' : '$60,000-$119,999',
+      ratePerThousand: ageRow[9],
+      monthlyCutoff: ageRow[10]
+    });
+    
     if (isMinor) {
-      brackets.push({
-        name: 'Standard',
-        range: '$0-$15,099',
-        ratePerThousand: ageRow[1],
-        monthlyCutoff: ageRow[2]
-      });
-      brackets.push({
-        name: 'Preferred',
-        range: '$15,100-$59,999',
-        ratePerThousand: ageRow[5],
-        monthlyCutoff: ageRow[6]
-      });
-      brackets.push({
-        name: 'Executive',
-        range: '$60,000-$9,999,999',
-        ratePerThousand: ageRow[9],
-        monthlyCutoff: ageRow[10]
-      });
       brackets.push({
         name: 'Select',
         range: '-',
@@ -393,51 +394,42 @@ function getRateBrackets(age, sex) {
         monthlyCutoff: null
       });
     } else {
-      brackets.push({
-        name: 'Standard',
-        range: '$0-$34,999',
-        ratePerThousand: ageRow[1],
-        monthlyCutoff: ageRow[2]
-      });
-      brackets.push({
-        name: 'Preferred',
-        range: '$35,000-$59,999',
-        ratePerThousand: ageRow[5],
-        monthlyCutoff: ageRow[6]
-      });
-      brackets.push({
-        name: 'Executive',
-        range: '$60,000-$119,999',
-        ratePerThousand: ageRow[9],
-        monthlyCutoff: ageRow[10]
-      });
+      // For adults, Select bracket exists
+      // Rate at col 13, but cutoff is stored as coverage ceiling (9999999) not monthly premium
+      // Calculate monthly cutoff from rate and coverage ceiling
+      const selectRate = ageRow[13];
+      const selectCeiling = ageRow[14]; // This is 9999999
+      // Monthly cutoff = (ceiling / 1000) * rate / 12
+      const selectCutoff = selectCeiling !== 9999999 ? (selectCeiling / 1000) * selectRate / 12 : null;
+      
       brackets.push({
         name: 'Select',
         range: '$120,000-$9,999,999',
-        ratePerThousand: ageRow[13],
-        monthlyCutoff: ageRow[14]
+        ratePerThousand: selectRate,
+        monthlyCutoff: selectCutoff
       });
     }
   } else { // female
+    brackets.push({
+      name: 'Standard',
+      range: isMinor ? '$0-$15,099' : '$0-$34,999',
+      ratePerThousand: ageRow[3],
+      monthlyCutoff: ageRow[4]
+    });
+    brackets.push({
+      name: 'Preferred',
+      range: isMinor ? '$15,100-$59,999' : '$35,000-$59,999',
+      ratePerThousand: ageRow[7],
+      monthlyCutoff: ageRow[8]
+    });
+    brackets.push({
+      name: 'Executive',
+      range: isMinor ? '$60,000-$9,999,999' : '$60,000-$119,999',
+      ratePerThousand: ageRow[11],
+      monthlyCutoff: ageRow[12]
+    });
+    
     if (isMinor) {
-      brackets.push({
-        name: 'Standard',
-        range: '$0-$15,099',
-        ratePerThousand: ageRow[3],
-        monthlyCutoff: ageRow[4]
-      });
-      brackets.push({
-        name: 'Preferred',
-        range: '$15,100-$59,999',
-        ratePerThousand: ageRow[7],
-        monthlyCutoff: ageRow[8]
-      });
-      brackets.push({
-        name: 'Executive',
-        range: '$60,000-$9,999,999',
-        ratePerThousand: ageRow[11],
-        monthlyCutoff: ageRow[12]
-      });
       brackets.push({
         name: 'Select',
         range: '-',
@@ -445,29 +437,15 @@ function getRateBrackets(age, sex) {
         monthlyCutoff: null
       });
     } else {
-      brackets.push({
-        name: 'Standard',
-        range: '$0-$34,999',
-        ratePerThousand: ageRow[3],
-        monthlyCutoff: ageRow[4]
-      });
-      brackets.push({
-        name: 'Preferred',
-        range: '$35,000-$59,999',
-        ratePerThousand: ageRow[7],
-        monthlyCutoff: ageRow[8]
-      });
-      brackets.push({
-        name: 'Executive',
-        range: '$60,000-$119,999',
-        ratePerThousand: ageRow[11],
-        monthlyCutoff: ageRow[12]
-      });
+      const selectRate = ageRow[15];
+      const selectCeiling = ageRow[16];
+      const selectCutoff = selectCeiling !== 9999999 ? (selectCeiling / 1000) * selectRate / 12 : null;
+      
       brackets.push({
         name: 'Select',
         range: '$120,000-$9,999,999',
-        ratePerThousand: ageRow[15],
-        monthlyCutoff: ageRow[16]
+        ratePerThousand: selectRate,
+        monthlyCutoff: selectCutoff
       });
     }
   }
