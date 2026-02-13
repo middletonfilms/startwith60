@@ -349,7 +349,6 @@ function getCAGRForPercentile(percentile, years) {
 }
 
 function getRateBrackets(age, sex) {
-  // Find the row for this age
   let ageRow = null;
   for (let i = 4; i < rawRateData.length; i++) {
     if (rawRateData[i][0] === age) {
@@ -360,13 +359,7 @@ function getRateBrackets(age, sex) {
   
   if (!ageRow) return null;
   
-  // Determine if minor or adult (under 18 = minor)
   const isMinor = age < 18;
-  
-  // Column structure based on sex and age category
-  // For males: columns 1, 5, 9, 13 (rates), columns 2, 6, 10, 14 (cutoffs)
-  // For females: columns 3, 7, 11, 15 (rates), columns 4, 8, 12, 16 (cutoffs)
-  
   const brackets = [];
   
   if (sex === 'male') {
@@ -375,50 +368,50 @@ function getRateBrackets(age, sex) {
         name: 'Standard',
         range: '$0-$15,099',
         ratePerThousand: ageRow[1],
-        cutoff: ageRow[2]
+        monthlyCutoff: ageRow[2]
       });
       brackets.push({
         name: 'Preferred',
         range: '$15,100-$59,999',
         ratePerThousand: ageRow[5],
-        cutoff: ageRow[6]
+        monthlyCutoff: ageRow[6]
       });
       brackets.push({
         name: 'Executive',
         range: '$60,000-$9,999,999',
         ratePerThousand: ageRow[9],
-        cutoff: ageRow[10]
+        monthlyCutoff: ageRow[10]
       });
       brackets.push({
         name: 'Select',
         range: '-',
         ratePerThousand: null,
-        cutoff: null
+        monthlyCutoff: null
       });
     } else {
       brackets.push({
         name: 'Standard',
         range: '$0-$34,999',
         ratePerThousand: ageRow[1],
-        cutoff: ageRow[2]
+        monthlyCutoff: ageRow[2]
       });
       brackets.push({
         name: 'Preferred',
         range: '$35,000-$59,999',
         ratePerThousand: ageRow[5],
-        cutoff: ageRow[6]
+        monthlyCutoff: ageRow[6]
       });
       brackets.push({
         name: 'Executive',
         range: '$60,000-$119,999',
         ratePerThousand: ageRow[9],
-        cutoff: ageRow[10]
+        monthlyCutoff: ageRow[10]
       });
       brackets.push({
         name: 'Select',
         range: '$120,000-$9,999,999',
         ratePerThousand: ageRow[13],
-        cutoff: ageRow[14]
+        monthlyCutoff: ageRow[14]
       });
     }
   } else { // female
@@ -427,50 +420,50 @@ function getRateBrackets(age, sex) {
         name: 'Standard',
         range: '$0-$15,099',
         ratePerThousand: ageRow[3],
-        cutoff: ageRow[4]
+        monthlyCutoff: ageRow[4]
       });
       brackets.push({
         name: 'Preferred',
         range: '$15,100-$59,999',
         ratePerThousand: ageRow[7],
-        cutoff: ageRow[8]
+        monthlyCutoff: ageRow[8]
       });
       brackets.push({
         name: 'Executive',
         range: '$60,000-$9,999,999',
         ratePerThousand: ageRow[11],
-        cutoff: ageRow[12]
+        monthlyCutoff: ageRow[12]
       });
       brackets.push({
         name: 'Select',
         range: '-',
         ratePerThousand: null,
-        cutoff: null
+        monthlyCutoff: null
       });
     } else {
       brackets.push({
         name: 'Standard',
         range: '$0-$34,999',
         ratePerThousand: ageRow[3],
-        cutoff: ageRow[4]
+        monthlyCutoff: ageRow[4]
       });
       brackets.push({
         name: 'Preferred',
         range: '$35,000-$59,999',
         ratePerThousand: ageRow[7],
-        cutoff: ageRow[8]
+        monthlyCutoff: ageRow[8]
       });
       brackets.push({
         name: 'Executive',
         range: '$60,000-$119,999',
         ratePerThousand: ageRow[11],
-        cutoff: ageRow[12]
+        monthlyCutoff: ageRow[12]
       });
       brackets.push({
         name: 'Select',
         range: '$120,000-$9,999,999',
         ratePerThousand: ageRow[15],
-        cutoff: ageRow[16]
+        monthlyCutoff: ageRow[16]
       });
     }
   }
@@ -482,26 +475,28 @@ function getActiveBracket(brackets, policySize, monthlyBudget) {
   if (!brackets) return -1;
   
   if (policySize) {
-    // Easy: find which bracket the policy size falls into
+    // Find which bracket the policy size falls into
     if (policySize <= 15099) return 0;
     if (policySize <= 59999) return 1;
     if (policySize <= 119999) return 2;
     return 3;
   } else if (monthlyBudget) {
-    // Find bracket by checking cutoffs
-    const annualBudget = monthlyBudget * 12;
-    
+    // Find bracket by checking monthly cutoffs
     for (let i = 0; i < brackets.length; i++) {
       const bracket = brackets[i];
-      if (!bracket.cutoff) continue;
+      if (!bracket.monthlyCutoff) continue;
       
-      if (annualBudget <= bracket.cutoff) {
+      if (monthlyBudget <= bracket.monthlyCutoff) {
         return i;
       }
     }
     
-    // If above all cutoffs, use last bracket
-    return brackets.length - 1;
+    // If above all cutoffs, use last bracket with data
+    for (let i = brackets.length - 1; i >= 0; i--) {
+      if (brackets[i].ratePerThousand !== null) {
+        return i;
+      }
+    }
   }
   
   return -1;
@@ -537,10 +532,10 @@ function displayRateTable(age, sex, activeBracketIndex) {
     brackets.map((b, i) => `<td class="rate-table-cell ${activeBracketIndex === i ? 'active-rate' : ''}">${b.ratePerThousand !== null ? '$' + b.ratePerThousand.toFixed(2) : '-'}</td>`).join('');
   table.appendChild(rateRow);
   
-  // Cutoff row
+  // Monthly cutoff row
   const cutoffRow = document.createElement('tr');
-  cutoffRow.innerHTML = '<td><strong>Annual Premium Cutoff</strong></td>' + 
-    brackets.map((b, i) => `<td class="rate-table-cell ${activeBracketIndex === i ? 'active-rate' : ''}">${b.cutoff !== null ? '$' + b.cutoff.toFixed(2) : '-'}</td>`).join('');
+  cutoffRow.innerHTML = '<td><strong>Monthly Premium Cutoff</strong></td>' + 
+    brackets.map((b, i) => `<td class="rate-table-cell ${activeBracketIndex === i ? 'active-rate' : ''}">${b.monthlyCutoff !== null ? '$' + b.monthlyCutoff.toFixed(2) : '-'}</td>`).join('');
   table.appendChild(cutoffRow);
 }
 
@@ -814,12 +809,23 @@ function formatValue(value, key) {
     return '-';
   }
   if (typeof value === 'number') {
-    if (key && (key.includes('AGE') || key.includes('YEAR') || key.includes('HORIZON') || key === 'year')) {
+    // No decimals for years/ages/life expectancy
+    if (key && (key.includes('AGE') || key.includes('YEAR') || key.includes('HORIZON') || key === 'year' || key === 'LIFE_EXPECTANCY')) {
       return Math.round(value).toString();
     }
+    // 4 decimals for mortality likelihood
+    if (key === 'MORTALITY_LIKELIHOOD') {
+      return value.toFixed(4);
+    }
+    // 4 decimals for inflation value
     if (key === 'inflationValue') {
       return value.toFixed(4);
     }
+    // 2 decimals for money amounts in inputs
+    if (key === 'MONTHLY_BUDGET' || key === 'POLICY_SIZE' || key === 'TERM_BUDGET' || key === 'TERM_POLICY_SIZE') {
+      return value.toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+    }
+    // 2 decimals for insurance rates and most results
     if (value > 100 || value < -100) {
       return value.toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
     }
