@@ -553,7 +553,7 @@ function handleBudgetInput() {
     if (brackets && activeBracket >= 0) {
       const rate = brackets[activeBracket].ratePerThousand;
       if (rate) {
-        const policySize = (annualBudget / rate) * 1000;
+        const policySize = (monthlyBudget / rate) * 1000;
         policy.value = Math.round(policySize);
       }
     }
@@ -583,8 +583,7 @@ function handlePolicyInput() {
     if (brackets && activeBracket >= 0) {
       const rate = brackets[activeBracket].ratePerThousand;
       if (rate) {
-        const annualPremium = (policySize / 1000) * rate;
-        const monthlyBudget = annualPremium / 12;
+        const monthlyBudget = (policySize / 1000) * rate;
         budget.value = monthlyBudget.toFixed(2);
       }
     }
@@ -825,7 +824,7 @@ function formatValue(value, key) {
 }
 
 // Display last updated timestamp
-document.getElementById('last-updated').textContent = '2/12/2026, 4:48 PM';
+document.getElementById('last-updated').textContent = '2/12/2026, 4:58 PM';
  
 init();
 </script>
