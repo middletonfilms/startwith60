@@ -169,9 +169,10 @@ async function runCode() {
   output.textContent = 'Running...\n\n';
   
   try {
-    const result = await (async function() {
-      return eval(code);
-    })();
+    // Use AsyncFunction constructor to support top-level await
+    const AsyncFunction = async function () {}.constructor;
+    const fn = new AsyncFunction(code);
+    const result = await fn();
     
     let finalOutput = '';
     if (consoleOutput.length > 0) {
