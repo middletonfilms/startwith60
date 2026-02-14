@@ -149,9 +149,8 @@ const marketHistory = await window.dataLoader.loadExcel('MarketHistory.xlsx', 'M
 </div>
 
 <script>
-let engineReady = true; // Data loader is ready immediately
+let engineReady = true;
 
-// Don't auto-init engine - let user load Excel files manually
 let consoleOutput = [];
 const originalLog = console.log;
 console.log = function(...args) {
@@ -165,25 +164,20 @@ async function runCode() {
   const code = document.getElementById('codeEditor').value;
   const output = document.getElementById('output');
   
-  // Clear console output
   consoleOutput = [];
-  
   output.className = 'output';
   output.textContent = 'Running...\n\n';
   
   try {
-    // Execute code (wrapped in async function to allow await)
     const result = await (async function() {
       return eval(code);
     })();
     
-    // Show console output
     let finalOutput = '';
     if (consoleOutput.length > 0) {
       finalOutput += '📋 Console Output:\n' + consoleOutput.join('\n') + '\n\n';
     }
     
-    // Show return value
     if (result !== undefined) {
       finalOutput += '📤 Returned Value:\n';
       if (typeof result === 'object') {
@@ -199,13 +193,12 @@ async function runCode() {
   } catch (err) {
     output.className = 'output error';
     output.textContent = '✗ Error:\n' + err.message + '\n\n' + err.stack;
-    console.error(err);
   }
 }
 
 function clearOutput() {
   document.getElementById('output').className = 'output success';
-  document.getElementById('output').textContent = 'Output cleared. Click "Run Code" to execute.';
+  document.getElementById('output').textContent = 'Output cleared.';
 }
 
 function resetCode() {
@@ -219,10 +212,6 @@ const marketHistory = await window.dataLoader.loadExcel('MarketHistory.xlsx', 'M
 `;
   clearOutput();
 }
-
-// Override console.log to capture output
-let consoleOutput = [];
-const originalLog = console.log;
 </script>
 
 </body>
