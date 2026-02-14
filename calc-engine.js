@@ -6,7 +6,7 @@
 
 class CalcEngine {
   constructor() {
-    this.VERSION = '2/13/2026, 3:58 PM';
+    this.VERSION = '2/13/2026, 4:10 PM';
     this.data = null;
   }
 
