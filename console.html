@@ -121,49 +121,19 @@
 <body>
 
 <h1>📝 JavaScript Code Editor</h1>
-<div class="status" id="status">Initializing engine...</div>
+<div class="status" id="status">Ready. Excel files load when you run code.</div>
 
 <div class="container">
   <div class="editor-section">
     <div class="editor-label">CODE EDITOR (write your code here):</div>
-    <textarea id="codeEditor">// ========================================
-// SETUP CODE (runs automatically on page load)
-// ========================================
+    <textarea id="codeEditor">// Load Excel files
+const rateTables = await window.dataLoader.loadExcel('RateTables.xlsx', 'LI_RATES');
+const mortality = await window.dataLoader.loadExcel('Mortality.xlsx', 'Mortality');
+const marketHistory = await window.dataLoader.loadExcel('MarketHistory.xlsx', 'Market');
 
-// Load and initialize the calc engine with Excel data
-await initCalcEngine();
-// This executes:
-//   window.calcEngine = new CalcEngine();
-//   window.calcEngine.data = await window.dataLoader.loadAll();
-//     - Loads RateTables.xlsx → calcEngine.data.rateTables
-//     - Loads Mortality.xlsx → calcEngine.data.mortality
-//     - Loads MarketHistory.xlsx → calcEngine.data.marketHistory
+// Your code here:
 
-// Now you have access to:
-const calcEngine = window.calcEngine;
-const rateTables = calcEngine.data.rateTables;
-const mortality = calcEngine.data.mortality;
-const marketHistory = calcEngine.data.marketHistory;
-
-// ========================================
-// YOUR CODE STARTS HERE
-// ========================================
-
-// Example: Get term rate
-let termRate = await calcEngine.getTermRate(35, 'male');
-console.log('Term rate:', termRate);
-
-// Example: Access raw data
-console.log('Mortality data exists:', !!mortality);
-console.log('Market history entries:', marketHistory.length);
-
-// Example: Build array
-let termSetAside = [];
-for (let year = 0; year < 10; year++) {
-  termSetAside.push(year < 10 ? 240 : 0);
-}
-
-termSetAside</textarea>
+</textarea>
   </div>
   
   <div class="output-section">
@@ -179,23 +149,9 @@ termSetAside</textarea>
 </div>
 
 <script>
-let engineReady = false;
+let engineReady = true; // Data loader is ready immediately
 
-// Initialize engine on load
-async function init() {
-  const status = document.getElementById('status');
-  try {
-    status.textContent = 'Loading engine and data files...';
-    await initCalcEngine();
-    engineReady = true;
-    status.textContent = '✓ Engine ready! Version: ' + window.calcEngine.VERSION;
-  } catch (err) {
-    status.textContent = '✗ Error loading engine: ' + err.message;
-    console.error(err);
-  }
-}
-
-// Override console.log to capture output
+// Don't auto-init engine - let user load Excel files manually
 let consoleOutput = [];
 const originalLog = console.log;
 console.log = function(...args) {
@@ -206,12 +162,6 @@ console.log = function(...args) {
 };
 
 async function runCode() {
-  if (!engineReady) {
-    document.getElementById('output').className = 'output error';
-    document.getElementById('output').textContent = '✗ Engine not ready yet. Wait for initialization.';
-    return;
-  }
-  
   const code = document.getElementById('codeEditor').value;
   const output = document.getElementById('output');
   
@@ -222,9 +172,6 @@ async function runCode() {
   output.textContent = 'Running...\n\n';
   
   try {
-    // Make calcEngine available in code scope
-    const calcEngine = window.calcEngine;
-    
     // Execute code (wrapped in async function to allow await)
     const result = await (async function() {
       return eval(code);
@@ -262,49 +209,20 @@ function clearOutput() {
 }
 
 function resetCode() {
-  document.getElementById('codeEditor').value = `// ========================================
-// SETUP CODE (runs automatically on page load)
-// ========================================
+  document.getElementById('codeEditor').value = `// Load Excel files
+const rateTables = await window.dataLoader.loadExcel('RateTables.xlsx', 'LI_RATES');
+const mortality = await window.dataLoader.loadExcel('Mortality.xlsx', 'Mortality');
+const marketHistory = await window.dataLoader.loadExcel('MarketHistory.xlsx', 'Market');
 
-// Load and initialize the calc engine with Excel data
-await initCalcEngine();
-// This executes:
-//   window.calcEngine = new CalcEngine();
-//   window.calcEngine.data = await window.dataLoader.loadAll();
-//     - Loads RateTables.xlsx → calcEngine.data.rateTables
-//     - Loads Mortality.xlsx → calcEngine.data.mortality
-//     - Loads MarketHistory.xlsx → calcEngine.data.marketHistory
+// Your code here:
 
-// Now you have access to:
-const calcEngine = window.calcEngine;
-const rateTables = calcEngine.data.rateTables;
-const mortality = calcEngine.data.mortality;
-const marketHistory = calcEngine.data.marketHistory;
-
-// ========================================
-// YOUR CODE STARTS HERE
-// ========================================
-
-// Example: Get term rate
-let termRate = await calcEngine.getTermRate(35, 'male');
-console.log('Term rate:', termRate);
-
-// Example: Access raw data
-console.log('Mortality data exists:', !!mortality);
-console.log('Market history entries:', marketHistory.length);
-
-// Example: Build array
-let termSetAside = [];
-for (let year = 0; year < 10; year++) {
-  termSetAside.push(year < 10 ? 240 : 0);
-}
-
-termSetAside`;
+`;
   clearOutput();
 }
 
-// Auto-init
-init();
+// Override console.log to capture output
+let consoleOutput = [];
+const originalLog = console.log;
 </script>
 
 </body>
