@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calc Engine Test Console</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="/data-loader.js"></script>
+<script src="/calc-engine.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Courier New', monospace;
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 20px;
+    font-size: 14px;
+  }
+  
+  h1 {
+    color: #4ec9b0;
+    margin-bottom: 20px;
+  }
+  
+  .console {
+    background: #252525;
+    border: 1px solid #3e3e3e;
+    border-radius: 4px;
+    padding: 15px;
+    min-height: 400px;
+    max-height: 600px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+  }
+  
+  .output {
+    margin-bottom: 10px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  
+  .output.error {
+    color: #f48771;
+  }
+  
+  .output.success {
+    color: #4ec9b0;
+  }
+  
+  .output.info {
+    color: #9cdcfe;
+  }
+  
+  .input-area {
+    display: flex;
+    gap: 10px;
+  }
+  
+  input {
+    flex: 1;
+    background: #3c3c3c;
+    border: 1px solid #555;
+    color: #d4d4d4;
+    padding: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+  }
+  
+  button {
+    background: #0e639c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+  }
+  
+  button:hover {
+    background: #1177bb;
+  }
+  
+  .quick-tests {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .quick-tests button {
+    background: #2d2d30;
+    border: 1px solid #555;
+    padding: 8px 15px;
+  }
+  
+  .quick-tests button:hover {
+    background: #3e3e42;
+  }
+</style>
+</head>
+<body>
+
+<h1>🧪 Calc Engine Test Console</h1>
+
+<div class="quick-tests">
+  <button onclick="testInit()">Test Init</button>
+  <button onclick="testRateBrackets()">Test Rate Brackets</button>
+  <button onclick="testTermRate()">Test Term Rate</button>
+  <button onclick="testMortality()">Test Mortality</button>
+  <button onclick="testPercentile()">Test Percentile</button>
+  <button onclick="testFullCalc()">Test Full Calculation</button>
+  <button onclick="clearConsole()">Clear</button>
+</div>
+
+<div class="console" id="console"></div>
+
+<div class="input-area">
+  <input type="text" id="commandInput" placeholder="Type JavaScript command (e.g., calcEngine.getTermRate(35, 'male'))" />
+  <button onclick="executeCommand()">Run</button>
+</div>
+
+<script>
+let calcReady = false;
+
+function log(message, type = 'info') {
+  const console = document.getElementById('console');
+  const output = document.createElement('div');
+  output.className = `output ${type}`;
+  
+  if (typeof message === 'object') {
+    output.textContent = JSON.stringify(message, null, 2);
+  } else {
+    output.textContent = message;
+  }
+  
+  console.appendChild(output);
+  console.scrollTop = console.scrollHeight;
+}
+
+function clearConsole() {
+  document.getElementById('console').innerHTML = '';
+}
+
+async function testInit() {
+  log('>>> Initializing calc engine...', 'info');
+  try {
+    await initCalcEngine();
+    calcReady = true;
+    log('✓ Engine initialized successfully', 'success');
+    log('Version: ' + window.calcEngine.VERSION, 'success');
+    log('Data loaded: ' + JSON.stringify(Object.keys(window.calcEngine.data)), 'success');
+  } catch (err) {
+    log('✗ Error: ' + err.message, 'error');
+    console.error(err);
+  }
+}
+
+async function testRateBrackets() {
+  if (!calcReady) {
+    log('✗ Engine not ready. Run "Test Init" first.', 'error');
+    return;
+  }
+  
+  log('>>> Testing getRateBrackets(35, "male")...', 'info');
+  try {
+    const brackets = await window.calcEngine.getRateBrackets(35, 'male');
+    log('✓ Rate brackets:', 'success');
+    log(brackets, 'success');
+  } catch (err) {
+    log('✗ Error: ' + err.message, 'error');
+    console.error(err);
+  }
+}
+
+async function testTermRate() {
+  if (!calcReady) {
+    log('✗ Engine not ready. Run "Test Init" first.', 'error');
+    return;
+  }
+  
+  log('>>> Testing getTermRate(35, "male")...', 'info');
+  try {
+    const rate = await window.calcEngine.getTermRate(35, 'male');
+    log('✓ Term rate: $' + rate, 'success');
+  } catch (err) {
+    log('✗ Error: ' + err.message, 'error');
+    console.error(err);
+  }
+}
+
+async function testMortality() {
+  if (!calcReady) {
+    log('✗ Engine not ready. Run "Test Init" first.', 'error');
+    return;
+  }
+  
+  log('>>> Testing getMortalityProbability(36, "male", 1)...', 'info');
+  try {
+    const prob = window.calcEngine.getMortalityProbability(36, 'male', 1);
+    log('✓ Mortality probability (1 year): ' + (prob * 100).toFixed(2) + '%', 'success');
+  } catch (err) {
+    log('✗ Error: ' + err.message, 'error');
+    console.error(err);
+  }
+}
+
+async function testPercentile() {
+  if (!calcReady) {
+    log('✗ Engine not ready. Run "Test Init" first.', 'error');
+    return;
+  }
+  
+  log('>>> Testing getCAGRForPercentile(50, 35)...', 'info');
+  try {
+    const cagr = window.calcEngine.getCAGRForPercentile(50, 35);
+    log('✓ 50th percentile CAGR over 35 years: ' + cagr + '%', 'success');
+  } catch (err) {
+    log('✗ Error: ' + err.message, 'error');
+    console.error(err);
+  }
+}
+
+async function testFullCalc() {
+  if (!calcReady) {
+    log('✗ Engine not ready. Run "Test Init" first.', 'error');
+    return;
+  }
+  
+  log('>>> Testing full calculation...', 'info');
+  const inputs = {
+    age: 35,
+    sex: 'male',
+    monthlyBudget: 100,
+    termPolicy: '10 YEAR',
+    termBudget: 20,
+    retirementAge: 65,
+    lifeExpectancy: 76
+  };
+  
+  log('Inputs: ' + JSON.stringify(inputs, null, 2), 'info');
+  
+  try {
+    const result = await window.calcEngine.calculate(inputs);
+    log('✓ Calculation complete!', 'success');
+    log('Sections: ' + Object.keys(result.sections).join(', '), 'success');
+    log('Array columns: ' + Object.keys(result.arrays).join(', '), 'success');
+    log('Sample output (first 3 years of termSetAside):', 'info');
+    log(result.arrays.termSetAside.slice(0, 3), 'success');
+  } catch (err) {
+    log('✗ Error: ' + err.message, 'error');
+    console.error(err);
+  }
+}
+
+async function executeCommand() {
+  const input = document.getElementById('commandInput');
+  const command = input.value.trim();
+  
+  if (!command) return;
+  
+  log('>>> ' + command, 'info');
+  
+  try {
+    // Make calcEngine available in eval scope
+    const calcEngine = window.calcEngine;
+    const result = await eval(command);
+    log('✓ Result:', 'success');
+    log(result, 'success');
+  } catch (err) {
+    log('✗ Error: ' + err.message, 'error');
+    console.error(err);
+  }
+  
+  input.value = '';
+}
+
+// Allow Enter key to execute
+document.getElementById('commandInput').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    executeCommand();
+  }
+});
+
+// Auto-init on load
+log('Welcome to Calc Engine Test Console', 'info');
+log('Click "Test Init" to load the engine, then run tests.', 'info');
+log('Or type JavaScript commands in the input below.', 'info');
+</script>
+
+</body>
+</html>
