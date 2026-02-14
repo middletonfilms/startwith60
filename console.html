@@ -127,12 +127,13 @@
   <div class="editor-section">
     <div class="editor-label">CODE EDITOR (write your code here):</div>
     <textarea id="codeEditor">// Load Excel files
-const rateTables = await window.dataLoader.loadExcel('RateTables.xlsx', 'LI_RATES');
-const mortality = await window.dataLoader.loadExcel('Mortality.xlsx', 'Mortality');
-const marketHistory = await window.dataLoader.loadExcel('MarketHistory.xlsx', 'Market');
-
+const data = await window.dataLoader.loadAll();
+const rateTables = data.rateTables;     
+const mortality = data.mortality;        
+const marketHistory = data.marketHistory; 
 // Your code here:
 
+     
 </textarea>
   </div>
   
