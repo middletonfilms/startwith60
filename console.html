@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calc Engine Test Console</title>
+<title>JavaScript Code Editor</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="/data-loader.js"></script>
 <script src="/calc-engine.js"></script>
@@ -14,29 +14,63 @@
     background: #1e1e1e;
     color: #d4d4d4;
     padding: 20px;
-    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
   }
   
   h1 {
     color: #4ec9b0;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+    font-size: 18px;
   }
   
-  .console {
+  .container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 10px;
+  }
+  
+  .editor-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .editor-label {
+    color: #9cdcfe;
+    margin-bottom: 5px;
+    font-size: 12px;
+  }
+  
+  textarea {
+    flex: 1;
     background: #252525;
     border: 1px solid #3e3e3e;
-    border-radius: 4px;
+    color: #d4d4d4;
     padding: 15px;
-    min-height: 400px;
-    max-height: 600px;
-    overflow-y: auto;
-    margin-bottom: 15px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    resize: none;
+    line-height: 1.5;
+  }
+  
+  .output-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
   
   .output {
-    margin-bottom: 10px;
+    flex: 1;
+    background: #252525;
+    border: 1px solid #3e3e3e;
+    padding: 15px;
+    overflow-y: auto;
     white-space: pre-wrap;
     word-wrap: break-word;
+    font-size: 14px;
   }
   
   .output.error {
@@ -47,243 +81,230 @@
     color: #4ec9b0;
   }
   
-  .output.info {
-    color: #9cdcfe;
-  }
-  
-  .input-area {
+  .controls {
     display: flex;
     gap: 10px;
-  }
-  
-  input {
-    flex: 1;
-    background: #3c3c3c;
-    border: 1px solid #555;
-    color: #d4d4d4;
-    padding: 10px;
-    font-family: 'Courier New', monospace;
-    font-size: 14px;
+    margin-top: 10px;
   }
   
   button {
     background: #0e639c;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 12px 30px;
     cursor: pointer;
     font-family: 'Courier New', monospace;
+    font-size: 14px;
+    font-weight: bold;
   }
   
   button:hover {
     background: #1177bb;
   }
   
-  .quick-tests {
-    margin-bottom: 20px;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  
-  .quick-tests button {
+  button.secondary {
     background: #2d2d30;
     border: 1px solid #555;
-    padding: 8px 15px;
   }
   
-  .quick-tests button:hover {
+  button.secondary:hover {
     background: #3e3e42;
+  }
+  
+  .status {
+    color: #9cdcfe;
+    font-size: 12px;
+    padding: 5px 0;
   }
 </style>
 </head>
 <body>
 
-<h1>🧪 Calc Engine Test Console</h1>
+<h1>📝 JavaScript Code Editor</h1>
+<div class="status" id="status">Initializing engine...</div>
 
-<div class="quick-tests">
-  <button onclick="testInit()">Test Init</button>
-  <button onclick="testRateBrackets()">Test Rate Brackets</button>
-  <button onclick="testTermRate()">Test Term Rate</button>
-  <button onclick="testMortality()">Test Mortality</button>
-  <button onclick="testPercentile()">Test Percentile</button>
-  <button onclick="testFullCalc()">Test Full Calculation</button>
-  <button onclick="clearConsole()">Clear</button>
+<div class="container">
+  <div class="editor-section">
+    <div class="editor-label">CODE EDITOR (write your code here):</div>
+    <textarea id="codeEditor">// ========================================
+// SETUP CODE (runs automatically on page load)
+// ========================================
+
+// Load and initialize the calc engine with Excel data
+await initCalcEngine();
+// This executes:
+//   window.calcEngine = new CalcEngine();
+//   window.calcEngine.data = await window.dataLoader.loadAll();
+//     - Loads RateTables.xlsx → calcEngine.data.rateTables
+//     - Loads Mortality.xlsx → calcEngine.data.mortality
+//     - Loads MarketHistory.xlsx → calcEngine.data.marketHistory
+
+// Now you have access to:
+const calcEngine = window.calcEngine;
+const rateTables = calcEngine.data.rateTables;
+const mortality = calcEngine.data.mortality;
+const marketHistory = calcEngine.data.marketHistory;
+
+// ========================================
+// YOUR CODE STARTS HERE
+// ========================================
+
+// Example: Get term rate
+let termRate = await calcEngine.getTermRate(35, 'male');
+console.log('Term rate:', termRate);
+
+// Example: Access raw data
+console.log('Mortality data exists:', !!mortality);
+console.log('Market history entries:', marketHistory.length);
+
+// Example: Build array
+let termSetAside = [];
+for (let year = 0; year < 10; year++) {
+  termSetAside.push(year < 10 ? 240 : 0);
+}
+
+termSetAside</textarea>
+  </div>
+  
+  <div class="output-section">
+    <div class="editor-label">OUTPUT:</div>
+    <div class="output success" id="output">Click "Run Code" to execute your code...</div>
+  </div>
 </div>
 
-<div class="console" id="console"></div>
-
-<div class="input-area">
-  <input type="text" id="commandInput" placeholder="Type JavaScript command (e.g., calcEngine.getTermRate(35, 'male'))" />
-  <button onclick="executeCommand()">Run</button>
+<div class="controls">
+  <button onclick="runCode()">▶ Run Code</button>
+  <button class="secondary" onclick="clearOutput()">Clear Output</button>
+  <button class="secondary" onclick="resetCode()">Reset Code</button>
 </div>
 
 <script>
-let calcReady = false;
+let engineReady = false;
 
-function log(message, type = 'info') {
-  const console = document.getElementById('console');
-  const output = document.createElement('div');
-  output.className = `output ${type}`;
-  
-  if (typeof message === 'object') {
-    output.textContent = JSON.stringify(message, null, 2);
-  } else {
-    output.textContent = message;
-  }
-  
-  console.appendChild(output);
-  console.scrollTop = console.scrollHeight;
-}
-
-function clearConsole() {
-  document.getElementById('console').innerHTML = '';
-}
-
-async function testInit() {
-  log('>>> Initializing calc engine...', 'info');
+// Initialize engine on load
+async function init() {
+  const status = document.getElementById('status');
   try {
+    status.textContent = 'Loading engine and data files...';
     await initCalcEngine();
-    calcReady = true;
-    log('✓ Engine initialized successfully', 'success');
-    log('Version: ' + window.calcEngine.VERSION, 'success');
-    log('Data loaded: ' + JSON.stringify(Object.keys(window.calcEngine.data)), 'success');
+    engineReady = true;
+    status.textContent = '✓ Engine ready! Version: ' + window.calcEngine.VERSION;
   } catch (err) {
-    log('✗ Error: ' + err.message, 'error');
+    status.textContent = '✗ Error loading engine: ' + err.message;
     console.error(err);
   }
 }
 
-async function testRateBrackets() {
-  if (!calcReady) {
-    log('✗ Engine not ready. Run "Test Init" first.', 'error');
+// Override console.log to capture output
+let consoleOutput = [];
+const originalLog = console.log;
+console.log = function(...args) {
+  originalLog.apply(console, args);
+  consoleOutput.push(args.map(arg => 
+    typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+  ).join(' '));
+};
+
+async function runCode() {
+  if (!engineReady) {
+    document.getElementById('output').className = 'output error';
+    document.getElementById('output').textContent = '✗ Engine not ready yet. Wait for initialization.';
     return;
   }
   
-  log('>>> Testing getRateBrackets(35, "male")...', 'info');
-  try {
-    const brackets = await window.calcEngine.getRateBrackets(35, 'male');
-    log('✓ Rate brackets:', 'success');
-    log(brackets, 'success');
-  } catch (err) {
-    log('✗ Error: ' + err.message, 'error');
-    console.error(err);
-  }
-}
-
-async function testTermRate() {
-  if (!calcReady) {
-    log('✗ Engine not ready. Run "Test Init" first.', 'error');
-    return;
-  }
+  const code = document.getElementById('codeEditor').value;
+  const output = document.getElementById('output');
   
-  log('>>> Testing getTermRate(35, "male")...', 'info');
-  try {
-    const rate = await window.calcEngine.getTermRate(35, 'male');
-    log('✓ Term rate: $' + rate, 'success');
-  } catch (err) {
-    log('✗ Error: ' + err.message, 'error');
-    console.error(err);
-  }
-}
-
-async function testMortality() {
-  if (!calcReady) {
-    log('✗ Engine not ready. Run "Test Init" first.', 'error');
-    return;
-  }
+  // Clear console output
+  consoleOutput = [];
   
-  log('>>> Testing getMortalityProbability(36, "male", 1)...', 'info');
-  try {
-    const prob = window.calcEngine.getMortalityProbability(36, 'male', 1);
-    log('✓ Mortality probability (1 year): ' + (prob * 100).toFixed(2) + '%', 'success');
-  } catch (err) {
-    log('✗ Error: ' + err.message, 'error');
-    console.error(err);
-  }
-}
-
-async function testPercentile() {
-  if (!calcReady) {
-    log('✗ Engine not ready. Run "Test Init" first.', 'error');
-    return;
-  }
-  
-  log('>>> Testing getCAGRForPercentile(50, 35)...', 'info');
-  try {
-    const cagr = window.calcEngine.getCAGRForPercentile(50, 35);
-    log('✓ 50th percentile CAGR over 35 years: ' + cagr + '%', 'success');
-  } catch (err) {
-    log('✗ Error: ' + err.message, 'error');
-    console.error(err);
-  }
-}
-
-async function testFullCalc() {
-  if (!calcReady) {
-    log('✗ Engine not ready. Run "Test Init" first.', 'error');
-    return;
-  }
-  
-  log('>>> Testing full calculation...', 'info');
-  const inputs = {
-    age: 35,
-    sex: 'male',
-    monthlyBudget: 100,
-    termPolicy: '10 YEAR',
-    termBudget: 20,
-    retirementAge: 65,
-    lifeExpectancy: 76
-  };
-  
-  log('Inputs: ' + JSON.stringify(inputs, null, 2), 'info');
+  output.className = 'output';
+  output.textContent = 'Running...\n\n';
   
   try {
-    const result = await window.calcEngine.calculate(inputs);
-    log('✓ Calculation complete!', 'success');
-    log('Sections: ' + Object.keys(result.sections).join(', '), 'success');
-    log('Array columns: ' + Object.keys(result.arrays).join(', '), 'success');
-    log('Sample output (first 3 years of termSetAside):', 'info');
-    log(result.arrays.termSetAside.slice(0, 3), 'success');
-  } catch (err) {
-    log('✗ Error: ' + err.message, 'error');
-    console.error(err);
-  }
-}
-
-async function executeCommand() {
-  const input = document.getElementById('commandInput');
-  const command = input.value.trim();
-  
-  if (!command) return;
-  
-  log('>>> ' + command, 'info');
-  
-  try {
-    // Make calcEngine available in eval scope
+    // Make calcEngine available in code scope
     const calcEngine = window.calcEngine;
-    const result = await eval(command);
-    log('✓ Result:', 'success');
-    log(result, 'success');
+    
+    // Execute code (wrapped in async function to allow await)
+    const result = await (async function() {
+      return eval(code);
+    })();
+    
+    // Show console output
+    let finalOutput = '';
+    if (consoleOutput.length > 0) {
+      finalOutput += '📋 Console Output:\n' + consoleOutput.join('\n') + '\n\n';
+    }
+    
+    // Show return value
+    if (result !== undefined) {
+      finalOutput += '📤 Returned Value:\n';
+      if (typeof result === 'object') {
+        finalOutput += JSON.stringify(result, null, 2);
+      } else {
+        finalOutput += String(result);
+      }
+    }
+    
+    output.className = 'output success';
+    output.textContent = finalOutput || '✓ Code executed successfully (no output)';
+    
   } catch (err) {
-    log('✗ Error: ' + err.message, 'error');
+    output.className = 'output error';
+    output.textContent = '✗ Error:\n' + err.message + '\n\n' + err.stack;
     console.error(err);
   }
-  
-  input.value = '';
 }
 
-// Allow Enter key to execute
-document.getElementById('commandInput').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') {
-    executeCommand();
-  }
-});
+function clearOutput() {
+  document.getElementById('output').className = 'output success';
+  document.getElementById('output').textContent = 'Output cleared. Click "Run Code" to execute.';
+}
 
-// Auto-init on load
-log('Welcome to Calc Engine Test Console', 'info');
-log('Click "Test Init" to load the engine, then run tests.', 'info');
-log('Or type JavaScript commands in the input below.', 'info');
+function resetCode() {
+  document.getElementById('codeEditor').value = `// ========================================
+// SETUP CODE (runs automatically on page load)
+// ========================================
+
+// Load and initialize the calc engine with Excel data
+await initCalcEngine();
+// This executes:
+//   window.calcEngine = new CalcEngine();
+//   window.calcEngine.data = await window.dataLoader.loadAll();
+//     - Loads RateTables.xlsx → calcEngine.data.rateTables
+//     - Loads Mortality.xlsx → calcEngine.data.mortality
+//     - Loads MarketHistory.xlsx → calcEngine.data.marketHistory
+
+// Now you have access to:
+const calcEngine = window.calcEngine;
+const rateTables = calcEngine.data.rateTables;
+const mortality = calcEngine.data.mortality;
+const marketHistory = calcEngine.data.marketHistory;
+
+// ========================================
+// YOUR CODE STARTS HERE
+// ========================================
+
+// Example: Get term rate
+let termRate = await calcEngine.getTermRate(35, 'male');
+console.log('Term rate:', termRate);
+
+// Example: Access raw data
+console.log('Mortality data exists:', !!mortality);
+console.log('Market history entries:', marketHistory.length);
+
+// Example: Build array
+let termSetAside = [];
+for (let year = 0; year < 10; year++) {
+  termSetAside.push(year < 10 ? 240 : 0);
+}
+
+termSetAside`;
+  clearOutput();
+}
+
+// Auto-init
+init();
 </script>
 
 </body>
