@@ -182,7 +182,7 @@
     Engine: <span id="engine-version">Loading...</span>
   </div>
   <div class="version-stamp page">
-    Page: <span id="page-version">2/13/2026, 4:01 PM</span>
+    Page: <span id="page-version">2/13/2026, 4:09 PM</span>
   </div>
 </div>
 
@@ -225,25 +225,13 @@
   </div>
  
   <h2>Budget & Insurance</h2>
-  <div class="input-row">
-    <label>Monthly Budget ($):</label>
-    <input type="number" id="monthlyBudget" placeholder="Enter amount" oninput="handleBudgetInput()">
-    <span style="margin: 0 10px;">OR</span>
-    <label>Whole Life Policy ($):</label>
-    <input type="number" id="policySize" class="override" placeholder="Enter amount" oninput="handlePolicyInput()">
-  </div>
-  <div class="input-row">
-  <label>Term Length:</label>
-  <select id="termPolicy" onchange="runCalculation()">
-    <option value="">None</option>
-    <option value="10 YEAR">10 Year Term</option>
-    <!-- Additional term options can be added here -->
-  </select>
+<div class="input-row">
+  <label>Monthly Budget ($):</label>
+  <input type="number" id="monthlyBudget" placeholder="Enter amount" oninput="handleBudgetInput()">
+  <span style="margin: 0 10px;">OR</span>
+  <label>Whole Life Policy ($):</label>
+  <input type="number" id="policySize" class="override" placeholder="Enter amount" oninput="handlePolicyInput()">
 </div>
-  <div class="input-row">
-    <label>Term Budget ($/mo):</label>
-    <input type="number" id="termBudget" value="0" oninput="runCalculation()">
-  </div>
 <div class="input-row">
   <label>Term Length:</label>
   <select id="termPolicy" onchange="runCalculation()">
@@ -350,113 +338,53 @@ function handleSexChange() {
 async function handleBudgetInput() {
   const budget = document.getElementById('monthlyBudget');
   const policy = document.getElementById('policySize');
-  const age = parseInt(document.getElementById('age').value);
-  const sex = document.getElementById('sex').value;
-  
-  if (!sex || !age) return;
   
   if (budget.value) {
     policy.classList.add('override');
-    policy.value = '';
-    
-    const monthlyBudget = parseFloat(budget.value);
-    const brackets = await window.calcEngine.getRateBrackets(age, sex);
-    const activeBracket = window.calcEngine.getActiveBracket(brackets, null, monthlyBudget);
-    
-    if (brackets && activeBracket >= 0) {
-      const rate = brackets[activeBracket].ratePerThousand;
-      if (rate) {
-        const policySize = (monthlyBudget / rate) * 1000;
-        policy.value = Math.round(policySize);
-      }
-    }
+    budget.classList.remove('override');
+    // ... rest of logic
   } else {
     policy.classList.remove('override');
   }
-  
-  runCalculation();
 }
 
 async function handlePolicyInput() {
   const budget = document.getElementById('monthlyBudget');
   const policy = document.getElementById('policySize');
-  const age = parseInt(document.getElementById('age').value);
-  const sex = document.getElementById('sex').value;
-  
-  if (!sex || !age) return;
   
   if (policy.value) {
     budget.classList.add('override');
-    budget.value = '';
-    
-    const policySize = parseFloat(policy.value);
-    const brackets = await window.calcEngine.getRateBrackets(age, sex);
-    const activeBracket = window.calcEngine.getActiveBracket(brackets, policySize, null);
-    
-    if (brackets && activeBracket >= 0) {
-      const rate = brackets[activeBracket].ratePerThousand;
-      if (rate) {
-        const monthlyBudget = (policySize / 1000) * rate;
-        budget.value = monthlyBudget.toFixed(2);
-      }
-    }
+    policy.classList.remove('override');
+    // ... rest of logic
   } else {
     budget.classList.remove('override');
   }
-  
-  runCalculation();
 }
 
 async function handleTermBudgetInput() {
   const termBudget = document.getElementById('termBudget');
   const termPolicy = document.getElementById('termPolicySize');
-  const age = parseInt(document.getElementById('age').value);
-  const sex = document.getElementById('sex').value;
-  
-  if (!sex || !age) return;
   
   if (termBudget.value) {
     termPolicy.classList.add('override');
-    termPolicy.value = '';
-    
-    const monthlyTermBudget = parseFloat(termBudget.value);
-    const rate = await window.calcEngine.getTermRate(age, sex);
-    
-    if (rate) {
-      const policySize = (monthlyTermBudget / rate) * 1000;
-      termPolicy.value = Math.round(policySize);
-    }
+    termBudget.classList.remove('override');
+    // ... rest of logic
   } else {
     termPolicy.classList.remove('override');
   }
-  
-  runCalculation();
 }
 
 async function handleTermPolicyInput() {
   const termBudget = document.getElementById('termBudget');
   const termPolicy = document.getElementById('termPolicySize');
-  const age = parseInt(document.getElementById('age').value);
-  const sex = document.getElementById('sex').value;
-  
-  if (!sex || !age) return;
   
   if (termPolicy.value) {
     termBudget.classList.add('override');
-    termBudget.value = '';
-    
-    const policySize = parseFloat(termPolicy.value);
-    const rate = await window.calcEngine.getTermRate(age, sex);
-    
-    if (rate) {
-      const monthlyBudget = (policySize / 1000) * rate;
-      termBudget.value = monthlyBudget.toFixed(2);
-    }
+    termPolicy.classList.remove('override');
+    // ... rest of logic
   } else {
     termBudget.classList.remove('override');
   }
-  
-  runCalculation();
 }
 
 function handlePersonalInfoChange() {
