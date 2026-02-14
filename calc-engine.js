@@ -203,6 +203,7 @@ const TERM_ANNUAL_COST = TERM_BUDGET * 12;
   
   // Determine term length (0 if none, 10 if "10 YEAR")
   const termLength = termPolicy === '10 YEAR' ? 10 : 0;
+  console.log('termPolicy:', termPolicy, 'termLength:', termLength, 'termBudget:', termBudget);
 
   for (let year = 0; year <= timeHorizon; year++) {
     arrays.year.push(year);
