@@ -212,7 +212,7 @@ console.table = function(data) {
         return lines;
       }
       
-      const wrappedHeaders = headers.map((h, i) => wrapText(h, colWidths[i] + 2));
+      const wrappedHeaders = headers.map((h, i) => wrapText(h, colWidths[i]));
       const maxHeaderLines = Math.max(...wrappedHeaders.map(h => h.length));
       
       // Build table
