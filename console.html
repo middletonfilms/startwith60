@@ -198,7 +198,7 @@ console.table = function(data) {
         let maxWidth = 0;
         for (let i = dataStartRow; i < data.length; i++) {
           const formatted = formatCell(data[i][colIdx], colIdx);
-          maxWidth = Math.max(maxWidth, formatted.length) + 2;
+          maxWidth = Math.max(maxWidth, formatted.length);
         }
         colWidths.push(maxWidth);
       }
