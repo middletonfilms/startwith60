@@ -182,11 +182,11 @@ console.table = function(data) {
           const cell = row[colIdx];
           let val;
           if (colIdx === 4 || colIdx === 13) {
-            val = typeof cell === 'number' ? cell.toFixed(6) : String(cell);
+            val = typeof cell === 'number' ? cell.toFixed(4) : String(cell);
           } else {
             val = typeof cell === 'number' ? cell.toFixed(2) : String(cell);
           }
-          maxWidth = Math.max(maxWidth, val.length);
+          maxWidth = Math.max(maxWidth, val.length)-1;
         });
         
         colWidths.push(maxWidth + 2); // Add padding
