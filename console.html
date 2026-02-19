@@ -154,11 +154,48 @@ let engineReady = true;
 
 let consoleOutput = [];
 const originalLog = console.log;
+const originalTable = console.table;
+
 console.log = function(...args) {
   originalLog.apply(console, args);
   consoleOutput.push(args.map(arg => 
     typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
   ).join(' '));
+};
+
+console.table = function(data) {
+  originalTable.apply(console, arguments);
+  
+  if (Array.isArray(data)) {
+    // Format array as table
+    let tableStr = '';
+    
+    if (data.length > 0 && Array.isArray(data[0])) {
+      // 2D array
+      tableStr = '┌─────┬' + data[0].map((_, i) => `─────────`).join('┬') + '┐\n';
+      tableStr += '│ idx │ ' + data[0].map((_, i) => `col ${i}   `).join('│ ') + '│\n';
+      tableStr += '├─────┼' + data[0].map(() => `─────────`).join('┼') + '┤\n';
+      
+      data.forEach((row, i) => {
+        tableStr += `│ ${String(i).padEnd(3)} │ `;
+        tableStr += row.map(cell => {
+          const val = typeof cell === 'number' ? cell.toFixed(2) : String(cell);
+          return val.padEnd(7);
+        }).join(' │ ');
+        tableStr += ' │\n';
+      });
+      
+      tableStr += '└─────┴' + data[0].map(() => `─────────`).join('┴') + '┘';
+    } else {
+      // 1D array or array of objects
+      tableStr = JSON.stringify(data, null, 2);
+    }
+    
+    consoleOutput.push(tableStr);
+  } else {
+    // Object
+    consoleOutput.push(JSON.stringify(data, null, 2));
+  }
 };
 
 async function runCode() {
