@@ -176,14 +176,16 @@ console.table = function(data) {
       tableStr += '│ idx │ ' + data[0].map((_, i) => `col ${i}   `).join('│ ') + '│\n';
       tableStr += '├─────┼' + data[0].map(() => `─────────`).join('┼') + '┤\n';
       
-      data.forEach((row, i) => {
-        tableStr += `│ ${String(i).padEnd(3)} │ `;
-        tableStr += row.map(cell => {
-          const val = typeof cell === 'number' ? cell.toFixed(2) : String(cell);
-          return val.padEnd(7);
-        }).join(' │ ');
-        tableStr += ' │\n';
-      });
+      tableStr += row.map((cell, colIdx) => {
+  let val;
+  // Column 4 (inflationValue) and 13 (mortalityLikelihood) need more precision
+  if (colIdx === 4 || colIdx === 13) {
+    val = typeof cell === 'number' ? cell.toFixed(6) : String(cell);
+  } else {
+    val = typeof cell === 'number' ? cell.toFixed(2) : String(cell);
+  }
+  return val.padEnd(11);
+}).join(' │ ');
       
       tableStr += '└─────┴' + data[0].map(() => `─────────`).join('┴') + '┘';
     } else {
