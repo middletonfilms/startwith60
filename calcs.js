@@ -134,5 +134,19 @@ function generateProjectionArrays(inputs) {
   return columns;
 }
 
-
+function calculateBreakEven(projectionArrays, deathBenefit) {
+  for (let year = 0; year < projectionArrays['$accountIfWindowEnded'].length; year++) {
+    const accountValue = projectionArrays['$accountIfWindowEnded'][year];
+    
+    if (accountValue > deathBenefit) {
+      return {
+        year: year,
+        age: projectionArrays.age[year]
+      };
+    }
+  }
+  
+  // If never breaks even
+  return null;
+}
 
