@@ -4,13 +4,13 @@ const mortality = await window.dataLoader.loadExcel('Mortality.xlsx', 'Mortality
 const marketHistory = await window.dataLoader.loadExcel('MarketHistory.xlsx', 'Market');
 
 // Your code here:
-let market_Avg = .104
-let market_AvgMult = 1.104
-let inf_Avg = .0328
-let inf_AvgMult = 1-(inf_Avg/(1+inf_Avg))
-let retireAge_Avg = 65
-let deathAgeM_Avg = 76
-let deathAgeF_Avg = 81
+const market_Avg = .104
+const market_AvgMult = 1.104
+const inf_Avg = .0328
+const inf_AvgMult = 1-(inf_Avg/(1+inf_Avg))
+const retireAge_Avg = 65
+const deathAgeM_Avg = 76
+const deathAgeF_Avg = 81
 
 function formatCurrency(number, decimals = 0) {
   return '$' + number.toLocaleString('en-US', {
@@ -18,3 +18,20 @@ function formatCurrency(number, decimals = 0) {
     maximumFractionDigits: decimals
   });
 }
+function getMortalityArray(age, sex, timeHzn) {
+  const slice = mortality[sex]?.[age];
+  if (!slice) return null;
+  
+  const array = [null]; // Index 0 = null (no value for year 0)
+  
+  for (let year = 1; year <= timeHzn; year++) {
+    array.push(slice[year] || null);
+  }
+  
+  return array;
+}
+
+function inf_Calc(inf) {
+  return 1 - (inf / (1 + inf));
+}
+
