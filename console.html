@@ -170,48 +170,53 @@ console.table = function(data) {
     let tableStr = '';
     
     if (data.length > 0 && Array.isArray(data[0])) {
-      // 2D array - calculate column widths
+      // 2D array
       const numCols = data[0].length;
-      const colWidths = [];
       
-      // Calculate max width for each column
+      // Check if first row contains headers (strings with $)
+      const headers = data[0].map(cell => String(cell));
+      const hasHeaders = headers.some(h => h.includes('$'));
+      const dataStartRow = hasHeaders ? 1 : 0;
+      
+      // Format function
+      function formatCell(value, colIdx) {
+        if (value === null || value === undefined) return 'null';
+        if (typeof value !== 'number') return String(value);
+        
+        // If header has $, always 2 decimals
+        if (hasHeaders && headers[colIdx].includes('$')) {
+          return value.toFixed(2);
+        }
+        
+        // Otherwise max 4 decimals, strip trailing zeros
+        let str = value.toFixed(4);
+        str = str.replace(/\.?0+$/, '');
+        return str;
+      }
+      
+      // Calculate widths
+      const colWidths = [];
       for (let colIdx = 0; colIdx < numCols; colIdx++) {
-        let maxWidth = `col ${colIdx}`.length;
-        
-        data.forEach(row => {
-          const cell = row[colIdx];
-          let val;
-          if (colIdx === 4 || colIdx === 13) {
-            val = typeof cell === 'number' ? cell.toFixed(4) : String(cell);
-          } elif (colIdx === 0 || colIdx === 1) {
-            val = typeof cell === 'number' ? cell.toFixed(0) : String(cell);
-          } else {
-            val = typeof cell === 'number' ? cell.toFixed(2) : String(cell);
-          }
-          maxWidth = Math.max(maxWidth, val.length);
-        });
-        
+        let maxWidth = headers[colIdx].length;
+        for (let i = dataStartRow; i < data.length; i++) {
+          const formatted = formatCell(data[i][colIdx], colIdx);
+          maxWidth = Math.max(maxWidth, formatted.length);
+        }
         colWidths.push(maxWidth);
       }
       
-      // Build table with dynamic widths
+      // Build table
       tableStr = '┌─────┬' + colWidths.map(w => '─'.repeat(w)).join('┬') + '┐\n';
-      tableStr += '│ idx │' + colWidths.map((w, i) => `col ${i}`.padEnd(w)).join('│') + '│\n';
+      tableStr += '│ idx │' + headers.map((h, i) => h.padEnd(colWidths[i])).join('│') + '│\n';
       tableStr += '├─────┼' + colWidths.map(w => '─'.repeat(w)).join('┼') + '┤\n';
       
-      data.forEach((row, i) => {
-        tableStr += `│ ${String(i).padEnd(3)} │`;
-        tableStr += row.map((cell, colIdx) => {
-          let val;
-          if (colIdx === 4 || colIdx === 13) {
-            val = typeof cell === 'number' ? cell.toFixed(6) : String(cell);
-          } else {
-            val = typeof cell === 'number' ? cell.toFixed(2) : String(cell);
-          }
-          return val.padEnd(colWidths[colIdx]);
+      for (let rowIdx = dataStartRow; rowIdx < data.length; rowIdx++) {
+        tableStr += `│ ${String(rowIdx).padEnd(3)} │`;
+        tableStr += data[rowIdx].map((cell, colIdx) => {
+          return formatCell(cell, colIdx).padEnd(colWidths[colIdx]);
         }).join('│');
         tableStr += '│\n';
-      });
+      }
       
       tableStr += '└─────┴' + colWidths.map(w => '─'.repeat(w)).join('┴') + '┘';
     } else {
