@@ -200,7 +200,7 @@ console.table = function(data) {
           const formatted = formatCell(data[i][colIdx], colIdx);
           maxWidth = Math.max(maxWidth, formatted.length);
         }
-        colWidths.push(maxWidth);
+        colWidths.push(maxWidth + 2);
       }
       
       // Wrap headers to column width
@@ -212,7 +212,7 @@ console.table = function(data) {
         return lines;
       }
       
-      const wrappedHeaders = headers.map((h, i) => wrapText(h, colWidths[i]));
+      const wrappedHeaders = headers.map((h, i) => wrapText(h, colWidths[i] + 2));
       const maxHeaderLines = Math.max(...wrappedHeaders.map(h => h.length));
       
       // Build table
