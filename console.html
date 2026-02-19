@@ -182,7 +182,7 @@ console.table = function(data) {
           const cell = row[colIdx];
           let val;
           if (colIdx === 4 || colIdx === 13) {
-            val = typeof cell === 'number' ? cell.toFixed(6) : String(cell);
+            val = typeof cell === 'number' ? cell.toFixed(4) : String(cell);
           } else {
             val = typeof cell === 'number' ? cell.toFixed(2) : String(cell);
           }
