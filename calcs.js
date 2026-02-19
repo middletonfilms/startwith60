@@ -12,6 +12,19 @@ const retireAge_Avg = 65
 const deathAgeM_Avg = 76
 const deathAgeF_Avg = 81
 
+function columnsTo2D(columns) {
+  const keys = Object.keys(columns);
+  const length = columns[keys[0]].length;
+  const array = [keys]; // Header row first!
+  
+  for (let i = 0; i < length; i++) {
+    const row = keys.map(key => columns[key][i]);
+    array.push(row);
+  }
+  
+  return array;
+}
+
 function formatCurrency(number, decimals = 0) {
   return '$' + number.toLocaleString('en-US', {
     minimumFractionDigits: decimals,
@@ -34,4 +47,92 @@ function getMortalityArray(age, sex, timeHzn) {
 function inf_Calc(inf) {
   return 1 - (inf / (1 + inf));
 }
+
+function generateProjectionArrays(inputs) {
+  const {
+    timeHorizon,
+    age,
+    sex,
+    monthlyBudget,
+    termBudget = 0,
+    termLength = 0,
+    marketMult = 1.104,
+    inflationMult = 0.968241673
+  } = inputs;
+  
+  const annualBudget = monthlyBudget * 12;
+  const annualTermCost = termBudget * 12;
+  
+  // Initialize all columns
+  const columns = {
+    year: [],
+    age: [],
+    '$termSetAside': [],
+    '$payInYear': [],
+    inflationValue: [],
+    '$paidInTotal': [],
+    '$payInYearAdjusted': [],
+    '$paidInTotalAdjusted': [],
+    '$marketGainsYear': [],
+    '$marketGainsTotal': [],
+    '$accountIfWindowEnded': [],
+    '$totalInAccount': [],
+    '$totalInAccountAdjusted': [],
+    mortalityLikelihood: []
+  };
+  
+  // Calculate each year
+  for (let year = 0; year <= timeHorizon; year++) {
+    columns.year.push(year);
+    columns.age.push(age + year);
+    
+    const termCost = (year < termLength) ? annualTermCost : 0;
+    columns['$termSetAside'].push(termCost);
+    
+    const payIn = annualBudget - termCost;
+    columns['$payInYear'].push(payIn);
+    
+    const infValue = Math.pow(inflationMult, year);
+    columns.inflationValue.push(infValue);
+    
+    const mort = mortality?.[sex]?.[age]?.[year] || null;
+    
+    if (year === 0) {
+      columns['$paidInTotal'].push(payIn);
+      columns['$payInYearAdjusted'].push(payIn);
+      columns['$paidInTotalAdjusted'].push(payIn);
+      columns['$marketGainsYear'].push(0);
+      columns['$marketGainsTotal'].push(0);
+      columns['$accountIfWindowEnded'].push(payIn);
+      columns['$totalInAccount'].push(payIn);
+      columns['$totalInAccountAdjusted'].push(payIn);
+      columns.mortalityLikelihood.push(null);
+    } else {
+      const prevTotal = columns['$totalInAccount'][year - 1];
+      
+      columns['$paidInTotal'].push(columns['$paidInTotal'][year - 1] + payIn);
+      
+      const adjPayIn = payIn * infValue;
+      columns['$payInYearAdjusted'].push(adjPayIn);
+      columns['$paidInTotalAdjusted'].push(columns['$paidInTotalAdjusted'][year - 1] + adjPayIn);
+      
+      const gains = prevTotal * (marketMult - 1);
+      columns['$marketGainsYear'].push(gains);
+      columns['$marketGainsTotal'].push(columns['$marketGainsTotal'][year - 1] + gains);
+      
+      const windowEnded = prevTotal + gains;
+      columns['$accountIfWindowEnded'].push(windowEnded);
+      
+      const newTotal = prevTotal + gains + payIn;
+      columns['$totalInAccount'].push(newTotal);
+      columns['$totalInAccountAdjusted'].push(newTotal * infValue);
+      
+      columns.mortalityLikelihood.push(mort);
+    }
+  }
+  
+  return columns;
+}
+
+
 
