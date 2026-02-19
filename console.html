@@ -176,12 +176,12 @@ console.table = function(data) {
       tableStr += '├─────┼' + data[0].map(() => `─────────────`).join('┼') + '┤\n';
       
       data.forEach((row, i) => {
-        tableStr += `│ ${String(i).padEnd(3)} │ `;
+        tableStr += `│ ${String(i).padEnd(1)} │ `;
         tableStr += row.map((cell, colIdx) => {
           let val;
           // Column 4 (inflationValue) and 13 (mortalityLikelihood) need more precision
           if (colIdx === 4 || colIdx === 13) {
-            val = typeof cell === 'number' ? cell.toFixed(6) : String(cell);
+            val = typeof cell === 'number' ? cell.toFixed(4) : String(cell);
           } else {
             val = typeof cell === 'number' ? cell.toFixed(2) : String(cell);
           }
