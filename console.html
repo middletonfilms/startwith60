@@ -173,7 +173,7 @@ console.table = function(data) {
       // 2D array
       const numCols = data[0].length;
       
-      // Check if first row contains headers (strings with $)
+      // Check if first row contains headers
       const headers = data[0].map(cell => String(cell));
       const hasHeaders = headers.some(h => h.includes('$'));
       const dataStartRow = hasHeaders ? 1 : 0;
@@ -183,21 +183,19 @@ console.table = function(data) {
         if (value === null || value === undefined) return 'null';
         if (typeof value !== 'number') return String(value);
         
-        // If header has $, always 2 decimals
         if (hasHeaders && headers[colIdx].includes('$')) {
           return value.toFixed(2);
         }
         
-        // Otherwise max 4 decimals, strip trailing zeros
         let str = value.toFixed(4);
         str = str.replace(/\.?0+$/, '');
         return str;
       }
       
-      // Calculate widths
+      // Calculate column widths (based on data, not headers)
       const colWidths = [];
       for (let colIdx = 0; colIdx < numCols; colIdx++) {
-        let maxWidth = headers[colIdx].length;
+        let maxWidth = 0;
         for (let i = dataStartRow; i < data.length; i++) {
           const formatted = formatCell(data[i][colIdx], colIdx);
           maxWidth = Math.max(maxWidth, formatted.length);
@@ -205,13 +203,35 @@ console.table = function(data) {
         colWidths.push(maxWidth);
       }
       
+      // Wrap headers to column width
+      function wrapText(text, width) {
+        const lines = [];
+        for (let i = 0; i < text.length; i += width) {
+          lines.push(text.slice(i, i + width));
+        }
+        return lines;
+      }
+      
+      const wrappedHeaders = headers.map((h, i) => wrapText(h, colWidths[i]));
+      const maxHeaderLines = Math.max(...wrappedHeaders.map(h => h.length));
+      
       // Build table
       tableStr = '┌─────┬' + colWidths.map(w => '─'.repeat(w)).join('┬') + '┐\n';
-      tableStr += '│ idx │' + headers.map((h, i) => h.padEnd(colWidths[i])).join('│') + '│\n';
+      
+      // Multi-line header
+      for (let lineIdx = 0; lineIdx < maxHeaderLines; lineIdx++) {
+        tableStr += '│ idx │';
+        tableStr += wrappedHeaders.map((lines, colIdx) => {
+          const line = lines[lineIdx] || '';
+          return line.padEnd(colWidths[colIdx]);
+        }).join('│');
+        tableStr += '│\n';
+      }
+      
       tableStr += '├─────┼' + colWidths.map(w => '─'.repeat(w)).join('┼') + '┤\n';
       
       for (let rowIdx = dataStartRow; rowIdx < data.length; rowIdx++) {
-        tableStr += `│ ${String(rowIdx).padEnd(3)} │`;
+        tableStr += `│ ${String(rowIdx - dataStartRow).padEnd(3)} │`;
         tableStr += data[rowIdx].map((cell, colIdx) => {
           return formatCell(cell, colIdx).padEnd(colWidths[colIdx]);
         }).join('│');
