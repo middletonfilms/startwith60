@@ -182,23 +182,23 @@ console.table = function(data) {
           const cell = row[colIdx];
           let val;
           if (colIdx === 4 || colIdx === 13) {
-            val = typeof cell === 'number' ? cell.toFixed(4) : String(cell);
+            val = typeof cell === 'number' ? cell.toFixed(6) : String(cell);
           } else {
             val = typeof cell === 'number' ? cell.toFixed(2) : String(cell);
           }
-          maxWidth = Math.max(maxWidth, val.length)-1;
+          maxWidth = Math.max(maxWidth, val.length);
         });
         
-        colWidths.push(maxWidth + 2); // Add padding
+        colWidths.push(maxWidth);
       }
       
       // Build table with dynamic widths
       tableStr = '┌─────┬' + colWidths.map(w => '─'.repeat(w)).join('┬') + '┐\n';
-      tableStr += '│ idx │ ' + colWidths.map((w, i) => `col ${i}`.padEnd(w - 1)).join('│ ') + '│\n';
+      tableStr += '│ idx │' + colWidths.map((w, i) => `col ${i}`.padEnd(w)).join('│') + '│\n';
       tableStr += '├─────┼' + colWidths.map(w => '─'.repeat(w)).join('┼') + '┤\n';
       
       data.forEach((row, i) => {
-        tableStr += `│ ${String(i).padEnd(3)} │ `;
+        tableStr += `│ ${String(i).padEnd(3)} │`;
         tableStr += row.map((cell, colIdx) => {
           let val;
           if (colIdx === 4 || colIdx === 13) {
@@ -206,9 +206,9 @@ console.table = function(data) {
           } else {
             val = typeof cell === 'number' ? cell.toFixed(2) : String(cell);
           }
-          return val.padEnd(colWidths[colIdx] - 1);
-        }).join(' │ ');
-        tableStr += ' │\n';
+          return val.padEnd(colWidths[colIdx]);
+        }).join('│');
+        tableStr += '│\n';
       });
       
       tableStr += '└─────┴' + colWidths.map(w => '─'.repeat(w)).join('┴') + '┘';
