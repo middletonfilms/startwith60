@@ -12,6 +12,8 @@ const retireAge_Avg = 65
 const deathAgeM_Avg = 76
 const deathAgeF_Avg = 81
 
+const round = (num,digits=0) => parseFloat(num.toFixed(digits));
+
 function columnsTo2D(columns) {
   const keys = Object.keys(columns);
   const length = columns[keys[0]].length;
@@ -148,5 +150,28 @@ function calculateBreakEven(projectionArrays, deathBenefit) {
   
   // If never breaks even
   return null;
+}
+
+
+
+function calculateEndingGrowth(cutoffYear, ...additionalYears) {
+  const prevYear = result['$totalInAccount'][cutoffYear - 1];
+  const currentYear = result['$accountIfWindowEnded'][cutoffYear];
+  
+  const results = {
+    day: round(currentYear - (prevYear * Math.pow(marketMult, 364/365)),2),
+    week: round(currentYear - (prevYear * Math.pow(marketMult, 51/52)),2),
+    month: round(currentYear - (prevYear * Math.pow(marketMult, 11/12)),2),
+    year: round(currentYear - prevYear,2)
+  };
+  
+  additionalYears.forEach(years => {
+    const startYear = cutoffYear - years;
+    if (startYear >= 0) {
+      results[`last${years}Years`] = round(currentYear - result['$accountIfWindowEnded'][startYear],2);
+    }
+  });
+  
+  return results;
 }
 
